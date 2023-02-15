@@ -1,0 +1,23 @@
+{
+  "name": "c-slang",
+  "version": "1.0.0",
+  "main": "dist/index",
+  "repository": "git@github.com:CS4215-GN-IY/c-slang.git",
+  "license": "MIT",
+  "dependencies": {
+    "@types/estree": "^1.0.0",
+    "antlr4ts": "^0.5.0-alpha.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
+    "typescript": "^4.9.5"
+  },
+  "bin": {
+    "c-slang": "dist/repl/repl.js"
+  },
+  "scripts": {
+    "antlr4ts": "antlr4ts -visitor ./src/lang/C.g4",
+    "build": "yarn tsc --build --force"
+  }
+}
