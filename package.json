@@ -1,0 +1,13 @@
+{
+  "name": "c-slang",
+  "version": "0.0.0",
+  "description": "JavaScript-based implementation of C, written in TypeScript",
+  "main": "index.js",
+  "repository": "git@github.com:CS4215-GN-IY/c-slang.git",
+  "author": {
+    "name": "CS4215-GN-IY",
+    "url": "https://github.com/CS4215-GN-IY"
+  },
+  "license": "Apache-2.0",
+  "private": false
+}
