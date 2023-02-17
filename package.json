@@ -9,5 +9,8 @@
     "url": "https://github.com/CS4215-GN-IY"
   },
   "license": "Apache-2.0",
-  "private": false
+  "private": false,
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
 }
