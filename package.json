@@ -10,6 +10,19 @@
   },
   "license": "Apache-2.0",
   "private": false,
+  "bin": {
+    "c-slang": "dist/repl/repl.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "eslint": "eslint --ext \".ts,.tsx\" src",
+    "eslint:fix": "eslint --ext \".ts,.tsx\" src --fix",
+    "format": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "format:fix": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "lint": "yarn run format && yarn run eslint",
+    "lint:fix": "yarn run format:fix && yarn run eslint:fix",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "eslint": "^8.0.1",
