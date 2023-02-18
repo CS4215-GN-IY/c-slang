@@ -14,6 +14,7 @@
     "c-slang": "dist/repl/repl.js"
   },
   "scripts": {
+    "antlr4ts": "antlr4ts -visitor ./src/lang/C.g4",
     "build": "tsc --build",
     "eslint": "eslint --ext \".ts,.tsx\" src",
     "eslint:fix": "eslint --ext \".ts,.tsx\" src --fix",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard-with-typescript": "^34.0.0",
@@ -33,5 +35,8 @@
     "eslint-plugin-promise": "^6.0.0",
     "prettier": "2.8.4",
     "typescript": "*"
+  },
+  "dependencies": {
+    "antlr4ts": "^0.5.0-alpha.4"
   }
 }

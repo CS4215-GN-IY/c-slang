@@ -15,5 +15,10 @@ module.exports = {
     sourceType: 'module',
     project: 'tsconfig.json'
   },
-  rules: {}
+  rules: {
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-useless-constructor": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "no-lone-blocks": "off",
+  }
 };
