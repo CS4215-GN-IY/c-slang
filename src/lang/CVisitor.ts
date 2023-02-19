@@ -1,97 +1,95 @@
 // Generated from ./src/lang/C.g4 by ANTLR 4.9.0-SNAPSHOT
 
-import { type ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
+import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 
-import {
-  type PrimaryExpressionContext,
-  type GenericSelectionContext,
-  type GenericAssocListContext,
-  type GenericAssociationContext,
-  type PostfixExpressionContext,
-  type ArgumentExpressionListContext,
-  type UnaryExpressionContext,
-  type UnaryOperatorContext,
-  type CastExpressionContext,
-  type MultiplicativeExpressionContext,
-  type AdditiveExpressionContext,
-  type ShiftExpressionContext,
-  type RelationalExpressionContext,
-  type EqualityExpressionContext,
-  type AndExpressionContext,
-  type ExclusiveOrExpressionContext,
-  type InclusiveOrExpressionContext,
-  type LogicalAndExpressionContext,
-  type LogicalOrExpressionContext,
-  type ConditionalExpressionContext,
-  type AssignmentExpressionContext,
-  type AssignmentOperatorContext,
-  type ExpressionContext,
-  type ConstantExpressionContext,
-  type DeclarationContext,
-  type DeclarationSpecifiersContext,
-  type DeclarationSpecifiers2Context,
-  type DeclarationSpecifierContext,
-  type InitDeclaratorListContext,
-  type InitDeclaratorContext,
-  type StorageClassSpecifierContext,
-  type TypeSpecifierContext,
-  type StructOrUnionSpecifierContext,
-  type StructOrUnionContext,
-  type StructDeclarationListContext,
-  type StructDeclarationContext,
-  type SpecifierQualifierListContext,
-  type StructDeclaratorListContext,
-  type StructDeclaratorContext,
-  type EnumSpecifierContext,
-  type EnumeratorListContext,
-  type EnumeratorContext,
-  type EnumerationConstantContext,
-  type AtomicTypeSpecifierContext,
-  type TypeQualifierContext,
-  type FunctionSpecifierContext,
-  type AlignmentSpecifierContext,
-  type DeclaratorContext,
-  type DirectDeclaratorContext,
-  type VcSpecificModiferContext,
-  type GccDeclaratorExtensionContext,
-  type GccAttributeSpecifierContext,
-  type GccAttributeListContext,
-  type GccAttributeContext,
-  type NestedParenthesesBlockContext,
-  type PointerContext,
-  type TypeQualifierListContext,
-  type ParameterTypeListContext,
-  type ParameterListContext,
-  type ParameterDeclarationContext,
-  type IdentifierListContext,
-  type TypeNameContext,
-  type AbstractDeclaratorContext,
-  type DirectAbstractDeclaratorContext,
-  type TypedefNameContext,
-  type InitializerContext,
-  type InitializerListContext,
-  type DesignationContext,
-  type DesignatorListContext,
-  type DesignatorContext,
-  type StaticAssertDeclarationContext,
-  type StatementContext,
-  type LabeledStatementContext,
-  type CompoundStatementContext,
-  type BlockItemListContext,
-  type BlockItemContext,
-  type ExpressionStatementContext,
-  type SelectionStatementContext,
-  type IterationStatementContext,
-  type ForConditionContext,
-  type ForDeclarationContext,
-  type ForExpressionContext,
-  type JumpStatementContext,
-  type CompilationUnitContext,
-  type TranslationUnitContext,
-  type ExternalDeclarationContext,
-  type FunctionDefinitionContext,
-  type DeclarationListContext
-} from './CParser';
+import { PrimaryExpressionContext } from './CParser';
+import { GenericSelectionContext } from './CParser';
+import { GenericAssocListContext } from './CParser';
+import { GenericAssociationContext } from './CParser';
+import { PostfixExpressionContext } from './CParser';
+import { ArgumentExpressionListContext } from './CParser';
+import { UnaryExpressionContext } from './CParser';
+import { UnaryOperatorContext } from './CParser';
+import { CastExpressionContext } from './CParser';
+import { MultiplicativeExpressionContext } from './CParser';
+import { AdditiveExpressionContext } from './CParser';
+import { ShiftExpressionContext } from './CParser';
+import { RelationalExpressionContext } from './CParser';
+import { EqualityExpressionContext } from './CParser';
+import { AndExpressionContext } from './CParser';
+import { ExclusiveOrExpressionContext } from './CParser';
+import { InclusiveOrExpressionContext } from './CParser';
+import { LogicalAndExpressionContext } from './CParser';
+import { LogicalOrExpressionContext } from './CParser';
+import { ConditionalExpressionContext } from './CParser';
+import { AssignmentExpressionContext } from './CParser';
+import { AssignmentOperatorContext } from './CParser';
+import { ExpressionContext } from './CParser';
+import { ConstantExpressionContext } from './CParser';
+import { DeclarationContext } from './CParser';
+import { DeclarationSpecifiersContext } from './CParser';
+import { DeclarationSpecifiers2Context } from './CParser';
+import { DeclarationSpecifierContext } from './CParser';
+import { InitDeclaratorListContext } from './CParser';
+import { InitDeclaratorContext } from './CParser';
+import { StorageClassSpecifierContext } from './CParser';
+import { TypeSpecifierContext } from './CParser';
+import { StructOrUnionSpecifierContext } from './CParser';
+import { StructOrUnionContext } from './CParser';
+import { StructDeclarationListContext } from './CParser';
+import { StructDeclarationContext } from './CParser';
+import { SpecifierQualifierListContext } from './CParser';
+import { StructDeclaratorListContext } from './CParser';
+import { StructDeclaratorContext } from './CParser';
+import { EnumSpecifierContext } from './CParser';
+import { EnumeratorListContext } from './CParser';
+import { EnumeratorContext } from './CParser';
+import { EnumerationConstantContext } from './CParser';
+import { AtomicTypeSpecifierContext } from './CParser';
+import { TypeQualifierContext } from './CParser';
+import { FunctionSpecifierContext } from './CParser';
+import { AlignmentSpecifierContext } from './CParser';
+import { DeclaratorContext } from './CParser';
+import { DirectDeclaratorContext } from './CParser';
+import { VcSpecificModiferContext } from './CParser';
+import { GccDeclaratorExtensionContext } from './CParser';
+import { GccAttributeSpecifierContext } from './CParser';
+import { GccAttributeListContext } from './CParser';
+import { GccAttributeContext } from './CParser';
+import { NestedParenthesesBlockContext } from './CParser';
+import { PointerContext } from './CParser';
+import { TypeQualifierListContext } from './CParser';
+import { ParameterTypeListContext } from './CParser';
+import { ParameterListContext } from './CParser';
+import { ParameterDeclarationContext } from './CParser';
+import { IdentifierListContext } from './CParser';
+import { TypeNameContext } from './CParser';
+import { AbstractDeclaratorContext } from './CParser';
+import { DirectAbstractDeclaratorContext } from './CParser';
+import { TypedefNameContext } from './CParser';
+import { InitializerContext } from './CParser';
+import { InitializerListContext } from './CParser';
+import { DesignationContext } from './CParser';
+import { DesignatorListContext } from './CParser';
+import { DesignatorContext } from './CParser';
+import { StaticAssertDeclarationContext } from './CParser';
+import { StatementContext } from './CParser';
+import { LabeledStatementContext } from './CParser';
+import { CompoundStatementContext } from './CParser';
+import { BlockItemListContext } from './CParser';
+import { BlockItemContext } from './CParser';
+import { ExpressionStatementContext } from './CParser';
+import { SelectionStatementContext } from './CParser';
+import { IterationStatementContext } from './CParser';
+import { ForConditionContext } from './CParser';
+import { ForDeclarationContext } from './CParser';
+import { ForExpressionContext } from './CParser';
+import { JumpStatementContext } from './CParser';
+import { CompilationUnitContext } from './CParser';
+import { TranslationUnitContext } from './CParser';
+import { ExternalDeclarationContext } from './CParser';
+import { FunctionDefinitionContext } from './CParser';
+import { DeclarationListContext } from './CParser';
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced

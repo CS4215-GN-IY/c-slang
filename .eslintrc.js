@@ -9,16 +9,12 @@ module.exports = {
     // Prettier should always come last so that it overrides other configs.
     'prettier'
   ],
+  ignorePatterns: ["src/lang/"],
   overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
     project: 'tsconfig.json'
   },
-  rules: {
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-useless-constructor": "off",
-    "@typescript-eslint/strict-boolean-expressions": "off",
-    "no-lone-blocks": "off",
-  }
+  rules: {}
 };

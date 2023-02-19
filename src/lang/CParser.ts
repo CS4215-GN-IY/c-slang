@@ -3,26 +3,27 @@
 import { ATN } from 'antlr4ts/atn/ATN';
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
 import { FailedPredicateException } from 'antlr4ts/FailedPredicateException';
-import { NotNull, Override } from 'antlr4ts/Decorators';
+import { NotNull } from 'antlr4ts/Decorators';
 import { NoViableAltException } from 'antlr4ts/NoViableAltException';
+import { Override } from 'antlr4ts/Decorators';
 import { Parser } from 'antlr4ts/Parser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator';
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { RecognitionException } from 'antlr4ts/RecognitionException';
-import { type RuleContext } from 'antlr4ts/RuleContext';
-// import { RuleVersion } from "antlr4ts/RuleVersion";
-import { type TerminalNode } from 'antlr4ts/tree/TerminalNode';
+import { RuleContext } from 'antlr4ts/RuleContext';
+//import { RuleVersion } from "antlr4ts/RuleVersion";
+import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { Token } from 'antlr4ts/Token';
-import { type TokenStream } from 'antlr4ts/TokenStream';
-import { type Vocabulary } from 'antlr4ts/Vocabulary';
+import { TokenStream } from 'antlr4ts/TokenStream';
+import { Vocabulary } from 'antlr4ts/Vocabulary';
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl';
 
 import * as Utils from 'antlr4ts/misc/Utils';
 
-import { type CListener } from './CListener';
-import { type CVisitor } from './CVisitor';
+import { CListener } from './CListener';
+import { CVisitor } from './CVisitor';
 
 export class CParser extends Parser {
   public static readonly T__0 = 1;
@@ -236,6 +237,7 @@ export class CParser extends Parser {
   public static readonly RULE_externalDeclaration = 85;
   public static readonly RULE_functionDefinition = 86;
   public static readonly RULE_declarationList = 87;
+  // tslint:disable:no-trailing-whitespace
   public static readonly ruleNames: string[] = [
     'primaryExpression',
     'genericSelection',
@@ -439,7 +441,6 @@ export class CParser extends Parser {
     "'.'",
     "'...'"
   ];
-
   private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
     undefined,
     undefined,
@@ -566,7 +567,6 @@ export class CParser extends Parser {
     'BlockComment',
     'LineComment'
   ];
-
   public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(
     CParser._LITERAL_NAMES,
     CParser._SYMBOLIC_NAMES,
@@ -578,9 +578,12 @@ export class CParser extends Parser {
   public get vocabulary(): Vocabulary {
     return CParser.VOCABULARY;
   }
+  // tslint:enable:no-trailing-whitespace
 
   // @Override
-  public readonly grammarFileName = 'C.g4';
+  public get grammarFileName(): string {
+    return 'C.g4';
+  }
 
   // @Override
   public get ruleNames(): string[] {
@@ -603,10 +606,9 @@ export class CParser extends Parser {
     super(input);
     this._interp = new ParserATNSimulator(CParser._ATN, this);
   }
-
   // @RuleVersion(0)
   public primaryExpression(): PrimaryExpressionContext {
-    const _localctx: PrimaryExpressionContext = new PrimaryExpressionContext(
+    let _localctx: PrimaryExpressionContext = new PrimaryExpressionContext(
       this._ctx,
       this.state
     );
@@ -743,10 +745,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public genericSelection(): GenericSelectionContext {
-    const _localctx: GenericSelectionContext = new GenericSelectionContext(
+    let _localctx: GenericSelectionContext = new GenericSelectionContext(
       this._ctx,
       this.state
     );
@@ -780,10 +781,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public genericAssocList(): GenericAssocListContext {
-    const _localctx: GenericAssocListContext = new GenericAssocListContext(
+    let _localctx: GenericAssocListContext = new GenericAssocListContext(
       this._ctx,
       this.state
     );
@@ -824,10 +824,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public genericAssociation(): GenericAssociationContext {
-    const _localctx: GenericAssociationContext = new GenericAssociationContext(
+    let _localctx: GenericAssociationContext = new GenericAssociationContext(
       this._ctx,
       this.state
     );
@@ -894,10 +893,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public postfixExpression(): PostfixExpressionContext {
-    const _localctx: PostfixExpressionContext = new PostfixExpressionContext(
+    let _localctx: PostfixExpressionContext = new PostfixExpressionContext(
       this._ctx,
       this.state
     );
@@ -1092,10 +1090,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public argumentExpressionList(): ArgumentExpressionListContext {
-    const _localctx: ArgumentExpressionListContext =
+    let _localctx: ArgumentExpressionListContext =
       new ArgumentExpressionListContext(this._ctx, this.state);
     this.enterRule(_localctx, 10, CParser.RULE_argumentExpressionList);
     let _la: number;
@@ -1134,10 +1131,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public unaryExpression(): UnaryExpressionContext {
-    const _localctx: UnaryExpressionContext = new UnaryExpressionContext(
+    let _localctx: UnaryExpressionContext = new UnaryExpressionContext(
       this._ctx,
       this.state
     );
@@ -1256,10 +1252,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public unaryOperator(): UnaryOperatorContext {
-    const _localctx: UnaryOperatorContext = new UnaryOperatorContext(
+    let _localctx: UnaryOperatorContext = new UnaryOperatorContext(
       this._ctx,
       this.state
     );
@@ -1306,10 +1301,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public castExpression(): CastExpressionContext {
-    const _localctx: CastExpressionContext = new CastExpressionContext(
+    let _localctx: CastExpressionContext = new CastExpressionContext(
       this._ctx,
       this.state
     );
@@ -1372,10 +1366,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public multiplicativeExpression(): MultiplicativeExpressionContext {
-    const _localctx: MultiplicativeExpressionContext =
+    let _localctx: MultiplicativeExpressionContext =
       new MultiplicativeExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 18, CParser.RULE_multiplicativeExpression);
     let _la: number;
@@ -1440,10 +1433,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public additiveExpression(): AdditiveExpressionContext {
-    const _localctx: AdditiveExpressionContext = new AdditiveExpressionContext(
+    let _localctx: AdditiveExpressionContext = new AdditiveExpressionContext(
       this._ctx,
       this.state
     );
@@ -1494,10 +1486,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public shiftExpression(): ShiftExpressionContext {
-    const _localctx: ShiftExpressionContext = new ShiftExpressionContext(
+    let _localctx: ShiftExpressionContext = new ShiftExpressionContext(
       this._ctx,
       this.state
     );
@@ -1548,10 +1539,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public relationalExpression(): RelationalExpressionContext {
-    const _localctx: RelationalExpressionContext =
+    let _localctx: RelationalExpressionContext =
       new RelationalExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 24, CParser.RULE_relationalExpression);
     let _la: number;
@@ -1618,10 +1608,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public equalityExpression(): EqualityExpressionContext {
-    const _localctx: EqualityExpressionContext = new EqualityExpressionContext(
+    let _localctx: EqualityExpressionContext = new EqualityExpressionContext(
       this._ctx,
       this.state
     );
@@ -1672,10 +1661,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public andExpression(): AndExpressionContext {
-    const _localctx: AndExpressionContext = new AndExpressionContext(
+    let _localctx: AndExpressionContext = new AndExpressionContext(
       this._ctx,
       this.state
     );
@@ -1716,10 +1704,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public exclusiveOrExpression(): ExclusiveOrExpressionContext {
-    const _localctx: ExclusiveOrExpressionContext =
+    let _localctx: ExclusiveOrExpressionContext =
       new ExclusiveOrExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 30, CParser.RULE_exclusiveOrExpression);
     let _la: number;
@@ -1758,10 +1745,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public inclusiveOrExpression(): InclusiveOrExpressionContext {
-    const _localctx: InclusiveOrExpressionContext =
+    let _localctx: InclusiveOrExpressionContext =
       new InclusiveOrExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 32, CParser.RULE_inclusiveOrExpression);
     let _la: number;
@@ -1800,10 +1786,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public logicalAndExpression(): LogicalAndExpressionContext {
-    const _localctx: LogicalAndExpressionContext =
+    let _localctx: LogicalAndExpressionContext =
       new LogicalAndExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 34, CParser.RULE_logicalAndExpression);
     let _la: number;
@@ -1842,11 +1827,12 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public logicalOrExpression(): LogicalOrExpressionContext {
-    const _localctx: LogicalOrExpressionContext =
-      new LogicalOrExpressionContext(this._ctx, this.state);
+    let _localctx: LogicalOrExpressionContext = new LogicalOrExpressionContext(
+      this._ctx,
+      this.state
+    );
     this.enterRule(_localctx, 36, CParser.RULE_logicalOrExpression);
     let _la: number;
     try {
@@ -1884,10 +1870,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public conditionalExpression(): ConditionalExpressionContext {
-    const _localctx: ConditionalExpressionContext =
+    let _localctx: ConditionalExpressionContext =
       new ConditionalExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 38, CParser.RULE_conditionalExpression);
     let _la: number;
@@ -1925,10 +1910,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public assignmentExpression(): AssignmentExpressionContext {
-    const _localctx: AssignmentExpressionContext =
+    let _localctx: AssignmentExpressionContext =
       new AssignmentExpressionContext(this._ctx, this.state);
     this.enterRule(_localctx, 40, CParser.RULE_assignmentExpression);
     try {
@@ -1976,10 +1960,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public assignmentOperator(): AssignmentOperatorContext {
-    const _localctx: AssignmentOperatorContext = new AssignmentOperatorContext(
+    let _localctx: AssignmentOperatorContext = new AssignmentOperatorContext(
       this._ctx,
       this.state
     );
@@ -2031,10 +2014,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public expression(): ExpressionContext {
-    const _localctx: ExpressionContext = new ExpressionContext(
+    let _localctx: ExpressionContext = new ExpressionContext(
       this._ctx,
       this.state
     );
@@ -2075,10 +2057,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public constantExpression(): ConstantExpressionContext {
-    const _localctx: ConstantExpressionContext = new ConstantExpressionContext(
+    let _localctx: ConstantExpressionContext = new ConstantExpressionContext(
       this._ctx,
       this.state
     );
@@ -2102,10 +2083,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declaration(): DeclarationContext {
-    const _localctx: DeclarationContext = new DeclarationContext(
+    let _localctx: DeclarationContext = new DeclarationContext(
       this._ctx,
       this.state
     );
@@ -2210,10 +2190,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declarationSpecifiers(): DeclarationSpecifiersContext {
-    const _localctx: DeclarationSpecifiersContext =
+    let _localctx: DeclarationSpecifiersContext =
       new DeclarationSpecifiersContext(this._ctx, this.state);
     this.enterRule(_localctx, 50, CParser.RULE_declarationSpecifiers);
     try {
@@ -2254,10 +2233,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declarationSpecifiers2(): DeclarationSpecifiers2Context {
-    const _localctx: DeclarationSpecifiers2Context =
+    let _localctx: DeclarationSpecifiers2Context =
       new DeclarationSpecifiers2Context(this._ctx, this.state);
     this.enterRule(_localctx, 52, CParser.RULE_declarationSpecifiers2);
     let _la: number;
@@ -2336,10 +2314,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declarationSpecifier(): DeclarationSpecifierContext {
-    const _localctx: DeclarationSpecifierContext =
+    let _localctx: DeclarationSpecifierContext =
       new DeclarationSpecifierContext(this._ctx, this.state);
     this.enterRule(_localctx, 54, CParser.RULE_declarationSpecifier);
     try {
@@ -2399,10 +2376,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public initDeclaratorList(): InitDeclaratorListContext {
-    const _localctx: InitDeclaratorListContext = new InitDeclaratorListContext(
+    let _localctx: InitDeclaratorListContext = new InitDeclaratorListContext(
       this._ctx,
       this.state
     );
@@ -2443,10 +2419,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public initDeclarator(): InitDeclaratorContext {
-    const _localctx: InitDeclaratorContext = new InitDeclaratorContext(
+    let _localctx: InitDeclaratorContext = new InitDeclaratorContext(
       this._ctx,
       this.state
     );
@@ -2482,10 +2457,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public storageClassSpecifier(): StorageClassSpecifierContext {
-    const _localctx: StorageClassSpecifierContext =
+    let _localctx: StorageClassSpecifierContext =
       new StorageClassSpecifierContext(this._ctx, this.state);
     this.enterRule(_localctx, 60, CParser.RULE_storageClassSpecifier);
     let _la: number;
@@ -2530,10 +2504,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public typeSpecifier(): TypeSpecifierContext {
-    const _localctx: TypeSpecifierContext = new TypeSpecifierContext(
+    let _localctx: TypeSpecifierContext = new TypeSpecifierContext(
       this._ctx,
       this.state
     );
@@ -2686,10 +2659,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structOrUnionSpecifier(): StructOrUnionSpecifierContext {
-    const _localctx: StructOrUnionSpecifierContext =
+    let _localctx: StructOrUnionSpecifierContext =
       new StructOrUnionSpecifierContext(this._ctx, this.state);
     this.enterRule(_localctx, 64, CParser.RULE_structOrUnionSpecifier);
     let _la: number;
@@ -2744,10 +2716,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structOrUnion(): StructOrUnionContext {
-    const _localctx: StructOrUnionContext = new StructOrUnionContext(
+    let _localctx: StructOrUnionContext = new StructOrUnionContext(
       this._ctx,
       this.state
     );
@@ -2782,10 +2753,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structDeclarationList(): StructDeclarationListContext {
-    const _localctx: StructDeclarationListContext =
+    let _localctx: StructDeclarationListContext =
       new StructDeclarationListContext(this._ctx, this.state);
     this.enterRule(_localctx, 68, CParser.RULE_structDeclarationList);
     let _la: number;
@@ -2852,10 +2822,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structDeclaration(): StructDeclarationContext {
-    const _localctx: StructDeclarationContext = new StructDeclarationContext(
+    let _localctx: StructDeclarationContext = new StructDeclarationContext(
       this._ctx,
       this.state
     );
@@ -2907,10 +2876,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public specifierQualifierList(): SpecifierQualifierListContext {
-    const _localctx: SpecifierQualifierListContext =
+    let _localctx: SpecifierQualifierListContext =
       new SpecifierQualifierListContext(this._ctx, this.state);
     this.enterRule(_localctx, 72, CParser.RULE_specifierQualifierList);
     try {
@@ -2957,10 +2925,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structDeclaratorList(): StructDeclaratorListContext {
-    const _localctx: StructDeclaratorListContext =
+    let _localctx: StructDeclaratorListContext =
       new StructDeclaratorListContext(this._ctx, this.state);
     this.enterRule(_localctx, 74, CParser.RULE_structDeclaratorList);
     let _la: number;
@@ -2999,10 +2966,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public structDeclarator(): StructDeclaratorContext {
-    const _localctx: StructDeclaratorContext = new StructDeclaratorContext(
+    let _localctx: StructDeclaratorContext = new StructDeclaratorContext(
       this._ctx,
       this.state
     );
@@ -3070,10 +3036,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public enumSpecifier(): EnumSpecifierContext {
-    const _localctx: EnumSpecifierContext = new EnumSpecifierContext(
+    let _localctx: EnumSpecifierContext = new EnumSpecifierContext(
       this._ctx,
       this.state
     );
@@ -3140,10 +3105,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public enumeratorList(): EnumeratorListContext {
-    const _localctx: EnumeratorListContext = new EnumeratorListContext(
+    let _localctx: EnumeratorListContext = new EnumeratorListContext(
       this._ctx,
       this.state
     );
@@ -3186,10 +3150,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public enumerator(): EnumeratorContext {
-    const _localctx: EnumeratorContext = new EnumeratorContext(
+    let _localctx: EnumeratorContext = new EnumeratorContext(
       this._ctx,
       this.state
     );
@@ -3225,11 +3188,12 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public enumerationConstant(): EnumerationConstantContext {
-    const _localctx: EnumerationConstantContext =
-      new EnumerationConstantContext(this._ctx, this.state);
+    let _localctx: EnumerationConstantContext = new EnumerationConstantContext(
+      this._ctx,
+      this.state
+    );
     this.enterRule(_localctx, 84, CParser.RULE_enumerationConstant);
     try {
       this.enterOuterAlt(_localctx, 1);
@@ -3250,11 +3214,12 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public atomicTypeSpecifier(): AtomicTypeSpecifierContext {
-    const _localctx: AtomicTypeSpecifierContext =
-      new AtomicTypeSpecifierContext(this._ctx, this.state);
+    let _localctx: AtomicTypeSpecifierContext = new AtomicTypeSpecifierContext(
+      this._ctx,
+      this.state
+    );
     this.enterRule(_localctx, 86, CParser.RULE_atomicTypeSpecifier);
     try {
       this.enterOuterAlt(_localctx, 1);
@@ -3281,10 +3246,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public typeQualifier(): TypeQualifierContext {
-    const _localctx: TypeQualifierContext = new TypeQualifierContext(
+    let _localctx: TypeQualifierContext = new TypeQualifierContext(
       this._ctx,
       this.state
     );
@@ -3329,10 +3293,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public functionSpecifier(): FunctionSpecifierContext {
-    const _localctx: FunctionSpecifierContext = new FunctionSpecifierContext(
+    let _localctx: FunctionSpecifierContext = new FunctionSpecifierContext(
       this._ctx,
       this.state
     );
@@ -3405,10 +3368,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public alignmentSpecifier(): AlignmentSpecifierContext {
-    const _localctx: AlignmentSpecifierContext = new AlignmentSpecifierContext(
+    let _localctx: AlignmentSpecifierContext = new AlignmentSpecifierContext(
       this._ctx,
       this.state
     );
@@ -3453,10 +3415,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declarator(): DeclaratorContext {
-    const _localctx: DeclaratorContext = new DeclaratorContext(
+    let _localctx: DeclaratorContext = new DeclaratorContext(
       this._ctx,
       this.state
     );
@@ -3517,14 +3478,14 @@ export class CParser extends Parser {
       _p = 0;
     }
 
-    const _parentctx: ParserRuleContext = this._ctx;
-    const _parentState: number = this.state;
+    let _parentctx: ParserRuleContext = this._ctx;
+    let _parentState: number = this.state;
     let _localctx: DirectDeclaratorContext = new DirectDeclaratorContext(
       this._ctx,
       _parentState
     );
     let _prevctx: DirectDeclaratorContext = _localctx;
-    const _startState: number = 96;
+    let _startState: number = 96;
     this.enterRecursionRule(_localctx, 96, CParser.RULE_directDeclarator, _p);
     let _la: number;
     try {
@@ -3886,10 +3847,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public vcSpecificModifer(): VcSpecificModiferContext {
-    const _localctx: VcSpecificModiferContext = new VcSpecificModiferContext(
+    let _localctx: VcSpecificModiferContext = new VcSpecificModiferContext(
       this._ctx,
       this.state
     );
@@ -3936,10 +3896,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public gccDeclaratorExtension(): GccDeclaratorExtensionContext {
-    const _localctx: GccDeclaratorExtensionContext =
+    let _localctx: GccDeclaratorExtensionContext =
       new GccDeclaratorExtensionContext(this._ctx, this.state);
     this.enterRule(_localctx, 100, CParser.RULE_gccDeclaratorExtension);
     let _la: number;
@@ -3995,10 +3954,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public gccAttributeSpecifier(): GccAttributeSpecifierContext {
-    const _localctx: GccAttributeSpecifierContext =
+    let _localctx: GccAttributeSpecifierContext =
       new GccAttributeSpecifierContext(this._ctx, this.state);
     this.enterRule(_localctx, 102, CParser.RULE_gccAttributeSpecifier);
     try {
@@ -4030,10 +3988,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public gccAttributeList(): GccAttributeListContext {
-    const _localctx: GccAttributeListContext = new GccAttributeListContext(
+    let _localctx: GccAttributeListContext = new GccAttributeListContext(
       this._ctx,
       this.state
     );
@@ -4355,10 +4312,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public gccAttribute(): GccAttributeContext {
-    const _localctx: GccAttributeContext = new GccAttributeContext(
+    let _localctx: GccAttributeContext = new GccAttributeContext(
       this._ctx,
       this.state
     );
@@ -4455,10 +4411,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public nestedParenthesesBlock(): NestedParenthesesBlockContext {
-    const _localctx: NestedParenthesesBlockContext =
+    let _localctx: NestedParenthesesBlockContext =
       new NestedParenthesesBlockContext(this._ctx, this.state);
     this.enterRule(_localctx, 108, CParser.RULE_nestedParenthesesBlock);
     let _la: number;
@@ -4780,10 +4735,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public pointer(): PointerContext {
-    const _localctx: PointerContext = new PointerContext(this._ctx, this.state);
+    let _localctx: PointerContext = new PointerContext(this._ctx, this.state);
     this.enterRule(_localctx, 110, CParser.RULE_pointer);
     let _la: number;
     try {
@@ -4844,10 +4798,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public typeQualifierList(): TypeQualifierListContext {
-    const _localctx: TypeQualifierListContext = new TypeQualifierListContext(
+    let _localctx: TypeQualifierListContext = new TypeQualifierListContext(
       this._ctx,
       this.state
     );
@@ -4892,10 +4845,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public parameterTypeList(): ParameterTypeListContext {
-    const _localctx: ParameterTypeListContext = new ParameterTypeListContext(
+    let _localctx: ParameterTypeListContext = new ParameterTypeListContext(
       this._ctx,
       this.state
     );
@@ -4931,10 +4883,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public parameterList(): ParameterListContext {
-    const _localctx: ParameterListContext = new ParameterListContext(
+    let _localctx: ParameterListContext = new ParameterListContext(
       this._ctx,
       this.state
     );
@@ -4977,10 +4928,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public parameterDeclaration(): ParameterDeclarationContext {
-    const _localctx: ParameterDeclarationContext =
+    let _localctx: ParameterDeclarationContext =
       new ParameterDeclarationContext(this._ctx, this.state);
     this.enterRule(_localctx, 118, CParser.RULE_parameterDeclaration);
     let _la: number;
@@ -5036,10 +4986,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public identifierList(): IdentifierListContext {
-    const _localctx: IdentifierListContext = new IdentifierListContext(
+    let _localctx: IdentifierListContext = new IdentifierListContext(
       this._ctx,
       this.state
     );
@@ -5080,13 +5029,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public typeName(): TypeNameContext {
-    const _localctx: TypeNameContext = new TypeNameContext(
-      this._ctx,
-      this.state
-    );
+    let _localctx: TypeNameContext = new TypeNameContext(this._ctx, this.state);
     this.enterRule(_localctx, 122, CParser.RULE_typeName);
     let _la: number;
     try {
@@ -5125,10 +5070,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public abstractDeclarator(): AbstractDeclaratorContext {
-    const _localctx: AbstractDeclaratorContext = new AbstractDeclaratorContext(
+    let _localctx: AbstractDeclaratorContext = new AbstractDeclaratorContext(
       this._ctx,
       this.state
     );
@@ -5202,12 +5146,12 @@ export class CParser extends Parser {
       _p = 0;
     }
 
-    const _parentctx: ParserRuleContext = this._ctx;
-    const _parentState: number = this.state;
+    let _parentctx: ParserRuleContext = this._ctx;
+    let _parentState: number = this.state;
     let _localctx: DirectAbstractDeclaratorContext =
       new DirectAbstractDeclaratorContext(this._ctx, _parentState);
     let _prevctx: DirectAbstractDeclaratorContext = _localctx;
-    const _startState: number = 126;
+    let _startState: number = 126;
     this.enterRecursionRule(
       _localctx,
       126,
@@ -5796,10 +5740,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public typedefName(): TypedefNameContext {
-    const _localctx: TypedefNameContext = new TypedefNameContext(
+    let _localctx: TypedefNameContext = new TypedefNameContext(
       this._ctx,
       this.state
     );
@@ -5823,10 +5766,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public initializer(): InitializerContext {
-    const _localctx: InitializerContext = new InitializerContext(
+    let _localctx: InitializerContext = new InitializerContext(
       this._ctx,
       this.state
     );
@@ -5899,10 +5841,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public initializerList(): InitializerListContext {
-    const _localctx: InitializerListContext = new InitializerListContext(
+    let _localctx: InitializerListContext = new InitializerListContext(
       this._ctx,
       this.state
     );
@@ -5966,10 +5907,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public designation(): DesignationContext {
-    const _localctx: DesignationContext = new DesignationContext(
+    let _localctx: DesignationContext = new DesignationContext(
       this._ctx,
       this.state
     );
@@ -5995,10 +5935,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public designatorList(): DesignatorListContext {
-    const _localctx: DesignatorListContext = new DesignatorListContext(
+    let _localctx: DesignatorListContext = new DesignatorListContext(
       this._ctx,
       this.state
     );
@@ -6035,10 +5974,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public designator(): DesignatorContext {
-    const _localctx: DesignatorContext = new DesignatorContext(
+    let _localctx: DesignatorContext = new DesignatorContext(
       this._ctx,
       this.state
     );
@@ -6083,10 +6021,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public staticAssertDeclaration(): StaticAssertDeclarationContext {
-    const _localctx: StaticAssertDeclarationContext =
+    let _localctx: StaticAssertDeclarationContext =
       new StaticAssertDeclarationContext(this._ctx, this.state);
     this.enterRule(_localctx, 140, CParser.RULE_staticAssertDeclaration);
     let _la: number;
@@ -6133,10 +6070,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public statement(): StatementContext {
-    const _localctx: StatementContext = new StatementContext(
+    let _localctx: StatementContext = new StatementContext(
       this._ctx,
       this.state
     );
@@ -6374,10 +6310,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public labeledStatement(): LabeledStatementContext {
-    const _localctx: LabeledStatementContext = new LabeledStatementContext(
+    let _localctx: LabeledStatementContext = new LabeledStatementContext(
       this._ctx,
       this.state
     );
@@ -6437,10 +6372,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public compoundStatement(): CompoundStatementContext {
-    const _localctx: CompoundStatementContext = new CompoundStatementContext(
+    let _localctx: CompoundStatementContext = new CompoundStatementContext(
       this._ctx,
       this.state
     );
@@ -6561,10 +6495,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public blockItemList(): BlockItemListContext {
-    const _localctx: BlockItemListContext = new BlockItemListContext(
+    let _localctx: BlockItemListContext = new BlockItemListContext(
       this._ctx,
       this.state
     );
@@ -6685,10 +6618,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public blockItem(): BlockItemContext {
-    const _localctx: BlockItemContext = new BlockItemContext(
+    let _localctx: BlockItemContext = new BlockItemContext(
       this._ctx,
       this.state
     );
@@ -6726,11 +6658,12 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public expressionStatement(): ExpressionStatementContext {
-    const _localctx: ExpressionStatementContext =
-      new ExpressionStatementContext(this._ctx, this.state);
+    let _localctx: ExpressionStatementContext = new ExpressionStatementContext(
+      this._ctx,
+      this.state
+    );
     this.enterRule(_localctx, 152, CParser.RULE_expressionStatement);
     let _la: number;
     try {
@@ -6795,10 +6728,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public selectionStatement(): SelectionStatementContext {
-    const _localctx: SelectionStatementContext = new SelectionStatementContext(
+    let _localctx: SelectionStatementContext = new SelectionStatementContext(
       this._ctx,
       this.state
     );
@@ -6867,10 +6799,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public iterationStatement(): IterationStatementContext {
-    const _localctx: IterationStatementContext = new IterationStatementContext(
+    let _localctx: IterationStatementContext = new IterationStatementContext(
       this._ctx,
       this.state
     );
@@ -6944,10 +6875,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public forCondition(): ForConditionContext {
-    const _localctx: ForConditionContext = new ForConditionContext(
+    let _localctx: ForConditionContext = new ForConditionContext(
       this._ctx,
       this.state
     );
@@ -7116,10 +7046,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public forDeclaration(): ForDeclarationContext {
-    const _localctx: ForDeclarationContext = new ForDeclarationContext(
+    let _localctx: ForDeclarationContext = new ForDeclarationContext(
       this._ctx,
       this.state
     );
@@ -7170,10 +7099,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public forExpression(): ForExpressionContext {
-    const _localctx: ForExpressionContext = new ForExpressionContext(
+    let _localctx: ForExpressionContext = new ForExpressionContext(
       this._ctx,
       this.state
     );
@@ -7214,10 +7142,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public jumpStatement(): JumpStatementContext {
-    const _localctx: JumpStatementContext = new JumpStatementContext(
+    let _localctx: JumpStatementContext = new JumpStatementContext(
       this._ctx,
       this.state
     );
@@ -7329,10 +7256,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public compilationUnit(): CompilationUnitContext {
-    const _localctx: CompilationUnitContext = new CompilationUnitContext(
+    let _localctx: CompilationUnitContext = new CompilationUnitContext(
       this._ctx,
       this.state
     );
@@ -7424,10 +7350,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public translationUnit(): TranslationUnitContext {
-    const _localctx: TranslationUnitContext = new TranslationUnitContext(
+    let _localctx: TranslationUnitContext = new TranslationUnitContext(
       this._ctx,
       this.state
     );
@@ -7521,11 +7446,12 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public externalDeclaration(): ExternalDeclarationContext {
-    const _localctx: ExternalDeclarationContext =
-      new ExternalDeclarationContext(this._ctx, this.state);
+    let _localctx: ExternalDeclarationContext = new ExternalDeclarationContext(
+      this._ctx,
+      this.state
+    );
     this.enterRule(_localctx, 170, CParser.RULE_externalDeclaration);
     try {
       this.state = 1076;
@@ -7568,10 +7494,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public functionDefinition(): FunctionDefinitionContext {
-    const _localctx: FunctionDefinitionContext = new FunctionDefinitionContext(
+    let _localctx: FunctionDefinitionContext = new FunctionDefinitionContext(
       this._ctx,
       this.state
     );
@@ -7663,10 +7588,9 @@ export class CParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public declarationList(): DeclarationListContext {
-    const _localctx: DeclarationListContext = new DeclarationListContext(
+    let _localctx: DeclarationListContext = new DeclarationListContext(
       this._ctx,
       this.state
     );
@@ -7769,7 +7693,6 @@ export class CParser extends Parser {
     }
     return true;
   }
-
   private directDeclarator_sempred(
     _localctx: DirectDeclaratorContext,
     predIndex: number
@@ -7795,7 +7718,6 @@ export class CParser extends Parser {
     }
     return true;
   }
-
   private directAbstractDeclarator_sempred(
     _localctx: DirectAbstractDeclaratorContext,
     predIndex: number
@@ -8067,7 +7989,6 @@ export class CParser extends Parser {
     '\u01A4\u01A5\x03\x02\x02\x02\u01A5\u01A6\x07^\x02\x02\u01A6\u01A9\x03' +
     '\x02\x02\x02\u01A7\u01A9\x05\x8EH\x02\u01A8\u01A1\x03\x02\x02\x02\u01A8' +
     '\u01A7\x03\x02\x02\x02\u01A93\x03\x02\x02\x02\u01AA\u01AC\x058';
-
   private static readonly _serializedATNSegment1: string =
     '\x1D\x02\u01AB\u01AA\x03\x02\x02\x02\u01AC\u01AD\x03\x02\x02\x02\u01AD' +
     '\u01AB\x03\x02\x02\x02\u01AD\u01AE\x03\x02\x02\x02\u01AE5\x03\x02\x02' +
@@ -8378,12 +8299,10 @@ export class CParser extends Parser {
     '\u0374\u037D\u0385\u038E\u03A1\u03A4\u03AC\u03AF\u03B3\u03B8\u03C5\u03C9' +
     '\u03D0\u03D4\u03D7\u03E2\u03EA\u0400\u0404\u0406\u040A\u040E\u0412\u0419' +
     '\u0421\u0425\u042A\u0431\u0436\u0439\u043D\u0444';
-
   public static readonly _serializedATN: string = Utils.join(
     [CParser._serializedATNSegment0, CParser._serializedATNSegment1],
     ''
   );
-
   public static __ATN: ATN;
   public static get _ATN(): ATN {
     if (!CParser.__ATN) {
@@ -8400,11 +8319,9 @@ export class PrimaryExpressionContext extends ParserRuleContext {
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public Constant(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Constant, 0);
   }
-
   public StringLiteral(): TerminalNode[];
   public StringLiteral(i: number): TerminalNode;
   public StringLiteral(i?: number): TerminalNode | TerminalNode[] {
@@ -8414,65 +8331,52 @@ export class PrimaryExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.StringLiteral, i);
     }
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public genericSelection(): GenericSelectionContext | undefined {
     return this.tryGetRuleContext(0, GenericSelectionContext);
   }
-
   public compoundStatement(): CompoundStatementContext | undefined {
     return this.tryGetRuleContext(0, CompoundStatementContext);
   }
-
   public unaryExpression(): UnaryExpressionContext | undefined {
     return this.tryGetRuleContext(0, UnaryExpressionContext);
   }
-
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_primaryExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterPrimaryExpression != null) {
+    if (listener.enterPrimaryExpression) {
       listener.enterPrimaryExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitPrimaryExpression != null) {
+    if (listener.exitPrimaryExpression) {
       listener.exitPrimaryExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitPrimaryExpression != null) {
+    if (visitor.visitPrimaryExpression) {
       return visitor.visitPrimaryExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -8484,53 +8388,43 @@ export class GenericSelectionContext extends ParserRuleContext {
   public Generic(): TerminalNode {
     return this.getToken(CParser.Generic, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public assignmentExpression(): AssignmentExpressionContext {
     return this.getRuleContext(0, AssignmentExpressionContext);
   }
-
   public Comma(): TerminalNode {
     return this.getToken(CParser.Comma, 0);
   }
-
   public genericAssocList(): GenericAssocListContext {
     return this.getRuleContext(0, GenericAssocListContext);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_genericSelection;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGenericSelection != null) {
+    if (listener.enterGenericSelection) {
       listener.enterGenericSelection(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGenericSelection != null) {
+    if (listener.exitGenericSelection) {
       listener.exitGenericSelection(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGenericSelection != null) {
+    if (visitor.visitGenericSelection) {
       return visitor.visitGenericSelection(this);
     } else {
       return visitor.visitChildren(this);
@@ -8550,7 +8444,6 @@ export class GenericAssocListContext extends ParserRuleContext {
       return this.getRuleContext(i, GenericAssociationContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -8560,33 +8453,28 @@ export class GenericAssocListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_genericAssocList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGenericAssocList != null) {
+    if (listener.enterGenericAssocList) {
       listener.enterGenericAssocList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGenericAssocList != null) {
+    if (listener.exitGenericAssocList) {
       listener.exitGenericAssocList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGenericAssocList != null) {
+    if (visitor.visitGenericAssocList) {
       return visitor.visitGenericAssocList(this);
     } else {
       return visitor.visitChildren(this);
@@ -8598,45 +8486,37 @@ export class GenericAssociationContext extends ParserRuleContext {
   public Colon(): TerminalNode {
     return this.getToken(CParser.Colon, 0);
   }
-
   public assignmentExpression(): AssignmentExpressionContext {
     return this.getRuleContext(0, AssignmentExpressionContext);
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   public Default(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Default, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_genericAssociation;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGenericAssociation != null) {
+    if (listener.enterGenericAssociation) {
       listener.enterGenericAssociation(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGenericAssociation != null) {
+    if (listener.exitGenericAssociation) {
       listener.exitGenericAssociation(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGenericAssociation != null) {
+    if (visitor.visitGenericAssociation) {
       return visitor.visitGenericAssociation(this);
     } else {
       return visitor.visitChildren(this);
@@ -8648,7 +8528,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
   public primaryExpression(): PrimaryExpressionContext | undefined {
     return this.tryGetRuleContext(0, PrimaryExpressionContext);
   }
-
   public LeftParen(): TerminalNode[];
   public LeftParen(i: number): TerminalNode;
   public LeftParen(i?: number): TerminalNode | TerminalNode[] {
@@ -8658,11 +8537,9 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.LeftParen, i);
     }
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   public RightParen(): TerminalNode[];
   public RightParen(i: number): TerminalNode;
   public RightParen(i?: number): TerminalNode | TerminalNode[] {
@@ -8672,19 +8549,15 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.RightParen, i);
     }
   }
-
   public LeftBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBrace, 0);
   }
-
   public initializerList(): InitializerListContext | undefined {
     return this.tryGetRuleContext(0, InitializerListContext);
   }
-
   public RightBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBrace, 0);
   }
-
   public LeftBracket(): TerminalNode[];
   public LeftBracket(i: number): TerminalNode;
   public LeftBracket(i?: number): TerminalNode | TerminalNode[] {
@@ -8694,7 +8567,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.LeftBracket, i);
     }
   }
-
   public expression(): ExpressionContext[];
   public expression(i: number): ExpressionContext;
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
@@ -8704,7 +8576,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
   public RightBracket(): TerminalNode[];
   public RightBracket(i: number): TerminalNode;
   public RightBracket(i?: number): TerminalNode | TerminalNode[] {
@@ -8714,7 +8585,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.RightBracket, i);
     }
   }
-
   public Identifier(): TerminalNode[];
   public Identifier(i: number): TerminalNode;
   public Identifier(i?: number): TerminalNode | TerminalNode[] {
@@ -8724,7 +8594,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Identifier, i);
     }
   }
-
   public Dot(): TerminalNode[];
   public Dot(i: number): TerminalNode;
   public Dot(i?: number): TerminalNode | TerminalNode[] {
@@ -8734,7 +8603,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Dot, i);
     }
   }
-
   public Arrow(): TerminalNode[];
   public Arrow(i: number): TerminalNode;
   public Arrow(i?: number): TerminalNode | TerminalNode[] {
@@ -8744,7 +8612,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Arrow, i);
     }
   }
-
   public PlusPlus(): TerminalNode[];
   public PlusPlus(i: number): TerminalNode;
   public PlusPlus(i?: number): TerminalNode | TerminalNode[] {
@@ -8754,7 +8621,6 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.PlusPlus, i);
     }
   }
-
   public MinusMinus(): TerminalNode[];
   public MinusMinus(i: number): TerminalNode;
   public MinusMinus(i?: number): TerminalNode | TerminalNode[] {
@@ -8764,11 +8630,9 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.MinusMinus, i);
     }
   }
-
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   public argumentExpressionList(): ArgumentExpressionListContext[];
   public argumentExpressionList(i: number): ArgumentExpressionListContext;
   public argumentExpressionList(
@@ -8780,33 +8644,28 @@ export class PostfixExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, ArgumentExpressionListContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_postfixExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterPostfixExpression != null) {
+    if (listener.enterPostfixExpression) {
       listener.enterPostfixExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitPostfixExpression != null) {
+    if (listener.exitPostfixExpression) {
       listener.exitPostfixExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitPostfixExpression != null) {
+    if (visitor.visitPostfixExpression) {
       return visitor.visitPostfixExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -8826,7 +8685,6 @@ export class ArgumentExpressionListContext extends ParserRuleContext {
       return this.getRuleContext(i, AssignmentExpressionContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -8836,33 +8694,28 @@ export class ArgumentExpressionListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_argumentExpressionList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterArgumentExpressionList != null) {
+    if (listener.enterArgumentExpressionList) {
       listener.enterArgumentExpressionList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitArgumentExpressionList != null) {
+    if (listener.exitArgumentExpressionList) {
       listener.exitArgumentExpressionList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitArgumentExpressionList != null) {
+    if (visitor.visitArgumentExpressionList) {
       return visitor.visitArgumentExpressionList(this);
     } else {
       return visitor.visitChildren(this);
@@ -8874,35 +8727,27 @@ export class UnaryExpressionContext extends ParserRuleContext {
   public postfixExpression(): PostfixExpressionContext | undefined {
     return this.tryGetRuleContext(0, PostfixExpressionContext);
   }
-
   public unaryOperator(): UnaryOperatorContext | undefined {
     return this.tryGetRuleContext(0, UnaryOperatorContext);
   }
-
   public castExpression(): CastExpressionContext | undefined {
     return this.tryGetRuleContext(0, CastExpressionContext);
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public AndAnd(): TerminalNode | undefined {
     return this.tryGetToken(CParser.AndAnd, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public Sizeof(): TerminalNode[];
   public Sizeof(i: number): TerminalNode;
   public Sizeof(i?: number): TerminalNode | TerminalNode[] {
@@ -8912,11 +8757,9 @@ export class UnaryExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Sizeof, i);
     }
   }
-
   public Alignof(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Alignof, 0);
   }
-
   public PlusPlus(): TerminalNode[];
   public PlusPlus(i: number): TerminalNode;
   public PlusPlus(i?: number): TerminalNode | TerminalNode[] {
@@ -8926,7 +8769,6 @@ export class UnaryExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.PlusPlus, i);
     }
   }
-
   public MinusMinus(): TerminalNode[];
   public MinusMinus(i: number): TerminalNode;
   public MinusMinus(i?: number): TerminalNode | TerminalNode[] {
@@ -8936,33 +8778,28 @@ export class UnaryExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.MinusMinus, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_unaryExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterUnaryExpression != null) {
+    if (listener.enterUnaryExpression) {
       listener.enterUnaryExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitUnaryExpression != null) {
+    if (listener.exitUnaryExpression) {
       listener.exitUnaryExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitUnaryExpression != null) {
+    if (visitor.visitUnaryExpression) {
       return visitor.visitUnaryExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -8974,53 +8811,43 @@ export class UnaryOperatorContext extends ParserRuleContext {
   public And(): TerminalNode | undefined {
     return this.tryGetToken(CParser.And, 0);
   }
-
   public Star(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Star, 0);
   }
-
   public Plus(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Plus, 0);
   }
-
   public Minus(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Minus, 0);
   }
-
   public Tilde(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Tilde, 0);
   }
-
   public Not(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Not, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_unaryOperator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterUnaryOperator != null) {
+    if (listener.enterUnaryOperator) {
       listener.enterUnaryOperator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitUnaryOperator != null) {
+    if (listener.exitUnaryOperator) {
       listener.exitUnaryOperator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitUnaryOperator != null) {
+    if (visitor.visitUnaryOperator) {
       return visitor.visitUnaryOperator(this);
     } else {
       return visitor.visitChildren(this);
@@ -9032,53 +8859,43 @@ export class CastExpressionContext extends ParserRuleContext {
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public castExpression(): CastExpressionContext | undefined {
     return this.tryGetRuleContext(0, CastExpressionContext);
   }
-
   public unaryExpression(): UnaryExpressionContext | undefined {
     return this.tryGetRuleContext(0, UnaryExpressionContext);
   }
-
   public DigitSequence(): TerminalNode | undefined {
     return this.tryGetToken(CParser.DigitSequence, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_castExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterCastExpression != null) {
+    if (listener.enterCastExpression) {
       listener.enterCastExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitCastExpression != null) {
+    if (listener.exitCastExpression) {
       listener.exitCastExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitCastExpression != null) {
+    if (visitor.visitCastExpression) {
       return visitor.visitCastExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9098,7 +8915,6 @@ export class MultiplicativeExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, CastExpressionContext);
     }
   }
-
   public Star(): TerminalNode[];
   public Star(i: number): TerminalNode;
   public Star(i?: number): TerminalNode | TerminalNode[] {
@@ -9108,7 +8924,6 @@ export class MultiplicativeExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Star, i);
     }
   }
-
   public Div(): TerminalNode[];
   public Div(i: number): TerminalNode;
   public Div(i?: number): TerminalNode | TerminalNode[] {
@@ -9118,7 +8933,6 @@ export class MultiplicativeExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Div, i);
     }
   }
-
   public Mod(): TerminalNode[];
   public Mod(i: number): TerminalNode;
   public Mod(i?: number): TerminalNode | TerminalNode[] {
@@ -9128,33 +8942,28 @@ export class MultiplicativeExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Mod, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_multiplicativeExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterMultiplicativeExpression != null) {
+    if (listener.enterMultiplicativeExpression) {
       listener.enterMultiplicativeExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitMultiplicativeExpression != null) {
+    if (listener.exitMultiplicativeExpression) {
       listener.exitMultiplicativeExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitMultiplicativeExpression != null) {
+    if (visitor.visitMultiplicativeExpression) {
       return visitor.visitMultiplicativeExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9174,7 +8983,6 @@ export class AdditiveExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, MultiplicativeExpressionContext);
     }
   }
-
   public Plus(): TerminalNode[];
   public Plus(i: number): TerminalNode;
   public Plus(i?: number): TerminalNode | TerminalNode[] {
@@ -9184,7 +8992,6 @@ export class AdditiveExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Plus, i);
     }
   }
-
   public Minus(): TerminalNode[];
   public Minus(i: number): TerminalNode;
   public Minus(i?: number): TerminalNode | TerminalNode[] {
@@ -9194,33 +9001,28 @@ export class AdditiveExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Minus, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_additiveExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAdditiveExpression != null) {
+    if (listener.enterAdditiveExpression) {
       listener.enterAdditiveExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAdditiveExpression != null) {
+    if (listener.exitAdditiveExpression) {
       listener.exitAdditiveExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAdditiveExpression != null) {
+    if (visitor.visitAdditiveExpression) {
       return visitor.visitAdditiveExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9240,7 +9042,6 @@ export class ShiftExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, AdditiveExpressionContext);
     }
   }
-
   public LeftShift(): TerminalNode[];
   public LeftShift(i: number): TerminalNode;
   public LeftShift(i?: number): TerminalNode | TerminalNode[] {
@@ -9250,7 +9051,6 @@ export class ShiftExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.LeftShift, i);
     }
   }
-
   public RightShift(): TerminalNode[];
   public RightShift(i: number): TerminalNode;
   public RightShift(i?: number): TerminalNode | TerminalNode[] {
@@ -9260,33 +9060,28 @@ export class ShiftExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.RightShift, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_shiftExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterShiftExpression != null) {
+    if (listener.enterShiftExpression) {
       listener.enterShiftExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitShiftExpression != null) {
+    if (listener.exitShiftExpression) {
       listener.exitShiftExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitShiftExpression != null) {
+    if (visitor.visitShiftExpression) {
       return visitor.visitShiftExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9306,7 +9101,6 @@ export class RelationalExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, ShiftExpressionContext);
     }
   }
-
   public Less(): TerminalNode[];
   public Less(i: number): TerminalNode;
   public Less(i?: number): TerminalNode | TerminalNode[] {
@@ -9316,7 +9110,6 @@ export class RelationalExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Less, i);
     }
   }
-
   public Greater(): TerminalNode[];
   public Greater(i: number): TerminalNode;
   public Greater(i?: number): TerminalNode | TerminalNode[] {
@@ -9326,7 +9119,6 @@ export class RelationalExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Greater, i);
     }
   }
-
   public LessEqual(): TerminalNode[];
   public LessEqual(i: number): TerminalNode;
   public LessEqual(i?: number): TerminalNode | TerminalNode[] {
@@ -9336,7 +9128,6 @@ export class RelationalExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.LessEqual, i);
     }
   }
-
   public GreaterEqual(): TerminalNode[];
   public GreaterEqual(i: number): TerminalNode;
   public GreaterEqual(i?: number): TerminalNode | TerminalNode[] {
@@ -9346,33 +9137,28 @@ export class RelationalExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.GreaterEqual, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_relationalExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterRelationalExpression != null) {
+    if (listener.enterRelationalExpression) {
       listener.enterRelationalExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitRelationalExpression != null) {
+    if (listener.exitRelationalExpression) {
       listener.exitRelationalExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitRelationalExpression != null) {
+    if (visitor.visitRelationalExpression) {
       return visitor.visitRelationalExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9392,7 +9178,6 @@ export class EqualityExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, RelationalExpressionContext);
     }
   }
-
   public Equal(): TerminalNode[];
   public Equal(i: number): TerminalNode;
   public Equal(i?: number): TerminalNode | TerminalNode[] {
@@ -9402,7 +9187,6 @@ export class EqualityExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Equal, i);
     }
   }
-
   public NotEqual(): TerminalNode[];
   public NotEqual(i: number): TerminalNode;
   public NotEqual(i?: number): TerminalNode | TerminalNode[] {
@@ -9412,33 +9196,28 @@ export class EqualityExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.NotEqual, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_equalityExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterEqualityExpression != null) {
+    if (listener.enterEqualityExpression) {
       listener.enterEqualityExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitEqualityExpression != null) {
+    if (listener.exitEqualityExpression) {
       listener.exitEqualityExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitEqualityExpression != null) {
+    if (visitor.visitEqualityExpression) {
       return visitor.visitEqualityExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9458,7 +9237,6 @@ export class AndExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, EqualityExpressionContext);
     }
   }
-
   public And(): TerminalNode[];
   public And(i: number): TerminalNode;
   public And(i?: number): TerminalNode | TerminalNode[] {
@@ -9468,33 +9246,28 @@ export class AndExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.And, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_andExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAndExpression != null) {
+    if (listener.enterAndExpression) {
       listener.enterAndExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAndExpression != null) {
+    if (listener.exitAndExpression) {
       listener.exitAndExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAndExpression != null) {
+    if (visitor.visitAndExpression) {
       return visitor.visitAndExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9514,7 +9287,6 @@ export class ExclusiveOrExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, AndExpressionContext);
     }
   }
-
   public Caret(): TerminalNode[];
   public Caret(i: number): TerminalNode;
   public Caret(i?: number): TerminalNode | TerminalNode[] {
@@ -9524,33 +9296,28 @@ export class ExclusiveOrExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Caret, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_exclusiveOrExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterExclusiveOrExpression != null) {
+    if (listener.enterExclusiveOrExpression) {
       listener.enterExclusiveOrExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitExclusiveOrExpression != null) {
+    if (listener.exitExclusiveOrExpression) {
       listener.exitExclusiveOrExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitExclusiveOrExpression != null) {
+    if (visitor.visitExclusiveOrExpression) {
       return visitor.visitExclusiveOrExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9570,7 +9337,6 @@ export class InclusiveOrExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, ExclusiveOrExpressionContext);
     }
   }
-
   public Or(): TerminalNode[];
   public Or(i: number): TerminalNode;
   public Or(i?: number): TerminalNode | TerminalNode[] {
@@ -9580,33 +9346,28 @@ export class InclusiveOrExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Or, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_inclusiveOrExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterInclusiveOrExpression != null) {
+    if (listener.enterInclusiveOrExpression) {
       listener.enterInclusiveOrExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitInclusiveOrExpression != null) {
+    if (listener.exitInclusiveOrExpression) {
       listener.exitInclusiveOrExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitInclusiveOrExpression != null) {
+    if (visitor.visitInclusiveOrExpression) {
       return visitor.visitInclusiveOrExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9626,7 +9387,6 @@ export class LogicalAndExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, InclusiveOrExpressionContext);
     }
   }
-
   public AndAnd(): TerminalNode[];
   public AndAnd(i: number): TerminalNode;
   public AndAnd(i?: number): TerminalNode | TerminalNode[] {
@@ -9636,33 +9396,28 @@ export class LogicalAndExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.AndAnd, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_logicalAndExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterLogicalAndExpression != null) {
+    if (listener.enterLogicalAndExpression) {
       listener.enterLogicalAndExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitLogicalAndExpression != null) {
+    if (listener.exitLogicalAndExpression) {
       listener.exitLogicalAndExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitLogicalAndExpression != null) {
+    if (visitor.visitLogicalAndExpression) {
       return visitor.visitLogicalAndExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9682,7 +9437,6 @@ export class LogicalOrExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, LogicalAndExpressionContext);
     }
   }
-
   public OrOr(): TerminalNode[];
   public OrOr(i: number): TerminalNode;
   public OrOr(i?: number): TerminalNode | TerminalNode[] {
@@ -9692,33 +9446,28 @@ export class LogicalOrExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.OrOr, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_logicalOrExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterLogicalOrExpression != null) {
+    if (listener.enterLogicalOrExpression) {
       listener.enterLogicalOrExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitLogicalOrExpression != null) {
+    if (listener.exitLogicalOrExpression) {
       listener.exitLogicalOrExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitLogicalOrExpression != null) {
+    if (visitor.visitLogicalOrExpression) {
       return visitor.visitLogicalOrExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9730,49 +9479,40 @@ export class ConditionalExpressionContext extends ParserRuleContext {
   public logicalOrExpression(): LogicalOrExpressionContext {
     return this.getRuleContext(0, LogicalOrExpressionContext);
   }
-
   public Question(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Question, 0);
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   public Colon(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Colon, 0);
   }
-
   public conditionalExpression(): ConditionalExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConditionalExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_conditionalExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterConditionalExpression != null) {
+    if (listener.enterConditionalExpression) {
       listener.enterConditionalExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitConditionalExpression != null) {
+    if (listener.exitConditionalExpression) {
       listener.exitConditionalExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitConditionalExpression != null) {
+    if (visitor.visitConditionalExpression) {
       return visitor.visitConditionalExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9784,49 +9524,40 @@ export class AssignmentExpressionContext extends ParserRuleContext {
   public conditionalExpression(): ConditionalExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConditionalExpressionContext);
   }
-
   public unaryExpression(): UnaryExpressionContext | undefined {
     return this.tryGetRuleContext(0, UnaryExpressionContext);
   }
-
   public assignmentOperator(): AssignmentOperatorContext | undefined {
     return this.tryGetRuleContext(0, AssignmentOperatorContext);
   }
-
   public assignmentExpression(): AssignmentExpressionContext | undefined {
     return this.tryGetRuleContext(0, AssignmentExpressionContext);
   }
-
   public DigitSequence(): TerminalNode | undefined {
     return this.tryGetToken(CParser.DigitSequence, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_assignmentExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAssignmentExpression != null) {
+    if (listener.enterAssignmentExpression) {
       listener.enterAssignmentExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAssignmentExpression != null) {
+    if (listener.exitAssignmentExpression) {
       listener.exitAssignmentExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAssignmentExpression != null) {
+    if (visitor.visitAssignmentExpression) {
       return visitor.visitAssignmentExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9838,73 +9569,58 @@ export class AssignmentOperatorContext extends ParserRuleContext {
   public Assign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Assign, 0);
   }
-
   public StarAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.StarAssign, 0);
   }
-
   public DivAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.DivAssign, 0);
   }
-
   public ModAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.ModAssign, 0);
   }
-
   public PlusAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.PlusAssign, 0);
   }
-
   public MinusAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.MinusAssign, 0);
   }
-
   public LeftShiftAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftShiftAssign, 0);
   }
-
   public RightShiftAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightShiftAssign, 0);
   }
-
   public AndAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.AndAssign, 0);
   }
-
   public XorAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.XorAssign, 0);
   }
-
   public OrAssign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.OrAssign, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_assignmentOperator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAssignmentOperator != null) {
+    if (listener.enterAssignmentOperator) {
       listener.enterAssignmentOperator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAssignmentOperator != null) {
+    if (listener.exitAssignmentOperator) {
       listener.exitAssignmentOperator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAssignmentOperator != null) {
+    if (visitor.visitAssignmentOperator) {
       return visitor.visitAssignmentOperator(this);
     } else {
       return visitor.visitChildren(this);
@@ -9924,7 +9640,6 @@ export class ExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, AssignmentExpressionContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -9934,33 +9649,28 @@ export class ExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_expression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterExpression != null) {
+    if (listener.enterExpression) {
       listener.enterExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitExpression != null) {
+    if (listener.exitExpression) {
       listener.exitExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitExpression != null) {
+    if (visitor.visitExpression) {
       return visitor.visitExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -9972,33 +9682,28 @@ export class ConstantExpressionContext extends ParserRuleContext {
   public conditionalExpression(): ConditionalExpressionContext {
     return this.getRuleContext(0, ConditionalExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_constantExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterConstantExpression != null) {
+    if (listener.enterConstantExpression) {
       listener.enterConstantExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitConstantExpression != null) {
+    if (listener.exitConstantExpression) {
       listener.exitConstantExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitConstantExpression != null) {
+    if (visitor.visitConstantExpression) {
       return visitor.visitConstantExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -10010,45 +9715,37 @@ export class DeclarationContext extends ParserRuleContext {
   public declarationSpecifiers(): DeclarationSpecifiersContext | undefined {
     return this.tryGetRuleContext(0, DeclarationSpecifiersContext);
   }
-
   public Semi(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Semi, 0);
   }
-
   public initDeclaratorList(): InitDeclaratorListContext | undefined {
     return this.tryGetRuleContext(0, InitDeclaratorListContext);
   }
-
   public staticAssertDeclaration(): StaticAssertDeclarationContext | undefined {
     return this.tryGetRuleContext(0, StaticAssertDeclarationContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclaration != null) {
+    if (listener.enterDeclaration) {
       listener.enterDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclaration != null) {
+    if (listener.exitDeclaration) {
       listener.exitDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclaration != null) {
+    if (visitor.visitDeclaration) {
       return visitor.visitDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -10068,33 +9765,28 @@ export class DeclarationSpecifiersContext extends ParserRuleContext {
       return this.getRuleContext(i, DeclarationSpecifierContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declarationSpecifiers;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclarationSpecifiers != null) {
+    if (listener.enterDeclarationSpecifiers) {
       listener.enterDeclarationSpecifiers(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclarationSpecifiers != null) {
+    if (listener.exitDeclarationSpecifiers) {
       listener.exitDeclarationSpecifiers(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclarationSpecifiers != null) {
+    if (visitor.visitDeclarationSpecifiers) {
       return visitor.visitDeclarationSpecifiers(this);
     } else {
       return visitor.visitChildren(this);
@@ -10114,33 +9806,28 @@ export class DeclarationSpecifiers2Context extends ParserRuleContext {
       return this.getRuleContext(i, DeclarationSpecifierContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declarationSpecifiers2;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclarationSpecifiers2 != null) {
+    if (listener.enterDeclarationSpecifiers2) {
       listener.enterDeclarationSpecifiers2(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclarationSpecifiers2 != null) {
+    if (listener.exitDeclarationSpecifiers2) {
       listener.exitDeclarationSpecifiers2(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclarationSpecifiers2 != null) {
+    if (visitor.visitDeclarationSpecifiers2) {
       return visitor.visitDeclarationSpecifiers2(this);
     } else {
       return visitor.visitChildren(this);
@@ -10152,49 +9839,40 @@ export class DeclarationSpecifierContext extends ParserRuleContext {
   public storageClassSpecifier(): StorageClassSpecifierContext | undefined {
     return this.tryGetRuleContext(0, StorageClassSpecifierContext);
   }
-
   public typeSpecifier(): TypeSpecifierContext | undefined {
     return this.tryGetRuleContext(0, TypeSpecifierContext);
   }
-
   public typeQualifier(): TypeQualifierContext | undefined {
     return this.tryGetRuleContext(0, TypeQualifierContext);
   }
-
   public functionSpecifier(): FunctionSpecifierContext | undefined {
     return this.tryGetRuleContext(0, FunctionSpecifierContext);
   }
-
   public alignmentSpecifier(): AlignmentSpecifierContext | undefined {
     return this.tryGetRuleContext(0, AlignmentSpecifierContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declarationSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclarationSpecifier != null) {
+    if (listener.enterDeclarationSpecifier) {
       listener.enterDeclarationSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclarationSpecifier != null) {
+    if (listener.exitDeclarationSpecifier) {
       listener.exitDeclarationSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclarationSpecifier != null) {
+    if (visitor.visitDeclarationSpecifier) {
       return visitor.visitDeclarationSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -10214,7 +9892,6 @@ export class InitDeclaratorListContext extends ParserRuleContext {
       return this.getRuleContext(i, InitDeclaratorContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -10224,33 +9901,28 @@ export class InitDeclaratorListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_initDeclaratorList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterInitDeclaratorList != null) {
+    if (listener.enterInitDeclaratorList) {
       listener.enterInitDeclaratorList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitInitDeclaratorList != null) {
+    if (listener.exitInitDeclaratorList) {
       listener.exitInitDeclaratorList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitInitDeclaratorList != null) {
+    if (visitor.visitInitDeclaratorList) {
       return visitor.visitInitDeclaratorList(this);
     } else {
       return visitor.visitChildren(this);
@@ -10262,41 +9934,34 @@ export class InitDeclaratorContext extends ParserRuleContext {
   public declarator(): DeclaratorContext {
     return this.getRuleContext(0, DeclaratorContext);
   }
-
   public Assign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Assign, 0);
   }
-
   public initializer(): InitializerContext | undefined {
     return this.tryGetRuleContext(0, InitializerContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_initDeclarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterInitDeclarator != null) {
+    if (listener.enterInitDeclarator) {
       listener.enterInitDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitInitDeclarator != null) {
+    if (listener.exitInitDeclarator) {
       listener.exitInitDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitInitDeclarator != null) {
+    if (visitor.visitInitDeclarator) {
       return visitor.visitInitDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -10308,53 +9973,43 @@ export class StorageClassSpecifierContext extends ParserRuleContext {
   public Typedef(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Typedef, 0);
   }
-
   public Extern(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Extern, 0);
   }
-
   public Static(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Static, 0);
   }
-
   public ThreadLocal(): TerminalNode | undefined {
     return this.tryGetToken(CParser.ThreadLocal, 0);
   }
-
   public Auto(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Auto, 0);
   }
-
   public Register(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Register, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_storageClassSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStorageClassSpecifier != null) {
+    if (listener.enterStorageClassSpecifier) {
       listener.enterStorageClassSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStorageClassSpecifier != null) {
+    if (listener.exitStorageClassSpecifier) {
       listener.exitStorageClassSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStorageClassSpecifier != null) {
+    if (visitor.visitStorageClassSpecifier) {
       return visitor.visitStorageClassSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -10366,101 +10021,79 @@ export class TypeSpecifierContext extends ParserRuleContext {
   public Void(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Void, 0);
   }
-
   public Char(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Char, 0);
   }
-
   public Short(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Short, 0);
   }
-
   public Int(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Int, 0);
   }
-
   public Long(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Long, 0);
   }
-
   public Float(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Float, 0);
   }
-
   public Double(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Double, 0);
   }
-
   public Signed(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Signed, 0);
   }
-
   public Unsigned(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Unsigned, 0);
   }
-
   public Bool(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Bool, 0);
   }
-
   public Complex(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Complex, 0);
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public atomicTypeSpecifier(): AtomicTypeSpecifierContext | undefined {
     return this.tryGetRuleContext(0, AtomicTypeSpecifierContext);
   }
-
   public structOrUnionSpecifier(): StructOrUnionSpecifierContext | undefined {
     return this.tryGetRuleContext(0, StructOrUnionSpecifierContext);
   }
-
   public enumSpecifier(): EnumSpecifierContext | undefined {
     return this.tryGetRuleContext(0, EnumSpecifierContext);
   }
-
   public typedefName(): TypedefNameContext | undefined {
     return this.tryGetRuleContext(0, TypedefNameContext);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_typeSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTypeSpecifier != null) {
+    if (listener.enterTypeSpecifier) {
       listener.enterTypeSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTypeSpecifier != null) {
+    if (listener.exitTypeSpecifier) {
       listener.exitTypeSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTypeSpecifier != null) {
+    if (visitor.visitTypeSpecifier) {
       return visitor.visitTypeSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -10472,49 +10105,40 @@ export class StructOrUnionSpecifierContext extends ParserRuleContext {
   public structOrUnion(): StructOrUnionContext {
     return this.getRuleContext(0, StructOrUnionContext);
   }
-
   public LeftBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBrace, 0);
   }
-
   public structDeclarationList(): StructDeclarationListContext | undefined {
     return this.tryGetRuleContext(0, StructDeclarationListContext);
   }
-
   public RightBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBrace, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structOrUnionSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructOrUnionSpecifier != null) {
+    if (listener.enterStructOrUnionSpecifier) {
       listener.enterStructOrUnionSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructOrUnionSpecifier != null) {
+    if (listener.exitStructOrUnionSpecifier) {
       listener.exitStructOrUnionSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructOrUnionSpecifier != null) {
+    if (visitor.visitStructOrUnionSpecifier) {
       return visitor.visitStructOrUnionSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -10526,37 +10150,31 @@ export class StructOrUnionContext extends ParserRuleContext {
   public Struct(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Struct, 0);
   }
-
   public Union(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Union, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structOrUnion;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructOrUnion != null) {
+    if (listener.enterStructOrUnion) {
       listener.enterStructOrUnion(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructOrUnion != null) {
+    if (listener.exitStructOrUnion) {
       listener.exitStructOrUnion(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructOrUnion != null) {
+    if (visitor.visitStructOrUnion) {
       return visitor.visitStructOrUnion(this);
     } else {
       return visitor.visitChildren(this);
@@ -10576,33 +10194,28 @@ export class StructDeclarationListContext extends ParserRuleContext {
       return this.getRuleContext(i, StructDeclarationContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structDeclarationList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructDeclarationList != null) {
+    if (listener.enterStructDeclarationList) {
       listener.enterStructDeclarationList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructDeclarationList != null) {
+    if (listener.exitStructDeclarationList) {
       listener.exitStructDeclarationList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructDeclarationList != null) {
+    if (visitor.visitStructDeclarationList) {
       return visitor.visitStructDeclarationList(this);
     } else {
       return visitor.visitChildren(this);
@@ -10614,45 +10227,37 @@ export class StructDeclarationContext extends ParserRuleContext {
   public specifierQualifierList(): SpecifierQualifierListContext | undefined {
     return this.tryGetRuleContext(0, SpecifierQualifierListContext);
   }
-
   public structDeclaratorList(): StructDeclaratorListContext | undefined {
     return this.tryGetRuleContext(0, StructDeclaratorListContext);
   }
-
   public Semi(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Semi, 0);
   }
-
   public staticAssertDeclaration(): StaticAssertDeclarationContext | undefined {
     return this.tryGetRuleContext(0, StaticAssertDeclarationContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structDeclaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructDeclaration != null) {
+    if (listener.enterStructDeclaration) {
       listener.enterStructDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructDeclaration != null) {
+    if (listener.exitStructDeclaration) {
       listener.exitStructDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructDeclaration != null) {
+    if (visitor.visitStructDeclaration) {
       return visitor.visitStructDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -10664,41 +10269,34 @@ export class SpecifierQualifierListContext extends ParserRuleContext {
   public typeSpecifier(): TypeSpecifierContext | undefined {
     return this.tryGetRuleContext(0, TypeSpecifierContext);
   }
-
   public typeQualifier(): TypeQualifierContext | undefined {
     return this.tryGetRuleContext(0, TypeQualifierContext);
   }
-
   public specifierQualifierList(): SpecifierQualifierListContext | undefined {
     return this.tryGetRuleContext(0, SpecifierQualifierListContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_specifierQualifierList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterSpecifierQualifierList != null) {
+    if (listener.enterSpecifierQualifierList) {
       listener.enterSpecifierQualifierList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitSpecifierQualifierList != null) {
+    if (listener.exitSpecifierQualifierList) {
       listener.exitSpecifierQualifierList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitSpecifierQualifierList != null) {
+    if (visitor.visitSpecifierQualifierList) {
       return visitor.visitSpecifierQualifierList(this);
     } else {
       return visitor.visitChildren(this);
@@ -10718,7 +10316,6 @@ export class StructDeclaratorListContext extends ParserRuleContext {
       return this.getRuleContext(i, StructDeclaratorContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -10728,33 +10325,28 @@ export class StructDeclaratorListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structDeclaratorList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructDeclaratorList != null) {
+    if (listener.enterStructDeclaratorList) {
       listener.enterStructDeclaratorList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructDeclaratorList != null) {
+    if (listener.exitStructDeclaratorList) {
       listener.exitStructDeclaratorList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructDeclaratorList != null) {
+    if (visitor.visitStructDeclaratorList) {
       return visitor.visitStructDeclaratorList(this);
     } else {
       return visitor.visitChildren(this);
@@ -10766,41 +10358,34 @@ export class StructDeclaratorContext extends ParserRuleContext {
   public declarator(): DeclaratorContext | undefined {
     return this.tryGetRuleContext(0, DeclaratorContext);
   }
-
   public Colon(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Colon, 0);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_structDeclarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStructDeclarator != null) {
+    if (listener.enterStructDeclarator) {
       listener.enterStructDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStructDeclarator != null) {
+    if (listener.exitStructDeclarator) {
       listener.exitStructDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStructDeclarator != null) {
+    if (visitor.visitStructDeclarator) {
       return visitor.visitStructDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -10812,53 +10397,43 @@ export class EnumSpecifierContext extends ParserRuleContext {
   public Enum(): TerminalNode {
     return this.getToken(CParser.Enum, 0);
   }
-
   public LeftBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBrace, 0);
   }
-
   public enumeratorList(): EnumeratorListContext | undefined {
     return this.tryGetRuleContext(0, EnumeratorListContext);
   }
-
   public RightBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBrace, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_enumSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterEnumSpecifier != null) {
+    if (listener.enterEnumSpecifier) {
       listener.enterEnumSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitEnumSpecifier != null) {
+    if (listener.exitEnumSpecifier) {
       listener.exitEnumSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitEnumSpecifier != null) {
+    if (visitor.visitEnumSpecifier) {
       return visitor.visitEnumSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -10876,7 +10451,6 @@ export class EnumeratorListContext extends ParserRuleContext {
       return this.getRuleContext(i, EnumeratorContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -10886,33 +10460,28 @@ export class EnumeratorListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_enumeratorList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterEnumeratorList != null) {
+    if (listener.enterEnumeratorList) {
       listener.enterEnumeratorList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitEnumeratorList != null) {
+    if (listener.exitEnumeratorList) {
       listener.exitEnumeratorList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitEnumeratorList != null) {
+    if (visitor.visitEnumeratorList) {
       return visitor.visitEnumeratorList(this);
     } else {
       return visitor.visitChildren(this);
@@ -10924,41 +10493,34 @@ export class EnumeratorContext extends ParserRuleContext {
   public enumerationConstant(): EnumerationConstantContext {
     return this.getRuleContext(0, EnumerationConstantContext);
   }
-
   public Assign(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Assign, 0);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_enumerator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterEnumerator != null) {
+    if (listener.enterEnumerator) {
       listener.enterEnumerator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitEnumerator != null) {
+    if (listener.exitEnumerator) {
       listener.exitEnumerator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitEnumerator != null) {
+    if (visitor.visitEnumerator) {
       return visitor.visitEnumerator(this);
     } else {
       return visitor.visitChildren(this);
@@ -10970,33 +10532,28 @@ export class EnumerationConstantContext extends ParserRuleContext {
   public Identifier(): TerminalNode {
     return this.getToken(CParser.Identifier, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_enumerationConstant;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterEnumerationConstant != null) {
+    if (listener.enterEnumerationConstant) {
       listener.enterEnumerationConstant(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitEnumerationConstant != null) {
+    if (listener.exitEnumerationConstant) {
       listener.exitEnumerationConstant(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitEnumerationConstant != null) {
+    if (visitor.visitEnumerationConstant) {
       return visitor.visitEnumerationConstant(this);
     } else {
       return visitor.visitChildren(this);
@@ -11008,45 +10565,37 @@ export class AtomicTypeSpecifierContext extends ParserRuleContext {
   public Atomic(): TerminalNode {
     return this.getToken(CParser.Atomic, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public typeName(): TypeNameContext {
     return this.getRuleContext(0, TypeNameContext);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_atomicTypeSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAtomicTypeSpecifier != null) {
+    if (listener.enterAtomicTypeSpecifier) {
       listener.enterAtomicTypeSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAtomicTypeSpecifier != null) {
+    if (listener.exitAtomicTypeSpecifier) {
       listener.exitAtomicTypeSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAtomicTypeSpecifier != null) {
+    if (visitor.visitAtomicTypeSpecifier) {
       return visitor.visitAtomicTypeSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -11058,45 +10607,37 @@ export class TypeQualifierContext extends ParserRuleContext {
   public Const(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Const, 0);
   }
-
   public Restrict(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Restrict, 0);
   }
-
   public Volatile(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Volatile, 0);
   }
-
   public Atomic(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Atomic, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_typeQualifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTypeQualifier != null) {
+    if (listener.enterTypeQualifier) {
       listener.enterTypeQualifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTypeQualifier != null) {
+    if (listener.exitTypeQualifier) {
       listener.exitTypeQualifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTypeQualifier != null) {
+    if (visitor.visitTypeQualifier) {
       return visitor.visitTypeQualifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -11108,53 +10649,43 @@ export class FunctionSpecifierContext extends ParserRuleContext {
   public Inline(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Inline, 0);
   }
-
   public Noreturn(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Noreturn, 0);
   }
-
   public gccAttributeSpecifier(): GccAttributeSpecifierContext | undefined {
     return this.tryGetRuleContext(0, GccAttributeSpecifierContext);
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_functionSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterFunctionSpecifier != null) {
+    if (listener.enterFunctionSpecifier) {
       listener.enterFunctionSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitFunctionSpecifier != null) {
+    if (listener.exitFunctionSpecifier) {
       listener.exitFunctionSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitFunctionSpecifier != null) {
+    if (visitor.visitFunctionSpecifier) {
       return visitor.visitFunctionSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -11166,49 +10697,40 @@ export class AlignmentSpecifierContext extends ParserRuleContext {
   public Alignas(): TerminalNode {
     return this.getToken(CParser.Alignas, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   public typeName(): TypeNameContext | undefined {
     return this.tryGetRuleContext(0, TypeNameContext);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_alignmentSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAlignmentSpecifier != null) {
+    if (listener.enterAlignmentSpecifier) {
       listener.enterAlignmentSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAlignmentSpecifier != null) {
+    if (listener.exitAlignmentSpecifier) {
       listener.exitAlignmentSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAlignmentSpecifier != null) {
+    if (visitor.visitAlignmentSpecifier) {
       return visitor.visitAlignmentSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -11220,11 +10742,9 @@ export class DeclaratorContext extends ParserRuleContext {
   public directDeclarator(): DirectDeclaratorContext {
     return this.getRuleContext(0, DirectDeclaratorContext);
   }
-
   public pointer(): PointerContext | undefined {
     return this.tryGetRuleContext(0, PointerContext);
   }
-
   public gccDeclaratorExtension(): GccDeclaratorExtensionContext[];
   public gccDeclaratorExtension(i: number): GccDeclaratorExtensionContext;
   public gccDeclaratorExtension(
@@ -11236,33 +10756,28 @@ export class DeclaratorContext extends ParserRuleContext {
       return this.getRuleContext(i, GccDeclaratorExtensionContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclarator != null) {
+    if (listener.enterDeclarator) {
       listener.enterDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclarator != null) {
+    if (listener.exitDeclarator) {
       listener.exitDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclarator != null) {
+    if (visitor.visitDeclarator) {
       return visitor.visitDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -11274,93 +10789,73 @@ export class DirectDeclaratorContext extends ParserRuleContext {
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public declarator(): DeclaratorContext | undefined {
     return this.tryGetRuleContext(0, DeclaratorContext);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public directDeclarator(): DirectDeclaratorContext | undefined {
     return this.tryGetRuleContext(0, DirectDeclaratorContext);
   }
-
   public LeftBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBracket, 0);
   }
-
   public RightBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBracket, 0);
   }
-
   public typeQualifierList(): TypeQualifierListContext | undefined {
     return this.tryGetRuleContext(0, TypeQualifierListContext);
   }
-
   public assignmentExpression(): AssignmentExpressionContext | undefined {
     return this.tryGetRuleContext(0, AssignmentExpressionContext);
   }
-
   public Static(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Static, 0);
   }
-
   public Star(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Star, 0);
   }
-
   public parameterTypeList(): ParameterTypeListContext | undefined {
     return this.tryGetRuleContext(0, ParameterTypeListContext);
   }
-
   public identifierList(): IdentifierListContext | undefined {
     return this.tryGetRuleContext(0, IdentifierListContext);
   }
-
   public Colon(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Colon, 0);
   }
-
   public DigitSequence(): TerminalNode | undefined {
     return this.tryGetToken(CParser.DigitSequence, 0);
   }
-
   public vcSpecificModifer(): VcSpecificModiferContext | undefined {
     return this.tryGetRuleContext(0, VcSpecificModiferContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_directDeclarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDirectDeclarator != null) {
+    if (listener.enterDirectDeclarator) {
       listener.enterDirectDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDirectDeclarator != null) {
+    if (listener.exitDirectDeclarator) {
       listener.exitDirectDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDirectDeclarator != null) {
+    if (visitor.visitDirectDeclarator) {
       return visitor.visitDirectDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -11372,29 +10867,25 @@ export class VcSpecificModiferContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_vcSpecificModifer;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterVcSpecificModifer != null) {
+    if (listener.enterVcSpecificModifer) {
       listener.enterVcSpecificModifer(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitVcSpecificModifer != null) {
+    if (listener.exitVcSpecificModifer) {
       listener.exitVcSpecificModifer(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitVcSpecificModifer != null) {
+    if (visitor.visitVcSpecificModifer) {
       return visitor.visitVcSpecificModifer(this);
     } else {
       return visitor.visitChildren(this);
@@ -11406,11 +10897,9 @@ export class GccDeclaratorExtensionContext extends ParserRuleContext {
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public StringLiteral(): TerminalNode[];
   public StringLiteral(i: number): TerminalNode;
   public StringLiteral(i?: number): TerminalNode | TerminalNode[] {
@@ -11420,37 +10909,31 @@ export class GccDeclaratorExtensionContext extends ParserRuleContext {
       return this.getToken(CParser.StringLiteral, i);
     }
   }
-
   public gccAttributeSpecifier(): GccAttributeSpecifierContext | undefined {
     return this.tryGetRuleContext(0, GccAttributeSpecifierContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_gccDeclaratorExtension;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGccDeclaratorExtension != null) {
+    if (listener.enterGccDeclaratorExtension) {
       listener.enterGccDeclaratorExtension(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGccDeclaratorExtension != null) {
+    if (listener.exitGccDeclaratorExtension) {
       listener.exitGccDeclaratorExtension(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGccDeclaratorExtension != null) {
+    if (visitor.visitGccDeclaratorExtension) {
       return visitor.visitGccDeclaratorExtension(this);
     } else {
       return visitor.visitChildren(this);
@@ -11468,11 +10951,9 @@ export class GccAttributeSpecifierContext extends ParserRuleContext {
       return this.getToken(CParser.LeftParen, i);
     }
   }
-
   public gccAttributeList(): GccAttributeListContext {
     return this.getRuleContext(0, GccAttributeListContext);
   }
-
   public RightParen(): TerminalNode[];
   public RightParen(i: number): TerminalNode;
   public RightParen(i?: number): TerminalNode | TerminalNode[] {
@@ -11482,33 +10963,28 @@ export class GccAttributeSpecifierContext extends ParserRuleContext {
       return this.getToken(CParser.RightParen, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_gccAttributeSpecifier;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGccAttributeSpecifier != null) {
+    if (listener.enterGccAttributeSpecifier) {
       listener.enterGccAttributeSpecifier(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGccAttributeSpecifier != null) {
+    if (listener.exitGccAttributeSpecifier) {
       listener.exitGccAttributeSpecifier(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGccAttributeSpecifier != null) {
+    if (visitor.visitGccAttributeSpecifier) {
       return visitor.visitGccAttributeSpecifier(this);
     } else {
       return visitor.visitChildren(this);
@@ -11526,7 +11002,6 @@ export class GccAttributeListContext extends ParserRuleContext {
       return this.getRuleContext(i, GccAttributeContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -11536,33 +11011,28 @@ export class GccAttributeListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_gccAttributeList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGccAttributeList != null) {
+    if (listener.enterGccAttributeList) {
       listener.enterGccAttributeList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGccAttributeList != null) {
+    if (listener.exitGccAttributeList) {
       listener.exitGccAttributeList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGccAttributeList != null) {
+    if (visitor.visitGccAttributeList) {
       return visitor.visitGccAttributeList(this);
     } else {
       return visitor.visitChildren(this);
@@ -11574,7 +11044,6 @@ export class GccAttributeContext extends ParserRuleContext {
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   public LeftParen(): TerminalNode[];
   public LeftParen(i: number): TerminalNode;
   public LeftParen(i?: number): TerminalNode | TerminalNode[] {
@@ -11584,7 +11053,6 @@ export class GccAttributeContext extends ParserRuleContext {
       return this.getToken(CParser.LeftParen, i);
     }
   }
-
   public RightParen(): TerminalNode[];
   public RightParen(i: number): TerminalNode;
   public RightParen(i?: number): TerminalNode | TerminalNode[] {
@@ -11594,37 +11062,31 @@ export class GccAttributeContext extends ParserRuleContext {
       return this.getToken(CParser.RightParen, i);
     }
   }
-
   public argumentExpressionList(): ArgumentExpressionListContext | undefined {
     return this.tryGetRuleContext(0, ArgumentExpressionListContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_gccAttribute;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterGccAttribute != null) {
+    if (listener.enterGccAttribute) {
       listener.enterGccAttribute(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitGccAttribute != null) {
+    if (listener.exitGccAttribute) {
       listener.exitGccAttribute(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitGccAttribute != null) {
+    if (visitor.visitGccAttribute) {
       return visitor.visitGccAttribute(this);
     } else {
       return visitor.visitChildren(this);
@@ -11642,7 +11104,6 @@ export class NestedParenthesesBlockContext extends ParserRuleContext {
       return this.getToken(CParser.LeftParen, i);
     }
   }
-
   public nestedParenthesesBlock(): NestedParenthesesBlockContext[];
   public nestedParenthesesBlock(i: number): NestedParenthesesBlockContext;
   public nestedParenthesesBlock(
@@ -11654,7 +11115,6 @@ export class NestedParenthesesBlockContext extends ParserRuleContext {
       return this.getRuleContext(i, NestedParenthesesBlockContext);
     }
   }
-
   public RightParen(): TerminalNode[];
   public RightParen(i: number): TerminalNode;
   public RightParen(i?: number): TerminalNode | TerminalNode[] {
@@ -11664,33 +11124,28 @@ export class NestedParenthesesBlockContext extends ParserRuleContext {
       return this.getToken(CParser.RightParen, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_nestedParenthesesBlock;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterNestedParenthesesBlock != null) {
+    if (listener.enterNestedParenthesesBlock) {
       listener.enterNestedParenthesesBlock(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitNestedParenthesesBlock != null) {
+    if (listener.exitNestedParenthesesBlock) {
       listener.exitNestedParenthesesBlock(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitNestedParenthesesBlock != null) {
+    if (visitor.visitNestedParenthesesBlock) {
       return visitor.visitNestedParenthesesBlock(this);
     } else {
       return visitor.visitChildren(this);
@@ -11708,7 +11163,6 @@ export class PointerContext extends ParserRuleContext {
       return this.getToken(CParser.Star, i);
     }
   }
-
   public Caret(): TerminalNode[];
   public Caret(i: number): TerminalNode;
   public Caret(i?: number): TerminalNode | TerminalNode[] {
@@ -11718,7 +11172,6 @@ export class PointerContext extends ParserRuleContext {
       return this.getToken(CParser.Caret, i);
     }
   }
-
   public typeQualifierList(): TypeQualifierListContext[];
   public typeQualifierList(i: number): TypeQualifierListContext;
   public typeQualifierList(
@@ -11730,33 +11183,28 @@ export class PointerContext extends ParserRuleContext {
       return this.getRuleContext(i, TypeQualifierListContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_pointer;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterPointer != null) {
+    if (listener.enterPointer) {
       listener.enterPointer(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitPointer != null) {
+    if (listener.exitPointer) {
       listener.exitPointer(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitPointer != null) {
+    if (visitor.visitPointer) {
       return visitor.visitPointer(this);
     } else {
       return visitor.visitChildren(this);
@@ -11776,33 +11224,28 @@ export class TypeQualifierListContext extends ParserRuleContext {
       return this.getRuleContext(i, TypeQualifierContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_typeQualifierList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTypeQualifierList != null) {
+    if (listener.enterTypeQualifierList) {
       listener.enterTypeQualifierList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTypeQualifierList != null) {
+    if (listener.exitTypeQualifierList) {
       listener.exitTypeQualifierList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTypeQualifierList != null) {
+    if (visitor.visitTypeQualifierList) {
       return visitor.visitTypeQualifierList(this);
     } else {
       return visitor.visitChildren(this);
@@ -11814,41 +11257,34 @@ export class ParameterTypeListContext extends ParserRuleContext {
   public parameterList(): ParameterListContext {
     return this.getRuleContext(0, ParameterListContext);
   }
-
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   public Ellipsis(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Ellipsis, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_parameterTypeList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterParameterTypeList != null) {
+    if (listener.enterParameterTypeList) {
       listener.enterParameterTypeList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitParameterTypeList != null) {
+    if (listener.exitParameterTypeList) {
       listener.exitParameterTypeList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitParameterTypeList != null) {
+    if (visitor.visitParameterTypeList) {
       return visitor.visitParameterTypeList(this);
     } else {
       return visitor.visitChildren(this);
@@ -11868,7 +11304,6 @@ export class ParameterListContext extends ParserRuleContext {
       return this.getRuleContext(i, ParameterDeclarationContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -11878,33 +11313,28 @@ export class ParameterListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_parameterList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterParameterList != null) {
+    if (listener.enterParameterList) {
       listener.enterParameterList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitParameterList != null) {
+    if (listener.exitParameterList) {
       listener.exitParameterList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitParameterList != null) {
+    if (visitor.visitParameterList) {
       return visitor.visitParameterList(this);
     } else {
       return visitor.visitChildren(this);
@@ -11916,45 +11346,37 @@ export class ParameterDeclarationContext extends ParserRuleContext {
   public declarationSpecifiers(): DeclarationSpecifiersContext | undefined {
     return this.tryGetRuleContext(0, DeclarationSpecifiersContext);
   }
-
   public declarator(): DeclaratorContext | undefined {
     return this.tryGetRuleContext(0, DeclaratorContext);
   }
-
   public declarationSpecifiers2(): DeclarationSpecifiers2Context | undefined {
     return this.tryGetRuleContext(0, DeclarationSpecifiers2Context);
   }
-
   public abstractDeclarator(): AbstractDeclaratorContext | undefined {
     return this.tryGetRuleContext(0, AbstractDeclaratorContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_parameterDeclaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterParameterDeclaration != null) {
+    if (listener.enterParameterDeclaration) {
       listener.enterParameterDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitParameterDeclaration != null) {
+    if (listener.exitParameterDeclaration) {
       listener.exitParameterDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitParameterDeclaration != null) {
+    if (visitor.visitParameterDeclaration) {
       return visitor.visitParameterDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -11972,7 +11394,6 @@ export class IdentifierListContext extends ParserRuleContext {
       return this.getToken(CParser.Identifier, i);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -11982,33 +11403,28 @@ export class IdentifierListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_identifierList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterIdentifierList != null) {
+    if (listener.enterIdentifierList) {
       listener.enterIdentifierList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitIdentifierList != null) {
+    if (listener.exitIdentifierList) {
       listener.exitIdentifierList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitIdentifierList != null) {
+    if (visitor.visitIdentifierList) {
       return visitor.visitIdentifierList(this);
     } else {
       return visitor.visitChildren(this);
@@ -12020,37 +11436,31 @@ export class TypeNameContext extends ParserRuleContext {
   public specifierQualifierList(): SpecifierQualifierListContext {
     return this.getRuleContext(0, SpecifierQualifierListContext);
   }
-
   public abstractDeclarator(): AbstractDeclaratorContext | undefined {
     return this.tryGetRuleContext(0, AbstractDeclaratorContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_typeName;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTypeName != null) {
+    if (listener.enterTypeName) {
       listener.enterTypeName(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTypeName != null) {
+    if (listener.exitTypeName) {
       listener.exitTypeName(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTypeName != null) {
+    if (visitor.visitTypeName) {
       return visitor.visitTypeName(this);
     } else {
       return visitor.visitChildren(this);
@@ -12062,13 +11472,11 @@ export class AbstractDeclaratorContext extends ParserRuleContext {
   public pointer(): PointerContext | undefined {
     return this.tryGetRuleContext(0, PointerContext);
   }
-
   public directAbstractDeclarator():
     | DirectAbstractDeclaratorContext
     | undefined {
     return this.tryGetRuleContext(0, DirectAbstractDeclaratorContext);
   }
-
   public gccDeclaratorExtension(): GccDeclaratorExtensionContext[];
   public gccDeclaratorExtension(i: number): GccDeclaratorExtensionContext;
   public gccDeclaratorExtension(
@@ -12080,33 +11488,28 @@ export class AbstractDeclaratorContext extends ParserRuleContext {
       return this.getRuleContext(i, GccDeclaratorExtensionContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_abstractDeclarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterAbstractDeclarator != null) {
+    if (listener.enterAbstractDeclarator) {
       listener.enterAbstractDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitAbstractDeclarator != null) {
+    if (listener.exitAbstractDeclarator) {
       listener.exitAbstractDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitAbstractDeclarator != null) {
+    if (visitor.visitAbstractDeclarator) {
       return visitor.visitAbstractDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -12118,15 +11521,12 @@ export class DirectAbstractDeclaratorContext extends ParserRuleContext {
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public abstractDeclarator(): AbstractDeclaratorContext | undefined {
     return this.tryGetRuleContext(0, AbstractDeclaratorContext);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public gccDeclaratorExtension(): GccDeclaratorExtensionContext[];
   public gccDeclaratorExtension(i: number): GccDeclaratorExtensionContext;
   public gccDeclaratorExtension(
@@ -12138,67 +11538,54 @@ export class DirectAbstractDeclaratorContext extends ParserRuleContext {
       return this.getRuleContext(i, GccDeclaratorExtensionContext);
     }
   }
-
   public LeftBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBracket, 0);
   }
-
   public RightBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBracket, 0);
   }
-
   public typeQualifierList(): TypeQualifierListContext | undefined {
     return this.tryGetRuleContext(0, TypeQualifierListContext);
   }
-
   public assignmentExpression(): AssignmentExpressionContext | undefined {
     return this.tryGetRuleContext(0, AssignmentExpressionContext);
   }
-
   public Static(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Static, 0);
   }
-
   public Star(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Star, 0);
   }
-
   public parameterTypeList(): ParameterTypeListContext | undefined {
     return this.tryGetRuleContext(0, ParameterTypeListContext);
   }
-
   public directAbstractDeclarator():
     | DirectAbstractDeclaratorContext
     | undefined {
     return this.tryGetRuleContext(0, DirectAbstractDeclaratorContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_directAbstractDeclarator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDirectAbstractDeclarator != null) {
+    if (listener.enterDirectAbstractDeclarator) {
       listener.enterDirectAbstractDeclarator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDirectAbstractDeclarator != null) {
+    if (listener.exitDirectAbstractDeclarator) {
       listener.exitDirectAbstractDeclarator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDirectAbstractDeclarator != null) {
+    if (visitor.visitDirectAbstractDeclarator) {
       return visitor.visitDirectAbstractDeclarator(this);
     } else {
       return visitor.visitChildren(this);
@@ -12210,33 +11597,28 @@ export class TypedefNameContext extends ParserRuleContext {
   public Identifier(): TerminalNode {
     return this.getToken(CParser.Identifier, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_typedefName;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTypedefName != null) {
+    if (listener.enterTypedefName) {
       listener.enterTypedefName(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTypedefName != null) {
+    if (listener.exitTypedefName) {
       listener.exitTypedefName(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTypedefName != null) {
+    if (visitor.visitTypedefName) {
       return visitor.visitTypedefName(this);
     } else {
       return visitor.visitChildren(this);
@@ -12248,49 +11630,40 @@ export class InitializerContext extends ParserRuleContext {
   public assignmentExpression(): AssignmentExpressionContext | undefined {
     return this.tryGetRuleContext(0, AssignmentExpressionContext);
   }
-
   public LeftBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBrace, 0);
   }
-
   public initializerList(): InitializerListContext | undefined {
     return this.tryGetRuleContext(0, InitializerListContext);
   }
-
   public RightBrace(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBrace, 0);
   }
-
   public Comma(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Comma, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_initializer;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterInitializer != null) {
+    if (listener.enterInitializer) {
       listener.enterInitializer(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitInitializer != null) {
+    if (listener.exitInitializer) {
       listener.exitInitializer(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitInitializer != null) {
+    if (visitor.visitInitializer) {
       return visitor.visitInitializer(this);
     } else {
       return visitor.visitChildren(this);
@@ -12308,7 +11681,6 @@ export class InitializerListContext extends ParserRuleContext {
       return this.getRuleContext(i, InitializerContext);
     }
   }
-
   public designation(): DesignationContext[];
   public designation(i: number): DesignationContext;
   public designation(i?: number): DesignationContext | DesignationContext[] {
@@ -12318,7 +11690,6 @@ export class InitializerListContext extends ParserRuleContext {
       return this.getRuleContext(i, DesignationContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -12328,33 +11699,28 @@ export class InitializerListContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_initializerList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterInitializerList != null) {
+    if (listener.enterInitializerList) {
       listener.enterInitializerList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitInitializerList != null) {
+    if (listener.exitInitializerList) {
       listener.exitInitializerList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitInitializerList != null) {
+    if (visitor.visitInitializerList) {
       return visitor.visitInitializerList(this);
     } else {
       return visitor.visitChildren(this);
@@ -12366,37 +11732,31 @@ export class DesignationContext extends ParserRuleContext {
   public designatorList(): DesignatorListContext {
     return this.getRuleContext(0, DesignatorListContext);
   }
-
   public Assign(): TerminalNode {
     return this.getToken(CParser.Assign, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_designation;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDesignation != null) {
+    if (listener.enterDesignation) {
       listener.enterDesignation(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDesignation != null) {
+    if (listener.exitDesignation) {
       listener.exitDesignation(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDesignation != null) {
+    if (visitor.visitDesignation) {
       return visitor.visitDesignation(this);
     } else {
       return visitor.visitChildren(this);
@@ -12414,33 +11774,28 @@ export class DesignatorListContext extends ParserRuleContext {
       return this.getRuleContext(i, DesignatorContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_designatorList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDesignatorList != null) {
+    if (listener.enterDesignatorList) {
       listener.enterDesignatorList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDesignatorList != null) {
+    if (listener.exitDesignatorList) {
       listener.exitDesignatorList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDesignatorList != null) {
+    if (visitor.visitDesignatorList) {
       return visitor.visitDesignatorList(this);
     } else {
       return visitor.visitChildren(this);
@@ -12452,49 +11807,40 @@ export class DesignatorContext extends ParserRuleContext {
   public LeftBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftBracket, 0);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   public RightBracket(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightBracket, 0);
   }
-
   public Dot(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Dot, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_designator;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDesignator != null) {
+    if (listener.enterDesignator) {
       listener.enterDesignator(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDesignator != null) {
+    if (listener.exitDesignator) {
       listener.exitDesignator(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDesignator != null) {
+    if (visitor.visitDesignator) {
       return visitor.visitDesignator(this);
     } else {
       return visitor.visitChildren(this);
@@ -12506,27 +11852,21 @@ export class StaticAssertDeclarationContext extends ParserRuleContext {
   public StaticAssert(): TerminalNode {
     return this.getToken(CParser.StaticAssert, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public constantExpression(): ConstantExpressionContext {
     return this.getRuleContext(0, ConstantExpressionContext);
   }
-
   public Comma(): TerminalNode {
     return this.getToken(CParser.Comma, 0);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   public Semi(): TerminalNode {
     return this.getToken(CParser.Semi, 0);
   }
-
   public StringLiteral(): TerminalNode[];
   public StringLiteral(i: number): TerminalNode;
   public StringLiteral(i?: number): TerminalNode | TerminalNode[] {
@@ -12536,33 +11876,28 @@ export class StaticAssertDeclarationContext extends ParserRuleContext {
       return this.getToken(CParser.StringLiteral, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_staticAssertDeclaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStaticAssertDeclaration != null) {
+    if (listener.enterStaticAssertDeclaration) {
       listener.enterStaticAssertDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStaticAssertDeclaration != null) {
+    if (listener.exitStaticAssertDeclaration) {
       listener.exitStaticAssertDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStaticAssertDeclaration != null) {
+    if (visitor.visitStaticAssertDeclaration) {
       return visitor.visitStaticAssertDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -12574,43 +11909,33 @@ export class StatementContext extends ParserRuleContext {
   public labeledStatement(): LabeledStatementContext | undefined {
     return this.tryGetRuleContext(0, LabeledStatementContext);
   }
-
   public compoundStatement(): CompoundStatementContext | undefined {
     return this.tryGetRuleContext(0, CompoundStatementContext);
   }
-
   public expressionStatement(): ExpressionStatementContext | undefined {
     return this.tryGetRuleContext(0, ExpressionStatementContext);
   }
-
   public selectionStatement(): SelectionStatementContext | undefined {
     return this.tryGetRuleContext(0, SelectionStatementContext);
   }
-
   public iterationStatement(): IterationStatementContext | undefined {
     return this.tryGetRuleContext(0, IterationStatementContext);
   }
-
   public jumpStatement(): JumpStatementContext | undefined {
     return this.tryGetRuleContext(0, JumpStatementContext);
   }
-
   public LeftParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.LeftParen, 0);
   }
-
   public RightParen(): TerminalNode | undefined {
     return this.tryGetToken(CParser.RightParen, 0);
   }
-
   public Semi(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Semi, 0);
   }
-
   public Volatile(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Volatile, 0);
   }
-
   public logicalOrExpression(): LogicalOrExpressionContext[];
   public logicalOrExpression(i: number): LogicalOrExpressionContext;
   public logicalOrExpression(
@@ -12622,7 +11947,6 @@ export class StatementContext extends ParserRuleContext {
       return this.getRuleContext(i, LogicalOrExpressionContext);
     }
   }
-
   public Colon(): TerminalNode[];
   public Colon(i: number): TerminalNode;
   public Colon(i?: number): TerminalNode | TerminalNode[] {
@@ -12632,7 +11956,6 @@ export class StatementContext extends ParserRuleContext {
       return this.getToken(CParser.Colon, i);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -12642,33 +11965,28 @@ export class StatementContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_statement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterStatement != null) {
+    if (listener.enterStatement) {
       listener.enterStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitStatement != null) {
+    if (listener.exitStatement) {
       listener.exitStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitStatement != null) {
+    if (visitor.visitStatement) {
       return visitor.visitStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -12680,53 +11998,43 @@ export class LabeledStatementContext extends ParserRuleContext {
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public Colon(): TerminalNode {
     return this.getToken(CParser.Colon, 0);
   }
-
   public statement(): StatementContext {
     return this.getRuleContext(0, StatementContext);
   }
-
   public Case(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Case, 0);
   }
-
   public constantExpression(): ConstantExpressionContext | undefined {
     return this.tryGetRuleContext(0, ConstantExpressionContext);
   }
-
   public Default(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Default, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_labeledStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterLabeledStatement != null) {
+    if (listener.enterLabeledStatement) {
       listener.enterLabeledStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitLabeledStatement != null) {
+    if (listener.exitLabeledStatement) {
       listener.exitLabeledStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitLabeledStatement != null) {
+    if (visitor.visitLabeledStatement) {
       return visitor.visitLabeledStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -12738,41 +12046,34 @@ export class CompoundStatementContext extends ParserRuleContext {
   public LeftBrace(): TerminalNode {
     return this.getToken(CParser.LeftBrace, 0);
   }
-
   public RightBrace(): TerminalNode {
     return this.getToken(CParser.RightBrace, 0);
   }
-
   public blockItemList(): BlockItemListContext | undefined {
     return this.tryGetRuleContext(0, BlockItemListContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_compoundStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterCompoundStatement != null) {
+    if (listener.enterCompoundStatement) {
       listener.enterCompoundStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitCompoundStatement != null) {
+    if (listener.exitCompoundStatement) {
       listener.exitCompoundStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitCompoundStatement != null) {
+    if (visitor.visitCompoundStatement) {
       return visitor.visitCompoundStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -12790,33 +12091,28 @@ export class BlockItemListContext extends ParserRuleContext {
       return this.getRuleContext(i, BlockItemContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_blockItemList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterBlockItemList != null) {
+    if (listener.enterBlockItemList) {
       listener.enterBlockItemList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitBlockItemList != null) {
+    if (listener.exitBlockItemList) {
       listener.exitBlockItemList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitBlockItemList != null) {
+    if (visitor.visitBlockItemList) {
       return visitor.visitBlockItemList(this);
     } else {
       return visitor.visitChildren(this);
@@ -12828,37 +12124,31 @@ export class BlockItemContext extends ParserRuleContext {
   public statement(): StatementContext | undefined {
     return this.tryGetRuleContext(0, StatementContext);
   }
-
   public declaration(): DeclarationContext | undefined {
     return this.tryGetRuleContext(0, DeclarationContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_blockItem;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterBlockItem != null) {
+    if (listener.enterBlockItem) {
       listener.enterBlockItem(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitBlockItem != null) {
+    if (listener.exitBlockItem) {
       listener.exitBlockItem(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitBlockItem != null) {
+    if (visitor.visitBlockItem) {
       return visitor.visitBlockItem(this);
     } else {
       return visitor.visitChildren(this);
@@ -12870,37 +12160,31 @@ export class ExpressionStatementContext extends ParserRuleContext {
   public Semi(): TerminalNode {
     return this.getToken(CParser.Semi, 0);
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_expressionStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterExpressionStatement != null) {
+    if (listener.enterExpressionStatement) {
       listener.enterExpressionStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitExpressionStatement != null) {
+    if (listener.exitExpressionStatement) {
       listener.exitExpressionStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitExpressionStatement != null) {
+    if (visitor.visitExpressionStatement) {
       return visitor.visitExpressionStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -12912,19 +12196,15 @@ export class SelectionStatementContext extends ParserRuleContext {
   public If(): TerminalNode | undefined {
     return this.tryGetToken(CParser.If, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public expression(): ExpressionContext {
     return this.getRuleContext(0, ExpressionContext);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   public statement(): StatementContext[];
   public statement(i: number): StatementContext;
   public statement(i?: number): StatementContext | StatementContext[] {
@@ -12934,41 +12214,34 @@ export class SelectionStatementContext extends ParserRuleContext {
       return this.getRuleContext(i, StatementContext);
     }
   }
-
   public Else(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Else, 0);
   }
-
   public Switch(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Switch, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_selectionStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterSelectionStatement != null) {
+    if (listener.enterSelectionStatement) {
       listener.enterSelectionStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitSelectionStatement != null) {
+    if (listener.exitSelectionStatement) {
       listener.exitSelectionStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitSelectionStatement != null) {
+    if (visitor.visitSelectionStatement) {
       return visitor.visitSelectionStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -12980,65 +12253,52 @@ export class IterationStatementContext extends ParserRuleContext {
   public While(): TerminalNode | undefined {
     return this.tryGetToken(CParser.While, 0);
   }
-
   public LeftParen(): TerminalNode {
     return this.getToken(CParser.LeftParen, 0);
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   public RightParen(): TerminalNode {
     return this.getToken(CParser.RightParen, 0);
   }
-
   public statement(): StatementContext {
     return this.getRuleContext(0, StatementContext);
   }
-
   public Do(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Do, 0);
   }
-
   public Semi(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Semi, 0);
   }
-
   public For(): TerminalNode | undefined {
     return this.tryGetToken(CParser.For, 0);
   }
-
   public forCondition(): ForConditionContext | undefined {
     return this.tryGetRuleContext(0, ForConditionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_iterationStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterIterationStatement != null) {
+    if (listener.enterIterationStatement) {
       listener.enterIterationStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitIterationStatement != null) {
+    if (listener.exitIterationStatement) {
       listener.exitIterationStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitIterationStatement != null) {
+    if (visitor.visitIterationStatement) {
       return visitor.visitIterationStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -13056,11 +12316,9 @@ export class ForConditionContext extends ParserRuleContext {
       return this.getToken(CParser.Semi, i);
     }
   }
-
   public forDeclaration(): ForDeclarationContext | undefined {
     return this.tryGetRuleContext(0, ForDeclarationContext);
   }
-
   public forExpression(): ForExpressionContext[];
   public forExpression(i: number): ForExpressionContext;
   public forExpression(
@@ -13072,37 +12330,31 @@ export class ForConditionContext extends ParserRuleContext {
       return this.getRuleContext(i, ForExpressionContext);
     }
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_forCondition;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterForCondition != null) {
+    if (listener.enterForCondition) {
       listener.enterForCondition(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitForCondition != null) {
+    if (listener.exitForCondition) {
       listener.exitForCondition(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitForCondition != null) {
+    if (visitor.visitForCondition) {
       return visitor.visitForCondition(this);
     } else {
       return visitor.visitChildren(this);
@@ -13114,37 +12366,31 @@ export class ForDeclarationContext extends ParserRuleContext {
   public declarationSpecifiers(): DeclarationSpecifiersContext {
     return this.getRuleContext(0, DeclarationSpecifiersContext);
   }
-
   public initDeclaratorList(): InitDeclaratorListContext | undefined {
     return this.tryGetRuleContext(0, InitDeclaratorListContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_forDeclaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterForDeclaration != null) {
+    if (listener.enterForDeclaration) {
       listener.enterForDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitForDeclaration != null) {
+    if (listener.exitForDeclaration) {
       listener.exitForDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitForDeclaration != null) {
+    if (visitor.visitForDeclaration) {
       return visitor.visitForDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -13164,7 +12410,6 @@ export class ForExpressionContext extends ParserRuleContext {
       return this.getRuleContext(i, AssignmentExpressionContext);
     }
   }
-
   public Comma(): TerminalNode[];
   public Comma(i: number): TerminalNode;
   public Comma(i?: number): TerminalNode | TerminalNode[] {
@@ -13174,33 +12419,28 @@ export class ForExpressionContext extends ParserRuleContext {
       return this.getToken(CParser.Comma, i);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_forExpression;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterForExpression != null) {
+    if (listener.enterForExpression) {
       listener.enterForExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitForExpression != null) {
+    if (listener.exitForExpression) {
       listener.exitForExpression(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitForExpression != null) {
+    if (visitor.visitForExpression) {
       return visitor.visitForExpression(this);
     } else {
       return visitor.visitChildren(this);
@@ -13212,61 +12452,49 @@ export class JumpStatementContext extends ParserRuleContext {
   public Semi(): TerminalNode {
     return this.getToken(CParser.Semi, 0);
   }
-
   public Goto(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Goto, 0);
   }
-
   public Identifier(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Identifier, 0);
   }
-
   public Return(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Return, 0);
   }
-
   public unaryExpression(): UnaryExpressionContext | undefined {
     return this.tryGetRuleContext(0, UnaryExpressionContext);
   }
-
   public Continue(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Continue, 0);
   }
-
   public Break(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Break, 0);
   }
-
   public expression(): ExpressionContext | undefined {
     return this.tryGetRuleContext(0, ExpressionContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_jumpStatement;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterJumpStatement != null) {
+    if (listener.enterJumpStatement) {
       listener.enterJumpStatement(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitJumpStatement != null) {
+    if (listener.exitJumpStatement) {
       listener.exitJumpStatement(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitJumpStatement != null) {
+    if (visitor.visitJumpStatement) {
       return visitor.visitJumpStatement(this);
     } else {
       return visitor.visitChildren(this);
@@ -13278,37 +12506,31 @@ export class CompilationUnitContext extends ParserRuleContext {
   public EOF(): TerminalNode {
     return this.getToken(CParser.EOF, 0);
   }
-
   public translationUnit(): TranslationUnitContext | undefined {
     return this.tryGetRuleContext(0, TranslationUnitContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_compilationUnit;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterCompilationUnit != null) {
+    if (listener.enterCompilationUnit) {
       listener.enterCompilationUnit(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitCompilationUnit != null) {
+    if (listener.exitCompilationUnit) {
       listener.exitCompilationUnit(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitCompilationUnit != null) {
+    if (visitor.visitCompilationUnit) {
       return visitor.visitCompilationUnit(this);
     } else {
       return visitor.visitChildren(this);
@@ -13328,33 +12550,28 @@ export class TranslationUnitContext extends ParserRuleContext {
       return this.getRuleContext(i, ExternalDeclarationContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_translationUnit;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterTranslationUnit != null) {
+    if (listener.enterTranslationUnit) {
       listener.enterTranslationUnit(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitTranslationUnit != null) {
+    if (listener.exitTranslationUnit) {
       listener.exitTranslationUnit(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitTranslationUnit != null) {
+    if (visitor.visitTranslationUnit) {
       return visitor.visitTranslationUnit(this);
     } else {
       return visitor.visitChildren(this);
@@ -13366,41 +12583,34 @@ export class ExternalDeclarationContext extends ParserRuleContext {
   public functionDefinition(): FunctionDefinitionContext | undefined {
     return this.tryGetRuleContext(0, FunctionDefinitionContext);
   }
-
   public declaration(): DeclarationContext | undefined {
     return this.tryGetRuleContext(0, DeclarationContext);
   }
-
   public Semi(): TerminalNode | undefined {
     return this.tryGetToken(CParser.Semi, 0);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_externalDeclaration;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterExternalDeclaration != null) {
+    if (listener.enterExternalDeclaration) {
       listener.enterExternalDeclaration(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitExternalDeclaration != null) {
+    if (listener.exitExternalDeclaration) {
       listener.exitExternalDeclaration(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitExternalDeclaration != null) {
+    if (visitor.visitExternalDeclaration) {
       return visitor.visitExternalDeclaration(this);
     } else {
       return visitor.visitChildren(this);
@@ -13412,45 +12622,37 @@ export class FunctionDefinitionContext extends ParserRuleContext {
   public declarator(): DeclaratorContext {
     return this.getRuleContext(0, DeclaratorContext);
   }
-
   public compoundStatement(): CompoundStatementContext {
     return this.getRuleContext(0, CompoundStatementContext);
   }
-
   public declarationSpecifiers(): DeclarationSpecifiersContext | undefined {
     return this.tryGetRuleContext(0, DeclarationSpecifiersContext);
   }
-
   public declarationList(): DeclarationListContext | undefined {
     return this.tryGetRuleContext(0, DeclarationListContext);
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_functionDefinition;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterFunctionDefinition != null) {
+    if (listener.enterFunctionDefinition) {
       listener.enterFunctionDefinition(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitFunctionDefinition != null) {
+    if (listener.exitFunctionDefinition) {
       listener.exitFunctionDefinition(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitFunctionDefinition != null) {
+    if (visitor.visitFunctionDefinition) {
       return visitor.visitFunctionDefinition(this);
     } else {
       return visitor.visitChildren(this);
@@ -13468,33 +12670,28 @@ export class DeclarationListContext extends ParserRuleContext {
       return this.getRuleContext(i, DeclarationContext);
     }
   }
-
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return CParser.RULE_declarationList;
   }
-
   // @Override
   public enterRule(listener: CListener): void {
-    if (listener.enterDeclarationList != null) {
+    if (listener.enterDeclarationList) {
       listener.enterDeclarationList(this);
     }
   }
-
   // @Override
   public exitRule(listener: CListener): void {
-    if (listener.exitDeclarationList != null) {
+    if (listener.exitDeclarationList) {
       listener.exitDeclarationList(this);
     }
   }
-
   // @Override
   public accept<Result>(visitor: CVisitor<Result>): Result {
-    if (visitor.visitDeclarationList != null) {
+    if (visitor.visitDeclarationList) {
       return visitor.visitDeclarationList(this);
     } else {
       return visitor.visitChildren(this);

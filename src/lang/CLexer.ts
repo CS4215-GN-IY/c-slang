@@ -1,13 +1,14 @@
 // Generated from ./src/lang/C.g4 by ANTLR 4.9.0-SNAPSHOT
 
-import { type ATN } from 'antlr4ts/atn/ATN';
+import { ATN } from 'antlr4ts/atn/ATN';
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
-import { type CharStream } from 'antlr4ts/CharStream';
+import { CharStream } from 'antlr4ts/CharStream';
 import { Lexer } from 'antlr4ts/Lexer';
 import { LexerATNSimulator } from 'antlr4ts/atn/LexerATNSimulator';
-import { NotNull, Override } from 'antlr4ts/Decorators';
+import { NotNull } from 'antlr4ts/Decorators';
+import { Override } from 'antlr4ts/Decorators';
 import { RuleContext } from 'antlr4ts/RuleContext';
-import { type Vocabulary } from 'antlr4ts/Vocabulary';
+import { Vocabulary } from 'antlr4ts/Vocabulary';
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl';
 
 import * as Utils from 'antlr4ts/misc/Utils';
@@ -137,11 +138,13 @@ export class CLexer extends Lexer {
   public static readonly BlockComment = 122;
   public static readonly LineComment = 123;
 
+  // tslint:disable:no-trailing-whitespace
   public static readonly channelNames: string[] = [
     'DEFAULT_TOKEN_CHANNEL',
     'HIDDEN'
   ];
 
+  // tslint:disable:no-trailing-whitespace
   public static readonly modeNames: string[] = ['DEFAULT_MODE'];
 
   public static readonly ruleNames: string[] = [
@@ -420,7 +423,6 @@ export class CLexer extends Lexer {
     "'.'",
     "'...'"
   ];
-
   private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
     undefined,
     undefined,
@@ -547,7 +549,6 @@ export class CLexer extends Lexer {
     'BlockComment',
     'LineComment'
   ];
-
   public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(
     CLexer._LITERAL_NAMES,
     CLexer._SYMBOLIC_NAMES,
@@ -559,6 +560,7 @@ export class CLexer extends Lexer {
   public get vocabulary(): Vocabulary {
     return CLexer.VOCABULARY;
   }
+  // tslint:enable:no-trailing-whitespace
 
   constructor(input: CharStream) {
     super(input);
@@ -566,7 +568,9 @@ export class CLexer extends Lexer {
   }
 
   // @Override
-  public readonly grammarFileName = 'C.g4';
+  public get grammarFileName(): string {
+    return 'C.g4';
+  }
 
   // @Override
   public get ruleNames(): string[] {
@@ -828,7 +832,6 @@ export class CLexer extends Lexer {
     '\x03\x02\x02\x02\xD5\u03BA\x03\x02\x02\x02\xD7\u03BD\x03\x02\x02\x02\xD9' +
     '\u03C0\x03\x02\x02\x02\xDB\u03C2\x03\x02\x02\x02\xDD\u03C6\x03\x02\x02' +
     '\x02\xDF\u03D0\x03\x02\x02\x02\xE1\u03D2\x03\x02\x02\x02\xE3';
-
   private static readonly _serializedATNSegment1: string =
     '\u03D4\x03\x02\x02\x02\xE5\u03E0\x03\x02\x02\x02\xE7\u03E2\x03\x02\x02' +
     '\x02\xE9\u03EA\x03\x02\x02\x02\xEB\u03F9\x03\x02\x02\x02\xED\u03FB\x03' +
@@ -1131,7 +1134,6 @@ export class CLexer extends Lexer {
     '\u0438\u0436\x03\x02\x02\x02\u0439\u0104\x03\x02\x02\x02\u043A\u043D\x05' +
     '\u0107\x84\x02\u043B\u043D\x05\u0109\x85\x02\u043C\u043A\x03\x02\x02\x02' +
     '\u043C\u043B\x03\x02\x02\x02\u043D\u0106\x03';
-
   private static readonly _serializedATNSegment2: string =
     '\x02\x02\x02\u043E\u0440\x05\u010B\x86\x02\u043F\u0441\x05\u010D\x87\x02' +
     '\u0440\u043F\x03\x02\x02\x02\u0440\u0441\x03\x02\x02\x02\u0441\u0443\x03' +
@@ -1289,7 +1291,6 @@ export class CLexer extends Lexer {
     '\u04B0\u04B3\u04BB\u04BE\u04C2\u04C9\u04CE\u04D7\u04DB\u04E7\u04EE\u04F9' +
     '\u04FF\u0507\u050B\u050E\u051B\u0522\u0532\u0538\u053F\u0543\u0549\u0550' +
     '\u055D\u0565\u056B\u056E\u0578\u0586\x03\b\x02\x02';
-
   public static readonly _serializedATN: string = Utils.join(
     [
       CLexer._serializedATNSegment0,
@@ -1298,7 +1299,6 @@ export class CLexer extends Lexer {
     ],
     ''
   );
-
   public static __ATN: ATN;
   public static get _ATN(): ATN {
     if (!CLexer.__ATN) {
