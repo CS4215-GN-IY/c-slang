@@ -9,6 +9,7 @@ module.exports = {
     // Prettier should always come last so that it overrides other configs.
     'prettier'
   ],
+  ignorePatterns: ["src/lang/"],
   overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',

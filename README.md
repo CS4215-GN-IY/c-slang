@@ -15,3 +15,23 @@
    ```sh
    yarn install
    ```
+
+# Usage
+
+1. To build,
+   ```sh
+   yarn build
+   ```
+1. Add \"c-slang\" to your PATH
+   ```sh
+   cd dist
+   npm link
+   ```
+1. To start the repl, run
+   ```sh
+   c-slang
+   ```
+   Or if you did not do step 2, run
+   ```sh
+   node dist/repl/repl.js
+   ```
