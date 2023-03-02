@@ -1,5 +1,8 @@
 import { type Result, type Value } from './types/evaluationResults';
 import { type CompilationUnitContext } from '../lang/CParser';
+import { Stack } from '../utils/stack';
+import { type ExplicitControlEvaluatorState } from './types/state';
+import { type ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 
 /**
  * Evaluates the abstract syntax tree using an explicit-control evaluator &
@@ -32,5 +35,20 @@ export const evaluate = async (
  * @param ast The abstract syntax tree to evaluate.
  */
 export const interpret = (ast: CompilationUnitContext): Value => {
+  const agenda = new Stack<ParserRuleContext>();
+  agenda.push(ast);
+  const stash = new Stack<Value>();
+  const state: ExplicitControlEvaluatorState = {
+    agenda,
+    stash
+  };
+
+  while (agenda.size() > 0) {
+    const command = agenda.pop();
+    // TODO: Implement the rest of the explicit-control evaluator.
+    console.log(state);
+    console.log(command);
+  }
+
   return undefined;
 };
