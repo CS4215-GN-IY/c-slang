@@ -1,11 +1,24 @@
 import { start } from 'repl';
-import { parse } from '../parser/parser';
+import { type Context } from 'vm';
+import { run } from '../runner/runner';
+import { type Result } from '../interpreter/types/evaluationResults';
 
 const startRepl = (): void => {
   start({
-    eval: (text, unusedContext, unusedFileName, callback) => {
-      const tree: string = parse(text);
-      callback(null, tree);
+    eval: (
+      replInput: string,
+      _context: Context,
+      _fileName: string,
+      callback: (err: Error | null, result: any) => void
+    ) => {
+      void run(replInput).then((result: Result) => {
+        if (result.status === 'error') {
+          // TODO: Implement error handling.
+          callback(new Error('An error occurred!'), undefined);
+          return;
+        }
+        callback(null, result.value);
+      });
     }
   });
 };

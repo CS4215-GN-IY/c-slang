@@ -25,7 +25,7 @@
 1. Add \"c-slang\" to your PATH
    ```sh
    cd dist
-   npm link
+   yarn link
    ```
 1. To start the repl, run
    ```sh
