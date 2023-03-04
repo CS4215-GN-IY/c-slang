@@ -24,14 +24,7 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Get current pull request number
-        id: find_pr_number
-        uses: jwalton/gh-find-current-pr@v1
       - name: Run tests
-        uses: ArtiomTr/jest-coverage-report-action@v2
-        with:
-          package-manager: yarn
-          skip-step: install
-          annotations: all
-          output: comment, report-markdown
-          prnumber: ${{ steps.find_pr_number.outputs.number }}
+        run: yarn jest --coverage
+      - name: Publish code coverage
+        uses: coverallsapp/github-action@v1
