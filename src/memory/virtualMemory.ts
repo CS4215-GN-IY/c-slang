@@ -1,6 +1,7 @@
 import { PageTable } from './pageTable';
 import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
+import { SegmentAddress } from './segmentAddress';
 
 export class virtualMemory {
   private readonly l1PageTable: PageTable = new PageTable();
@@ -9,14 +10,9 @@ export class virtualMemory {
   private readonly l4PageTables: PageTable[] = [];
   private readonly l5PageTables: PageTable[] = [];
 
-  private readonly segmentBaseAddresses: Map<Segment, number> = new Map<
+  private readonly segmentAddresses: Map<Segment, SegmentAddress> = new Map<
     Segment,
-    number
-  >();
-
-  private readonly segmentPointers: Map<Segment, number> = new Map<
-    Segment,
-    number
+    SegmentAddress
   >();
 
   /**
@@ -33,15 +29,38 @@ export class virtualMemory {
     const stackBaseAddress = this.allocateEntries(stackSize);
     const heapBaseAddress = this.allocateEntries(heapSize);
 
-    this.segmentBaseAddresses.set(Segment.TEXT, textBaseAddress);
-    this.segmentBaseAddresses.set(Segment.DATA, dataBaseAddress);
-    this.segmentBaseAddresses.set(Segment.STACK, stackBaseAddress);
-    this.segmentBaseAddresses.set(Segment.HEAP, heapBaseAddress);
-
-    this.segmentPointers.set(Segment.TEXT, textBaseAddress);
-    this.segmentPointers.set(Segment.DATA, dataBaseAddress);
-    this.segmentPointers.set(Segment.STACK, stackBaseAddress);
-    this.segmentPointers.set(Segment.HEAP, heapBaseAddress);
+    this.segmentAddresses.set(
+      Segment.TEXT,
+      new SegmentAddress(
+        textBaseAddress,
+        textBaseAddress,
+        textBaseAddress + textSize * PageTable.ENTRY_SIZE
+      )
+    );
+    this.segmentAddresses.set(
+      Segment.DATA,
+      new SegmentAddress(
+        dataBaseAddress,
+        dataBaseAddress,
+        dataBaseAddress + dataSize * PageTable.NUM_OF_ENTRIES
+      )
+    );
+    this.segmentAddresses.set(
+      Segment.STACK,
+      new SegmentAddress(
+        stackBaseAddress,
+        stackBaseAddress,
+        stackBaseAddress + stackSize * PageTable.NUM_OF_ENTRIES
+      )
+    );
+    this.segmentAddresses.set(
+      Segment.HEAP,
+      new SegmentAddress(
+        heapBaseAddress,
+        heapBaseAddress,
+        heapBaseAddress + heapSize * PageTable.NUM_OF_ENTRIES
+      )
+    );
   }
 
   /**
@@ -57,14 +76,18 @@ export class virtualMemory {
    * Allocates data to the top of the segment.
    */
   public allocate(data: number, segment: Segment): number {
-    const address = this.segmentPointers.get(segment);
-    if (address === undefined) {
+    const segmentAddress = this.segmentAddresses.get(segment);
+    if (segmentAddress === undefined) {
       return -1;
     }
+    if (segmentAddress.hasReachedTop()) {
+      return -1;
+    }
+    const address = segmentAddress.getFreeAddress();
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
-    l5PageTable.setFreeEntry(data);
-    this.segmentPointers.set(segment, address + PageTable.ENTRY_SIZE);
+    l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
+    segmentAddress.updateFreeAddress(address + PageTable.ENTRY_SIZE);
     return address;
   }
 

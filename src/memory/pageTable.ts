@@ -54,6 +54,18 @@ export class PageTable {
     return offset;
   }
 
+  public setFreeEntryAt(offset: number, data: number): number {
+    if (!this.isValidOffset(offset)) {
+      return -1;
+    }
+    assert(this.isFree(offset), 'Offset must be free.');
+
+    this.removeFromFreeList(offset);
+    this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
+    this.numOfFreeEntries -= 1;
+    return offset;
+  }
+
   /**
    * Updates the data contained in a used entry.
    */
@@ -84,6 +96,26 @@ export class PageTable {
 
   public getFreeOffset(): number {
     return this.freeList;
+  }
+
+  private removeFromFreeList(offset: number): void {
+    let prevFreeOffset = PageTable.EMPTY_FREE_LIST;
+    let freeOffset = this.freeList;
+    while (freeOffset !== offset && freeOffset !== PageTable.EMPTY_FREE_LIST) {
+      prevFreeOffset = freeOffset;
+      freeOffset = this.get(freeOffset);
+    }
+
+    if (freeOffset === PageTable.EMPTY_FREE_LIST) {
+      return;
+    }
+
+    if (prevFreeOffset !== PageTable.EMPTY_FREE_LIST) {
+      this.memory.setFloat64(
+        prevFreeOffset * PageTable.ENTRY_SIZE,
+        this.get(freeOffset)
+      );
+    }
   }
 
   public getNumOfFreeEntries(): number {
