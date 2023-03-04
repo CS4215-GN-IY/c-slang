@@ -141,24 +141,28 @@ export class VirtualMemory {
       ids.l4Idx,
       this.l4PageTables,
       numOfNewL5PageTables,
+      ids.getL5EntryOffset(),
       this.l5PageTables.length - numOfNewL5PageTables
     );
     const numOfNewL3PageTables = this.allocateLevelPageTables(
       ids.l3Idx,
       this.l3PageTables,
       numOfNewL4PageTables,
+      ids.l4Idx,
       this.l4PageTables.length - numOfNewL4PageTables
     );
     const numOfNewL2PageTables = this.allocateLevelPageTables(
       ids.l2Idx,
       this.l2PageTables,
       numOfNewL3PageTables,
+      ids.l3Idx,
       this.l3PageTables.length - numOfNewL3PageTables
     );
     this.updatePageTableEntries(
       this.l1PageTable,
       ids.l1Idx,
       numOfNewL2PageTables,
+      ids.l2Idx,
       this.l2PageTables.length - numOfNewL2PageTables
     );
   }
@@ -167,11 +171,12 @@ export class VirtualMemory {
     idx: number,
     levelPageTables: PageTable[],
     numOfEntries: number,
+    firstEntryIdx?: number,
     firstEntryData?: number
   ): number {
     const prevLastTableIdx = levelPageTables.length - 1;
     const numOfEntriesInLastTable =
-      idx === 0 ? 0 : PageTable.NUM_OF_ENTRIES - idx;
+      idx === 0 ? 0 : PageTable.NUM_OF_ENTRIES - idx - 1;
     const numOfNewPageTables = Math.max(
       Math.ceil(
         (numOfEntries - numOfEntriesInLastTable) / PageTable.NUM_OF_ENTRIES
@@ -179,11 +184,12 @@ export class VirtualMemory {
       0
     );
     this.addNewPageTables(numOfNewPageTables, levelPageTables);
+    const newEntriesStartIdx = firstEntryIdx === 0 ? idx : idx + 1;
     if (firstEntryData !== undefined) {
       this.updatePageTablesEntries(
         prevLastTableIdx,
         levelPageTables,
-        idx,
+        newEntriesStartIdx,
         numOfEntries,
         firstEntryData
       );
@@ -204,13 +210,17 @@ export class VirtualMemory {
     pageTable: PageTable,
     idxInPageTable: number,
     numOfEntries: number,
+    firstEntryIdx: number,
     firstEntryData: number
   ): void {
+    const newEntriesStartIdx =
+      firstEntryIdx === 0 ? idxInPageTable : idxInPageTable + 1;
     for (let i = firstEntryData; i < firstEntryData + numOfEntries; i++) {
-      if (idxInPageTable >= PageTable.NUM_OF_ENTRIES) {
+      if (newEntriesStartIdx >= PageTable.NUM_OF_ENTRIES) {
         return;
       }
-      pageTable.setFreeEntry(i);
+      pageTable.setFreeEntryAt(newEntriesStartIdx, i);
+      idxInPageTable = (newEntriesStartIdx + 1) % PageTable.NUM_OF_ENTRIES;
     }
   }
 
@@ -227,8 +237,8 @@ export class VirtualMemory {
         pageTableIdx += 1;
         pageTable = levelPageTables[pageTableIdx];
       }
-      pageTable.setFreeEntry(i);
-      idxInPageTable += 1;
+      pageTable.setFreeEntryAt(idxInPageTable, i);
+      idxInPageTable = (idxInPageTable + 1) % PageTable.NUM_OF_ENTRIES;
     }
   }
 }

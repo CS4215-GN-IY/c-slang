@@ -106,6 +106,10 @@ export class PageTable {
       return;
     }
 
+    if (prevFreeOffset === PageTable.EMPTY_FREE_LIST) {
+      this.freeList = this.get(freeOffset);
+    }
+
     if (prevFreeOffset !== PageTable.EMPTY_FREE_LIST) {
       this.memory.setFloat64(
         prevFreeOffset * PageTable.ENTRY_SIZE,
