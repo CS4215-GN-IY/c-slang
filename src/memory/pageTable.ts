@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { MemoryError, MemoryErrorType } from './memoryError';
 
 export class PageTable {
   public static readonly NUM_OF_ENTRIES: number = 512;
@@ -30,7 +31,7 @@ export class PageTable {
    */
   public get(offset: number): number {
     if (!this.isValidOffset(offset)) {
-      return -1;
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
     }
 
     return this.memory.getFloat64(offset * PageTable.ENTRY_SIZE);
@@ -43,7 +44,7 @@ export class PageTable {
     const offset = this.freeList;
 
     if (!this.isValidOffset(offset)) {
-      return -1;
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
     }
 
     this.freeList = this.get(offset);
@@ -56,8 +57,9 @@ export class PageTable {
    */
   public setFreeEntryAt(offset: number, data: number): number {
     if (!this.isValidOffset(offset)) {
-      return -1;
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
     }
+
     assert(this.isFree(offset), 'Offset must be free.');
 
     this.removeFromFreeList(offset);
@@ -70,7 +72,7 @@ export class PageTable {
    */
   public setAllocatedEntry(offset: number, data: number): void {
     if (!this.isValidOffset(offset)) {
-      return;
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
     }
 
     assert(!this.isFree(offset), 'Only allocated entries can be set.');
@@ -83,7 +85,7 @@ export class PageTable {
    */
   public free(offset: number): void {
     if (!this.isValidOffset(offset)) {
-      return;
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
     }
 
     assert(!this.isFree(offset), 'Only allocated entries can be freed.');

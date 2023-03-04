@@ -2,6 +2,7 @@ import { PageTable } from './pageTable';
 import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
+import { MemoryError, MemoryErrorType } from './memoryError';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -83,10 +84,13 @@ export class VirtualMemory {
   public allocate(data: number, segment: Segment): number {
     const segmentAddress = this.segmentAddresses.get(segment);
     if (segmentAddress === undefined) {
-      return -1;
+      throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
     }
     if (segmentAddress.hasReachedTop()) {
-      return -1;
+      throw new MemoryError(
+        MemoryErrorType.SEGMENTATION_FAULT,
+        segmentAddress.getFreeAddress()
+      );
     }
     const address = segmentAddress.getFreeAddress();
     const addressIndex = AddressIndex.fromAddress(address);
