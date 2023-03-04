@@ -18,7 +18,7 @@ export class PageTable {
     // The free list is made of entries, where each free entry carries the offset of the next free entry
     this.freeList = 0;
     let i;
-    for (i = this.freeList; i <= PageTable.NUM_OF_ENTRIES; i++) {
+    for (i = this.freeList; i < PageTable.NUM_OF_ENTRIES - 1; i++) {
       this.memory.setFloat64(i * PageTable.ENTRY_SIZE, i + 1);
     }
     this.memory.setFloat64(i, PageTable.EMPTY_FREE_LIST);
@@ -54,6 +54,9 @@ export class PageTable {
     return offset;
   }
 
+  /**
+   * Sets a free entry to contain data.
+   */
   public setFreeEntryAt(offset: number, data: number): number {
     if (!this.isValidOffset(offset)) {
       return -1;
@@ -138,10 +141,10 @@ export class PageTable {
     let freeOffset = this.freeList;
     while (freeOffset !== PageTable.EMPTY_FREE_LIST) {
       if (offset === freeOffset) {
-        return false;
+        return true;
       }
       freeOffset = this.get(freeOffset);
     }
-    return true;
+    return false;
   }
 }

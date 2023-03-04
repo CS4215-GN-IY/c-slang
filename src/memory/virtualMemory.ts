@@ -3,14 +3,14 @@ import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 
-export class virtualMemory {
-  private readonly l1PageTable: PageTable = new PageTable();
-  private readonly l2PageTables: PageTable[] = [];
-  private readonly l3PageTables: PageTable[] = [];
-  private readonly l4PageTables: PageTable[] = [];
-  private readonly l5PageTables: PageTable[] = [];
+export class VirtualMemory {
+  readonly l1PageTable: PageTable = new PageTable();
+  readonly l2PageTables: PageTable[] = [];
+  readonly l3PageTables: PageTable[] = [];
+  readonly l4PageTables: PageTable[] = [];
+  readonly l5PageTables: PageTable[] = [];
 
-  private readonly segmentAddresses: Map<Segment, SegmentAddress> = new Map<
+  readonly segmentAddresses: Map<Segment, SegmentAddress> = new Map<
     Segment,
     SegmentAddress
   >();
@@ -24,10 +24,16 @@ export class virtualMemory {
     stackSize: number,
     heapSize: number
   ) {
-    const textBaseAddress = this.allocateEntries(textSize);
-    const dataBaseAddress = this.allocateEntries(dataSize);
-    const stackBaseAddress = this.allocateEntries(stackSize);
-    const heapBaseAddress = this.allocateEntries(heapSize);
+    const memoryBaseAddress = 0;
+    const textBaseAddress = memoryBaseAddress;
+    const dataBaseAddress = textBaseAddress + textSize * PageTable.ENTRY_SIZE;
+    const stackBaseAddress = dataBaseAddress + dataSize * PageTable.ENTRY_SIZE;
+    const heapBaseAddress = stackBaseAddress + stackSize * PageTable.ENTRY_SIZE;
+
+    this.allocatePageTables(textBaseAddress, textSize);
+    this.allocatePageTables(dataBaseAddress, dataSize);
+    this.allocatePageTables(stackBaseAddress, stackSize);
+    this.allocatePageTables(heapBaseAddress, heapSize);
 
     this.segmentAddresses.set(
       Segment.TEXT,
@@ -42,7 +48,7 @@ export class virtualMemory {
       new SegmentAddress(
         dataBaseAddress,
         dataBaseAddress,
-        dataBaseAddress + dataSize * PageTable.NUM_OF_ENTRIES
+        dataBaseAddress + dataSize * PageTable.ENTRY_SIZE
       )
     );
     this.segmentAddresses.set(
@@ -50,7 +56,7 @@ export class virtualMemory {
       new SegmentAddress(
         stackBaseAddress,
         stackBaseAddress,
-        stackBaseAddress + stackSize * PageTable.NUM_OF_ENTRIES
+        stackBaseAddress + stackSize * PageTable.ENTRY_SIZE
       )
     );
     this.segmentAddresses.set(
@@ -58,7 +64,7 @@ export class virtualMemory {
       new SegmentAddress(
         heapBaseAddress,
         heapBaseAddress,
-        heapBaseAddress + heapSize * PageTable.NUM_OF_ENTRIES
+        heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
       )
     );
   }
@@ -121,95 +127,65 @@ export class virtualMemory {
     return this.l4PageTables[l4PageTableIdx];
   }
 
-  private allocateEntries(numOfEntries: number): number {
-    const l5AllocationData = this.allocateNewPageTables(
+  private allocatePageTables(baseAddress: number, numOfEntries: number): void {
+    const ids = AddressIndex.fromAddress(baseAddress);
+    const numOfNewL5PageTables = this.allocateLevelPageTables(
+      ids.getL5EntryOffset(),
       this.l5PageTables,
       numOfEntries
     );
-    const l4AllocationData = this.allocateNewPageTables(
+    const numOfNewL4PageTables = this.allocateLevelPageTables(
+      ids.l4Idx,
       this.l4PageTables,
-      l5AllocationData.numOfNewPageTables,
-      l5AllocationData.newPageTablesStartIdx
+      numOfNewL5PageTables,
+      this.l5PageTables.length - numOfNewL5PageTables
     );
-    const l3AllocationData = this.allocateNewPageTables(
+    const numOfNewL3PageTables = this.allocateLevelPageTables(
+      ids.l3Idx,
       this.l3PageTables,
-      l4AllocationData.numOfNewPageTables,
-      l4AllocationData.newPageTablesStartIdx
+      numOfNewL4PageTables,
+      this.l4PageTables.length - numOfNewL4PageTables
     );
-    const l2AllocationData = this.allocateNewPageTables(
+    const numOfNewL2PageTables = this.allocateLevelPageTables(
+      ids.l2Idx,
       this.l2PageTables,
-      l3AllocationData.numOfNewPageTables,
-      l3AllocationData.newPageTablesStartIdx
+      numOfNewL3PageTables,
+      this.l3PageTables.length - numOfNewL3PageTables
     );
-    const l1NewEntriesStartIdx = this.allocateNewEntriesInPageTable(
+    this.updatePageTableEntries(
       this.l1PageTable,
-      l2AllocationData.numOfNewPageTables,
-      l2AllocationData.newPageTablesStartIdx
+      ids.l1Idx,
+      numOfNewL2PageTables,
+      this.l2PageTables.length - numOfNewL2PageTables
     );
-
-    const addressIndex = AddressIndex.fromIds(
-      l1NewEntriesStartIdx,
-      l2AllocationData.newEntriesStartIdx,
-      l3AllocationData.newEntriesStartIdx,
-      l4AllocationData.newEntriesStartIdx,
-      l5AllocationData.newEntriesStartIdx
-    );
-    return addressIndex.getAddress();
   }
 
-  private allocateNewEntriesInPageTable(
-    pageTable: PageTable,
+  private allocateLevelPageTables(
+    idx: number,
+    levelPageTables: PageTable[],
     numOfEntries: number,
-    newEntriesStartIdx: number
+    firstEntryData?: number
   ): number {
-    const firstNewEntryIdx = pageTable.getFreeOffset();
-    for (
-      let i = newEntriesStartIdx;
-      i < newEntriesStartIdx + numOfEntries;
-      i++
-    ) {
-      pageTable.setFreeEntry(i);
-    }
-    return firstNewEntryIdx;
-  }
-
-  private allocateNewPageTables(
-    pageTables: PageTable[],
-    numOfEntries: number,
-    newEntriesStartValue?: number
-  ): PageTablesAllocationData {
-    const newPageTablesStartIdx = pageTables.length;
-    const numOfFreeEntriesInLastPageTable =
-      pageTables[pageTables.length - 1].getNumOfFreeEntries();
-    const numOfNewPageTables = Math.ceil(
-      (numOfEntries - numOfFreeEntriesInLastPageTable) /
-        PageTable.NUM_OF_ENTRIES
+    const prevLastTableIdx = levelPageTables.length - 1;
+    const numOfEntriesInLastTable =
+      idx === 0 ? 0 : PageTable.NUM_OF_ENTRIES - idx;
+    const numOfNewPageTables = Math.max(
+      Math.ceil(
+        (numOfEntries - numOfEntriesInLastTable) / PageTable.NUM_OF_ENTRIES
+      ),
+      0
     );
-    this.addNewPageTables(numOfNewPageTables, pageTables);
-    const firstNewEntryIdx =
-      numOfFreeEntriesInLastPageTable > 0
-        ? pageTables[newPageTablesStartIdx - 1].getFreeOffset()
-        : pageTables[newPageTablesStartIdx].getFreeOffset();
-
-    if (newEntriesStartValue === undefined) {
-      return new PageTablesAllocationData(
-        firstNewEntryIdx,
-        newPageTablesStartIdx,
-        numOfNewPageTables
+    this.addNewPageTables(numOfNewPageTables, levelPageTables);
+    if (firstEntryData !== undefined) {
+      this.updatePageTablesEntries(
+        prevLastTableIdx,
+        levelPageTables,
+        idx,
+        numOfEntries,
+        firstEntryData
       );
     }
-
-    this.storeChildPageTableIds(
-      pageTables,
-      newPageTablesStartIdx - 1,
-      newEntriesStartValue,
-      numOfEntries
-    );
-    return new PageTablesAllocationData(
-      firstNewEntryIdx,
-      newPageTablesStartIdx,
-      numOfNewPageTables
-    );
+    return numOfNewPageTables;
   }
 
   private addNewPageTables(
@@ -221,46 +197,35 @@ export class virtualMemory {
     }
   }
 
-  /**
-   * Stores the index of each child (lower level) page table,
-   * in an entry of the parent (higher level) page table.
-   *
-   * @return index to the first allocated entry in the parent page table.
-   */
-  private storeChildPageTableIds(
-    parentPageTables: PageTable[],
-    parentPageTableStartIdx: number,
-    childPageTableStartIdx: number,
-    numOfNewChildIds: number
+  private updatePageTableEntries(
+    pageTable: PageTable,
+    idxInPageTable: number,
+    numOfEntries: number,
+    firstEntryData: number
   ): void {
-    let parentPageTableIdx = parentPageTableStartIdx;
-    for (
-      let i = childPageTableStartIdx;
-      i < childPageTableStartIdx + numOfNewChildIds;
-      i++
-    ) {
-      if (parentPageTables[parentPageTableIdx].isFull()) {
-        parentPageTableIdx += 1;
+    for (let i = firstEntryData; i < firstEntryData + numOfEntries; i++) {
+      if (idxInPageTable >= PageTable.NUM_OF_ENTRIES) {
+        return;
       }
-
-      const parentPageTable = parentPageTables[parentPageTableIdx];
-      parentPageTable.setFreeEntry(i);
+      pageTable.setFreeEntry(i);
     }
   }
-}
 
-class PageTablesAllocationData {
-  readonly newEntriesStartIdx: number;
-  readonly newPageTablesStartIdx: number;
-  readonly numOfNewPageTables: number;
-
-  constructor(
-    newEntriesStartIdx: number,
-    newPageTableStartIdx: number,
-    numOfNewPageTables: number
-  ) {
-    this.newEntriesStartIdx = newEntriesStartIdx;
-    this.newPageTablesStartIdx = newPageTableStartIdx;
-    this.numOfNewPageTables = numOfNewPageTables;
+  private updatePageTablesEntries(
+    pageTableIdx: number,
+    levelPageTables: PageTable[],
+    idxInPageTable: number,
+    numOfEntries: number,
+    firstEntryData: number
+  ): void {
+    let pageTable = levelPageTables[pageTableIdx];
+    for (let i = firstEntryData; i < firstEntryData + numOfEntries; i++) {
+      if (idxInPageTable === 0) {
+        pageTableIdx += 1;
+        pageTable = levelPageTables[pageTableIdx];
+      }
+      pageTable.setFreeEntry(i);
+      idxInPageTable += 1;
+    }
   }
 }
