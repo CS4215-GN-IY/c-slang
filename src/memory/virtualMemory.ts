@@ -24,8 +24,7 @@ export class VirtualMemory {
     stackSize: number,
     heapSize: number
   ) {
-    const memoryBaseAddress = 0;
-    const textBaseAddress = memoryBaseAddress;
+    const textBaseAddress = 0;
     const dataBaseAddress = textBaseAddress + textSize * PageTable.ENTRY_SIZE;
     const stackBaseAddress = dataBaseAddress + dataSize * PageTable.ENTRY_SIZE;
     const heapBaseAddress = stackBaseAddress + stackSize * PageTable.ENTRY_SIZE;

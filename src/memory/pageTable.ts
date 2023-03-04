@@ -7,7 +7,6 @@ export class PageTable {
 
   private readonly memory: DataView;
   private freeList: number;
-  private numOfFreeEntries: number;
 
   constructor() {
     const data = new ArrayBuffer(
@@ -22,7 +21,6 @@ export class PageTable {
       this.memory.setFloat64(i * PageTable.ENTRY_SIZE, i + 1);
     }
     this.memory.setFloat64(i, PageTable.EMPTY_FREE_LIST);
-    this.numOfFreeEntries = PageTable.NUM_OF_ENTRIES;
   }
 
   /**
@@ -50,7 +48,6 @@ export class PageTable {
 
     this.freeList = this.get(offset);
     this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
-    this.numOfFreeEntries -= 1;
     return offset;
   }
 
@@ -65,7 +62,6 @@ export class PageTable {
 
     this.removeFromFreeList(offset);
     this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
-    this.numOfFreeEntries -= 1;
     return offset;
   }
 
@@ -94,11 +90,6 @@ export class PageTable {
 
     this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, this.freeList);
     this.freeList = offset;
-    this.numOfFreeEntries += 1;
-  }
-
-  public getFreeOffset(): number {
-    return this.freeList;
   }
 
   private removeFromFreeList(offset: number): void {
@@ -119,14 +110,6 @@ export class PageTable {
         this.get(freeOffset)
       );
     }
-  }
-
-  public getNumOfFreeEntries(): number {
-    return this.numOfFreeEntries;
-  }
-
-  public isFull(): boolean {
-    return this.numOfFreeEntries === 0;
   }
 
   private isValidOffset(offset: number): boolean {
