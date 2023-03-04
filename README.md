@@ -1,5 +1,7 @@
 # c-slang
 
+[![Coverage Status](https://coveralls.io/repos/github/CS4215-GN-IY/c-slang/badge.svg?branch=master)](https://coveralls.io/github/CS4215-GN-IY/c-slang?branch=master)
+
 # Getting Started
 
 1. Install nodenv by following the instructions [here](https://github.com/nodenv/nodenv#installation).
@@ -25,7 +27,7 @@
 1. Add \"c-slang\" to your PATH
    ```sh
    cd dist
-   npm link
+   yarn link
    ```
 1. To start the repl, run
    ```sh
