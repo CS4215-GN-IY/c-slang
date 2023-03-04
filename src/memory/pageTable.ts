@@ -1,8 +1,8 @@
 import assert from 'assert';
 
 export class PageTable {
-  public static NUM_OF_ENTRIES: number = 512;
-  private static readonly ENTRY_SIZE: number = 8;
+  public static readonly NUM_OF_ENTRIES: number = 512;
+  public static readonly ENTRY_SIZE: number = 8;
   private static readonly EMPTY_FREE_LIST: number = -1;
 
   private readonly memory: DataView;

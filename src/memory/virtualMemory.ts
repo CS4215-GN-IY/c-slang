@@ -1,4 +1,6 @@
 import { PageTable } from './pageTable';
+import { AddressIndex } from './addressIndex';
+import { Segment } from './segment';
 
 export class virtualMemory {
   private readonly l1PageTable: PageTable = new PageTable();
@@ -7,10 +9,15 @@ export class virtualMemory {
   private readonly l4PageTables: PageTable[] = [];
   private readonly l5PageTables: PageTable[] = [];
 
-  private readonly textBaseAddress: number;
-  private readonly dataBaseAddress: number;
-  private readonly stackBaseAddress: number;
-  private readonly heapBaseAddress: number;
+  private readonly segmentBaseAddresses: Map<Segment, number> = new Map<
+    Segment,
+    number
+  >();
+
+  private readonly segmentPointers: Map<Segment, number> = new Map<
+    Segment,
+    number
+  >();
 
   /**
    * Initializes the size of each segment. Size is the number of entries allocated to the segment.
@@ -21,32 +28,74 @@ export class virtualMemory {
     stackSize: number,
     heapSize: number
   ) {
-    this.textBaseAddress = this.allocateEntries(textSize);
-    this.dataBaseAddress = this.allocateEntries(dataSize);
-    this.stackBaseAddress = this.allocateEntries(stackSize);
-    this.heapBaseAddress = this.allocateEntries(heapSize);
+    const textBaseAddress = this.allocateEntries(textSize);
+    const dataBaseAddress = this.allocateEntries(dataSize);
+    const stackBaseAddress = this.allocateEntries(stackSize);
+    const heapBaseAddress = this.allocateEntries(heapSize);
+
+    this.segmentBaseAddresses.set(Segment.TEXT, textBaseAddress);
+    this.segmentBaseAddresses.set(Segment.DATA, dataBaseAddress);
+    this.segmentBaseAddresses.set(Segment.STACK, stackBaseAddress);
+    this.segmentBaseAddresses.set(Segment.HEAP, heapBaseAddress);
+
+    this.segmentPointers.set(Segment.TEXT, textBaseAddress);
+    this.segmentPointers.set(Segment.DATA, dataBaseAddress);
+    this.segmentPointers.set(Segment.STACK, stackBaseAddress);
+    this.segmentPointers.set(Segment.HEAP, heapBaseAddress);
   }
 
-  private makeAddress(
-    l1Idx: number,
-    l2Idx: number,
-    l3Idx: number,
-    l4Idx: number,
-    l5Idx: number
-  ): number {
-    // l1 to l4 indexes occupy 9 bits each
-    const l1ToL4Ids = [l1Idx, l2Idx, l3Idx, l4Idx];
-    let address = 0;
-    l1ToL4Ids.forEach((idx) => {
-      address <<= 9;
-      address |= idx;
-    });
+  /**
+   * Gets data from entry at address.
+   */
+  public get(address: number): number {
+    const ids = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(ids);
+    return l5PageTable.get(ids.getL5EntryOffset());
+  }
 
-    // l5 index occupies 12 bits. First 9 bits index to an entry.
-    // Last 3 bits index to within the entry.
-    address <<= 12;
-    address |= l5Idx;
+  /**
+   * Allocates data to the top of the segment.
+   */
+  public allocate(data: number, segment: Segment): number {
+    const address = this.segmentPointers.get(segment);
+    if (address === undefined) {
+      return -1;
+    }
+    const addressIndex = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(addressIndex);
+    l5PageTable.setFreeEntry(data);
+    this.segmentPointers.set(segment, address + PageTable.ENTRY_SIZE);
     return address;
+  }
+
+  /**
+   * Updates entry at address to store data.
+   * The address must have been allocated previously. It cannot be a free address.
+   */
+  public set(address: number, data: number): void {
+    const addressIndex = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(addressIndex);
+    l5PageTable.setAllocatedEntry(addressIndex.getL5EntryOffset(), data);
+  }
+
+  /**
+   * Frees address.
+   */
+  public free(address: number): void {
+    const addressIndex = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(addressIndex);
+    l5PageTable.free(addressIndex.getL5EntryOffset());
+  }
+
+  private getL5PageTable(addressIndex: AddressIndex): PageTable {
+    const l2PageTableIdx = this.l1PageTable.get(addressIndex.l1Idx);
+    const l3PageTableIdx = this.l2PageTables[l2PageTableIdx].get(
+      addressIndex.l2Idx
+    );
+    const l4PageTableIdx = this.l3PageTables[l3PageTableIdx].get(
+      addressIndex.l3Idx
+    );
+    return this.l4PageTables[l4PageTableIdx];
   }
 
   private allocateEntries(numOfEntries: number): number {
@@ -75,13 +124,14 @@ export class virtualMemory {
       l2AllocationData.newPageTablesStartIdx
     );
 
-    return this.makeAddress(
+    const addressIndex = AddressIndex.fromIds(
       l1NewEntriesStartIdx,
       l2AllocationData.newEntriesStartIdx,
       l3AllocationData.newEntriesStartIdx,
       l4AllocationData.newEntriesStartIdx,
       l5AllocationData.newEntriesStartIdx
     );
+    return addressIndex.getAddress();
   }
 
   private allocateNewEntriesInPageTable(
