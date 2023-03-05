@@ -168,7 +168,7 @@ export class VirtualMemory {
   }
 
   private allocateLevelPageTables(
-    idx: number,
+    idxInPageTable: number,
     levelPageTables: PageTable[],
     numOfEntries: number,
     firstEntryIdx?: number,
@@ -176,7 +176,7 @@ export class VirtualMemory {
   ): number {
     const prevLastTableIdx = levelPageTables.length - 1;
     const numOfEntriesInLastTable =
-      idx === 0 ? 0 : PageTable.NUM_OF_ENTRIES - idx - 1;
+      idxInPageTable === 0 ? 0 : PageTable.NUM_OF_ENTRIES - idxInPageTable - 1;
     const numOfNewPageTables = Math.max(
       Math.ceil(
         (numOfEntries - numOfEntriesInLastTable) / PageTable.NUM_OF_ENTRIES
@@ -184,7 +184,8 @@ export class VirtualMemory {
       0
     );
     this.addNewPageTables(numOfNewPageTables, levelPageTables);
-    const newEntriesStartIdx = firstEntryIdx === 0 ? idx : idx + 1;
+    const newEntriesStartIdx =
+      firstEntryIdx === 0 ? idxInPageTable : idxInPageTable + 1;
     if (firstEntryData !== undefined) {
       this.updatePageTablesEntries(
         prevLastTableIdx,
