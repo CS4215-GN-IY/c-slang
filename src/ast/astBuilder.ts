@@ -159,9 +159,14 @@ export class ASTBuilder implements CVisitor<BaseNode> {
   }
 
   visitCompilationUnit(ctx: CompilationUnitContext): Program {
-    return {
-      type: 'Program'
-    };
+    const translationUnit = ctx.translationUnit();
+    if (translationUnit === undefined) {
+      return {
+        type: 'Program',
+        body: []
+      };
+    }
+    return this.visitTranslationUnit(translationUnit);
   }
 
   visitCompoundStatement(ctx: CompoundStatementContext): BaseNode {
@@ -436,8 +441,12 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitTranslationUnit(ctx: TranslationUnitContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitTranslationUnit(ctx: TranslationUnitContext): Program {
+    return {
+      type: 'Program',
+      // TODO: Implement this.
+      body: []
+    };
   }
 
   visitTypeName(ctx: TypeNameContext): BaseNode {

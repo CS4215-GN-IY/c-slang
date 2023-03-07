@@ -7,4 +7,6 @@ export interface BaseNode {
 
 export interface Program extends BaseNode {
   type: 'Program';
+  // TODO: Use actual type instead of placeholder.
+  body: number[];
 }
