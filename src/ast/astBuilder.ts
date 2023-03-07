@@ -1,5 +1,5 @@
 import { type CVisitor } from '../lang/CVisitor';
-import { type BaseNode } from './types';
+import { type BaseNode, type Program } from './types';
 import {
   type ErrorNode,
   type ParseTree,
@@ -158,8 +158,10 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitCompilationUnit(ctx: CompilationUnitContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitCompilationUnit(ctx: CompilationUnitContext): Program {
+    return {
+      type: 'Program'
+    };
   }
 
   visitCompoundStatement(ctx: CompoundStatementContext): BaseNode {

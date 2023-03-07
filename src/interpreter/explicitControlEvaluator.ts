@@ -1,8 +1,7 @@
 import { type Result, type Value } from './types/evaluationResults';
-import { type CompilationUnitContext } from '../lang/CParser';
 import { Stack } from '../utils/stack';
 import { type ExplicitControlEvaluatorState } from './types/state';
-import { type ParserRuleContext } from 'antlr4ts/ParserRuleContext';
+import { type BaseNode, type Program } from '../ast/types';
 
 /**
  * Evaluates the abstract syntax tree using an explicit-control evaluator &
@@ -10,9 +9,7 @@ import { type ParserRuleContext } from 'antlr4ts/ParserRuleContext';
  *
  * @param ast The abstract syntax tree to evaluate.
  */
-export const evaluate = async (
-  ast: CompilationUnitContext
-): Promise<Result> => {
+export const evaluate = async (ast: Program): Promise<Result> => {
   return await new Promise(
     (
       resolve: (value: Result | PromiseLike<Result>) => void,
@@ -34,8 +31,8 @@ export const evaluate = async (
  *
  * @param ast The abstract syntax tree to evaluate.
  */
-export const interpret = (ast: CompilationUnitContext): Value => {
-  const agenda = new Stack<ParserRuleContext>();
+export const interpret = (ast: Program): Value => {
+  const agenda = new Stack<BaseNode>();
   agenda.push(ast);
   const stash = new Stack<Value>();
   const state: ExplicitControlEvaluatorState = {

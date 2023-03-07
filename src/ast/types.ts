@@ -4,3 +4,7 @@ export interface BaseNode {
   // make use of TypeScript's discriminated unions.
   type: string;
 }
+
+export interface Program extends BaseNode {
+  type: 'Program';
+}
