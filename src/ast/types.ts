@@ -7,6 +7,17 @@ export interface BaseNode {
 
 export interface Program extends BaseNode {
   type: 'Program';
-  // TODO: Use actual type instead of placeholder.
-  body: number[];
+  declarations: ExternalDeclaration[];
+}
+
+export type ExternalDeclaration = FunctionDefinition | Declaration;
+
+// TODO: Implement actual type.
+export interface FunctionDefinition extends BaseNode {
+  type: 'FunctionDefinition';
+}
+
+// TODO: Implement actual type.
+export interface Declaration extends BaseNode {
+  type: 'Declaration';
 }

@@ -7,7 +7,7 @@ describe('compilationUnit', () => {
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
-      body: []
+      declarations: []
     };
     expect(ast).toEqual(expectedAst);
   });

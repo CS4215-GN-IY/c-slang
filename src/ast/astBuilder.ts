@@ -1,5 +1,5 @@
 import { type CVisitor } from '../lang/CVisitor';
-import { type BaseNode, type Program } from './types';
+import { type BaseNode, type ExternalDeclaration, type Program } from './types';
 import {
   type ErrorNode,
   type ParseTree,
@@ -163,7 +163,7 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     if (translationUnit === undefined) {
       return {
         type: 'Program',
-        body: []
+        declarations: []
       };
     }
     return this.visitTranslationUnit(translationUnit);
@@ -259,8 +259,12 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitExternalDeclaration(ctx: ExternalDeclarationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitExternalDeclaration(
+    ctx: ExternalDeclarationContext
+  ): ExternalDeclaration {
+    return {
+      type: 'FunctionDefinition'
+    };
   }
 
   visitForCondition(ctx: ForConditionContext): BaseNode {
@@ -444,8 +448,7 @@ export class ASTBuilder implements CVisitor<BaseNode> {
   visitTranslationUnit(ctx: TranslationUnitContext): Program {
     return {
       type: 'Program',
-      // TODO: Implement this.
-      body: []
+      declarations: ctx.externalDeclaration().map(this.visitExternalDeclaration)
     };
   }
 
