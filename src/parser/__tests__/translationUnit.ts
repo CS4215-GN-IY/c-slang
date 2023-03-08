@@ -1,9 +1,9 @@
 import { parse } from '../parser';
 import { type Program } from '../../ast/types';
 
-describe('compilationUnit', () => {
-  it('returns an empty Program for the empty string', () => {
-    const code = '';
+describe('translationUnit', () => {
+  it('filters out null declarations (such as from the empty statement)', () => {
+    const code = ';';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',

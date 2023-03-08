@@ -7,17 +7,64 @@ export interface BaseNode {
 
 export interface Program extends BaseNode {
   type: 'Program';
-  declarations: ExternalDeclaration[];
+  body: ExternalDeclaration[];
 }
 
-export type ExternalDeclaration = FunctionDefinition | Declaration;
+export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
-// TODO: Implement actual type.
-export interface FunctionDefinition extends BaseNode {
-  type: 'FunctionDefinition';
+export interface BaseStatement extends BaseNode {}
+
+export type Expression = AssignmentExpression | Identifier | Literal;
+
+export interface BaseExpression extends BaseNode {}
+
+export interface Identifier extends BaseExpression {
+  type: 'Identifier';
+  name: string;
 }
 
-// TODO: Implement actual type.
-export interface Declaration extends BaseNode {
-  type: 'Declaration';
+export interface Literal extends BaseExpression {
+  type: 'Literal';
+  value: number | string;
+}
+
+export interface AssignmentExpression extends BaseExpression {
+  type: 'AssignmentExpression';
+  operator: AssignmentOperator;
+  // TODO: Not the final type.
+  left: string;
+  right: Expression;
+}
+
+export type AssignmentOperator =
+  | '='
+  | '*='
+  | '/='
+  | '%='
+  | '+='
+  | '-='
+  | '<<='
+  | '>>='
+  | '&='
+  | '^='
+  | '|=';
+
+export interface BaseDeclaration extends BaseStatement {}
+
+// TODO: Implement this.
+export interface FunctionDeclaration extends BaseDeclaration {
+  type: 'FunctionDeclaration';
+}
+
+export interface VariableDeclaration extends BaseDeclaration {
+  type: 'VariableDeclaration';
+  isConstant: boolean;
+  // For multiple variable declarations on the same line that are delimited by comma.
+  declarations: VariableDeclarator[];
+}
+
+export interface VariableDeclarator extends BaseNode {
+  type: 'VariableDeclarator';
+  id: Identifier;
+  initialValue?: Expression;
 }

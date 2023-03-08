@@ -1,5 +1,13 @@
 import { type CVisitor } from '../lang/CVisitor';
-import { type BaseNode, type ExternalDeclaration, type Program } from './types';
+import {
+  type BaseNode,
+  type ExternalDeclaration,
+  type FunctionDeclaration,
+  type Identifier,
+  type Program,
+  type VariableDeclaration,
+  type VariableDeclarator
+} from './types';
 import {
   type ErrorNode,
   type ParseTree,
@@ -96,8 +104,10 @@ import {
   type UnaryOperatorContext,
   type VcSpecificModiferContext
 } from '../lang/CParser';
+import { BrokenInvariantError, UnreachableCaseError } from './errors';
+import { isNotNull } from '../utils/typeGuards';
 
-export class ASTBuilder implements CVisitor<BaseNode> {
+export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
   visit(tree: ParseTree): BaseNode {
     throw new Error('Method not implemented.');
   }
@@ -163,7 +173,7 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     if (translationUnit === undefined) {
       return {
         type: 'Program',
-        declarations: []
+        body: []
       };
     }
     return this.visitTranslationUnit(translationUnit);
@@ -181,8 +191,19 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitDeclaration(ctx: DeclarationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDeclaration(ctx: DeclarationContext): VariableDeclaration {
+    const initDeclaratorList = ctx.initDeclaratorList();
+    if (initDeclaratorList === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a VariableDeclaration without an InitDeclaratorList.'
+      );
+    }
+    return {
+      type: 'VariableDeclaration',
+      // TODO: Implement this based off whether the 'const' keyword is used.
+      isConstant: false,
+      declarations: this.visitInitDeclaratorList(initDeclaratorList)
+    };
   }
 
   visitDeclarationList(ctx: DeclarationListContext): BaseNode {
@@ -201,8 +222,9 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitDeclarator(ctx: DeclaratorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDeclarator(ctx: DeclaratorContext): Identifier {
+    // TODO: Rework this to account for pointers.
+    return this.visitDirectDeclarator(ctx.directDeclarator());
   }
 
   visitDesignation(ctx: DesignationContext): BaseNode {
@@ -223,8 +245,16 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitDirectDeclarator(ctx: DirectDeclaratorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDirectDeclarator(ctx: DirectDeclaratorContext): Identifier {
+    // TODO: Rework this to deal with non-identifiers.
+    const identifier = ctx.Identifier();
+    if (identifier === undefined) {
+      throw new Error('Non-identifiers are not supported yet.');
+    }
+    return {
+      type: 'Identifier',
+      name: identifier.toString()
+    };
   }
 
   visitEnumSpecifier(ctx: EnumSpecifierContext): BaseNode {
@@ -261,10 +291,25 @@ export class ASTBuilder implements CVisitor<BaseNode> {
 
   visitExternalDeclaration(
     ctx: ExternalDeclarationContext
-  ): ExternalDeclaration {
-    return {
-      type: 'FunctionDefinition'
-    };
+  ): ExternalDeclaration | null {
+    const functionDefinition = ctx.functionDefinition();
+    const declaration = ctx.declaration();
+    if (functionDefinition === undefined && declaration === undefined) {
+      // Indicates a semicolon.
+      return null;
+    }
+    if (functionDefinition !== undefined && declaration !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an ExternalDeclaration with both a corresponding FunctionDefinition and Declaration.'
+      );
+    }
+    if (functionDefinition !== undefined) {
+      return this.visitFunctionDefinition(functionDefinition);
+    }
+    if (declaration !== undefined) {
+      return this.visitDeclaration(declaration);
+    }
+    throw new UnreachableCaseError();
   }
 
   visitForCondition(ctx: ForConditionContext): BaseNode {
@@ -279,8 +324,11 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitFunctionDefinition(ctx: FunctionDefinitionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
+    // TODO: Implement this.
+    return {
+      type: 'FunctionDeclaration'
+    };
   }
 
   visitFunctionSpecifier(ctx: FunctionSpecifierContext): BaseNode {
@@ -323,12 +371,18 @@ export class ASTBuilder implements CVisitor<BaseNode> {
     throw new Error('Method not implemented.');
   }
 
-  visitInitDeclarator(ctx: InitDeclaratorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInitDeclarator(ctx: InitDeclaratorContext): VariableDeclarator {
+    // TODO: Implement initial value.
+    return {
+      type: 'VariableDeclarator',
+      id: this.visitDeclarator(ctx.declarator())
+    };
   }
 
-  visitInitDeclaratorList(ctx: InitDeclaratorListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInitDeclaratorList(
+    ctx: InitDeclaratorListContext
+  ): VariableDeclarator[] {
+    return ctx.initDeclarator().map(this.visitInitDeclarator, this);
   }
 
   visitInitializer(ctx: InitializerContext): BaseNode {
@@ -448,7 +502,10 @@ export class ASTBuilder implements CVisitor<BaseNode> {
   visitTranslationUnit(ctx: TranslationUnitContext): Program {
     return {
       type: 'Program',
-      declarations: ctx.externalDeclaration().map(this.visitExternalDeclaration)
+      body: ctx
+        .externalDeclaration()
+        .map(this.visitExternalDeclaration, this)
+        .filter(isNotNull)
     };
   }
 
