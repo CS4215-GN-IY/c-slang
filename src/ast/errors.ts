@@ -9,3 +9,11 @@ export class UnreachableCaseError extends BrokenInvariantError {
     );
   }
 }
+
+export class UnsupportedKeywordError extends ASTConversionError {
+  constructor(keyword: string) {
+    super(
+      `'${keyword}' is a valid keyword in C17 but is not (currently) supported.`
+    );
+  }
+}
