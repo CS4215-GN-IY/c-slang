@@ -1,18 +1,8 @@
 import { parse } from '../parser';
 import { type Program } from '../../ast/types';
 
-describe('externalDeclaration', () => {
-  it('ignores empty statements', () => {
-    const code = ';;;';
-    const ast = parse(code);
-    const expectedAst: Program = {
-      type: 'Program',
-      body: []
-    };
-    expect(ast).toEqual(expectedAst);
-  });
-
-  it('handles variable declarations', () => {
+describe('Top-level variable declarations', () => {
+  it('handles initialised variable declarations', () => {
     const code = 'int a = 5;';
     const ast = parse(code);
     const expectedAst: Program = {
