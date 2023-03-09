@@ -104,8 +104,16 @@ import {
   type UnaryOperatorContext,
   type VcSpecificModiferContext
 } from '../lang/CParser';
-import { BrokenInvariantError, UnreachableCaseError } from './errors';
+import {
+  BrokenInvariantError,
+  UnreachableCaseError,
+  UnsupportedKeywordError
+} from './errors';
 import { isNotNull } from '../utils/typeGuards';
+import {
+  isValidTypeSpecifier,
+  type TypeSpecifier
+} from './keywordWhitelists/typeSpecifiers';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -555,8 +563,72 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitTypeSpecifier(ctx: TypeSpecifierContext): string {
-    throw new Error('Method not implemented.');
+  visitTypeSpecifier(ctx: TypeSpecifierContext): TypeSpecifier {
+    const validateTypeSpecifier = (typeSpecifier: string): TypeSpecifier => {
+      if (isValidTypeSpecifier(typeSpecifier)) {
+        return typeSpecifier;
+      }
+      throw new UnsupportedKeywordError(typeSpecifier);
+    };
+
+    const isVoid = ctx.Void() !== undefined;
+    if (isVoid) {
+      return validateTypeSpecifier('void');
+    }
+
+    const isChar = ctx.Char() !== undefined;
+    if (isChar) {
+      return validateTypeSpecifier('char');
+    }
+
+    const isShort = ctx.Char() !== undefined;
+    if (isShort) {
+      return validateTypeSpecifier('short');
+    }
+
+    const isInt = ctx.Int() !== undefined;
+    if (isInt) {
+      return validateTypeSpecifier('int');
+    }
+
+    const isLong = ctx.Long() !== undefined;
+    if (isLong) {
+      return validateTypeSpecifier('long');
+    }
+
+    const isFloat = ctx.Float() !== undefined;
+    if (isFloat) {
+      return validateTypeSpecifier('float');
+    }
+
+    const isDouble = ctx.Double() !== undefined;
+    if (isDouble) {
+      return validateTypeSpecifier('double');
+    }
+
+    const isSigned = ctx.Signed() !== undefined;
+    if (isSigned) {
+      return validateTypeSpecifier('signed');
+    }
+
+    const isUnsigned = ctx.Unsigned() !== undefined;
+    if (isUnsigned) {
+      return validateTypeSpecifier('unsigned');
+    }
+
+    const isBool = ctx.Bool() !== undefined;
+    if (isBool) {
+      return validateTypeSpecifier('_Bool');
+    }
+
+    const isComplex = ctx.Complex() !== undefined;
+    if (isComplex) {
+      return validateTypeSpecifier('_Complex');
+    }
+
+    // TODO: Implement visiting of nested rules.
+
+    throw new UnreachableCaseError();
   }
 
   visitTypedefName(ctx: TypedefNameContext): BaseNode {
