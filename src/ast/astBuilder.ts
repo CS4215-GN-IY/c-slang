@@ -107,7 +107,7 @@ import {
 import { BrokenInvariantError, UnreachableCaseError } from './errors';
 import { isNotNull } from '../utils/typeGuards';
 
-export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
+export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
     throw new Error('Method not implemented.');
   }
@@ -132,7 +132,7 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     throw new Error('Method not implemented.');
   }
 
-  visitAlignmentSpecifier(ctx: AlignmentSpecifierContext): BaseNode {
+  visitAlignmentSpecifier(ctx: AlignmentSpecifierContext): string {
     throw new Error('Method not implemented.');
   }
 
@@ -193,16 +193,24 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
 
   visitDeclaration(ctx: DeclarationContext): VariableDeclaration {
     const initDeclaratorList = ctx.initDeclaratorList();
-    if (initDeclaratorList === undefined) {
+    const declarations =
+      initDeclaratorList === undefined
+        ? []
+        : this.visitInitDeclaratorList(initDeclaratorList);
+
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers === undefined) {
       throw new BrokenInvariantError(
-        'Encountered a VariableDeclaration without an InitDeclaratorList.'
+        'Encountered a Declaration without DeclarationSpecifiers.'
       );
     }
+    this.visitDeclarationSpecifiers(declarationSpecifiers);
+
     return {
       type: 'VariableDeclaration',
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
-      declarations: this.visitInitDeclaratorList(initDeclaratorList)
+      declarations
     };
   }
 
@@ -210,12 +218,38 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     throw new Error('Method not implemented.');
   }
 
-  visitDeclarationSpecifier(ctx: DeclarationSpecifierContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDeclarationSpecifier(ctx: DeclarationSpecifierContext): string {
+    const storageClassSpecifier = ctx.storageClassSpecifier();
+    if (storageClassSpecifier !== undefined) {
+      return this.visitStorageClassSpecifier(storageClassSpecifier);
+    }
+
+    const typeSpecifier = ctx.typeSpecifier();
+    if (typeSpecifier !== undefined) {
+      return this.visitTypeSpecifier(typeSpecifier);
+    }
+
+    const typeQualifier = ctx.typeQualifier();
+    if (typeQualifier !== undefined) {
+      return this.visitTypeQualifier(typeQualifier);
+    }
+
+    const functionSpecifier = ctx.functionSpecifier();
+    if (functionSpecifier !== undefined) {
+      return this.visitFunctionSpecifier(functionSpecifier);
+    }
+
+    const alignmentSpecifier = ctx.alignmentSpecifier();
+    if (alignmentSpecifier !== undefined) {
+      return this.visitAlignmentSpecifier(alignmentSpecifier);
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitDeclarationSpecifiers(ctx: DeclarationSpecifiersContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDeclarationSpecifiers(ctx: DeclarationSpecifiersContext): string[] {
+    const declarationSpecifiers = ctx.declarationSpecifier();
+    return declarationSpecifiers.map(this.visitDeclarationSpecifier, this);
   }
 
   visitDeclarationSpecifiers2(ctx: DeclarationSpecifiers2Context): BaseNode {
@@ -331,7 +365,7 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     };
   }
 
-  visitFunctionSpecifier(ctx: FunctionSpecifierContext): BaseNode {
+  visitFunctionSpecifier(ctx: FunctionSpecifierContext): string {
     throw new Error('Method not implemented.');
   }
 
@@ -471,7 +505,7 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     throw new Error('Method not implemented.');
   }
 
-  visitStorageClassSpecifier(ctx: StorageClassSpecifierContext): BaseNode {
+  visitStorageClassSpecifier(ctx: StorageClassSpecifierContext): string {
     throw new Error('Method not implemented.');
   }
 
@@ -513,7 +547,7 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     throw new Error('Method not implemented.');
   }
 
-  visitTypeQualifier(ctx: TypeQualifierContext): BaseNode {
+  visitTypeQualifier(ctx: TypeQualifierContext): string {
     throw new Error('Method not implemented.');
   }
 
@@ -521,7 +555,7 @@ export class ASTBuilder implements CVisitor<BaseNode | BaseNode[] | null> {
     throw new Error('Method not implemented.');
   }
 
-  visitTypeSpecifier(ctx: TypeSpecifierContext): BaseNode {
+  visitTypeSpecifier(ctx: TypeSpecifierContext): string {
     throw new Error('Method not implemented.');
   }
 
