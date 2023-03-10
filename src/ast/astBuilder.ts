@@ -119,6 +119,7 @@ import {
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
+import { isTypedefNameReturnValue } from './typeGuards';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -219,7 +220,18 @@ export class ASTBuilder implements CVisitor<any> {
         'Encountered a Declaration without DeclarationSpecifiers.'
       );
     }
-    this.visitDeclarationSpecifiers(declarationSpecifiers);
+    const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+      declarationSpecifiers
+    );
+    const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
+      isTypedefNameReturnValue
+    );
+    typedefNameReturnValues.forEach((typedefNameReturnValue) => {
+      declarations.push({
+        type: 'VariableDeclarator',
+        id: typedefNameReturnValue.typedefName
+      });
+    });
 
     return {
       type: 'VariableDeclaration',
@@ -646,13 +658,29 @@ export class ASTBuilder implements CVisitor<any> {
       return validateTypeSpecifier('_Complex');
     }
 
-    // TODO: Implement visiting of nested rules.
+    // TODO: Implement visiting of rest of nested rules.
+    const typedefName = ctx.typedefName();
+    if (typedefName !== undefined) {
+      return {
+        type: 'TypedefName',
+        typedefName: this.visitTypedefName(typedefName)
+      };
+    }
 
     throw new UnreachableCaseError();
   }
 
-  visitTypedefName(ctx: TypedefNameContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitTypedefName(ctx: TypedefNameContext): Identifier {
+    const identifier = ctx.Identifier();
+    if (identifier === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a TypedefName without an Identifier.'
+      );
+    }
+    return {
+      type: 'Identifier',
+      name: identifier.toString()
+    };
   }
 
   visitUnaryExpression(ctx: UnaryExpressionContext): BaseNode {
