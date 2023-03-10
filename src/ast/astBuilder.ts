@@ -110,10 +110,15 @@ import {
   UnsupportedKeywordError
 } from './errors';
 import { isNotNull } from '../utils/typeGuards';
+import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
-  isValidTypeSpecifier,
-  type TypeSpecifier
-} from './keywordWhitelists/typeSpecifiers';
+  type VisitAlignmentSpecifierReturnValue,
+  type VisitDeclarationSpecifierReturnValue,
+  type VisitFunctionSpecifierReturnValue,
+  type VisitStorageClassSpecifierReturnValue,
+  type VisitTypeQualifierReturnValue,
+  type VisitTypeSpecifierReturnValue
+} from './astBuilderInternalTypes';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -140,7 +145,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAlignmentSpecifier(ctx: AlignmentSpecifierContext): string {
+  visitAlignmentSpecifier(
+    ctx: AlignmentSpecifierContext
+  ): VisitAlignmentSpecifierReturnValue {
     throw new Error('Method not implemented.');
   }
 
@@ -226,7 +233,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitDeclarationSpecifier(ctx: DeclarationSpecifierContext): string {
+  visitDeclarationSpecifier(
+    ctx: DeclarationSpecifierContext
+  ): VisitDeclarationSpecifierReturnValue {
     const storageClassSpecifier = ctx.storageClassSpecifier();
     if (storageClassSpecifier !== undefined) {
       return this.visitStorageClassSpecifier(storageClassSpecifier);
@@ -255,7 +264,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitDeclarationSpecifiers(ctx: DeclarationSpecifiersContext): string[] {
+  visitDeclarationSpecifiers(
+    ctx: DeclarationSpecifiersContext
+  ): VisitDeclarationSpecifierReturnValue[] {
     const declarationSpecifiers = ctx.declarationSpecifier();
     return declarationSpecifiers.map(this.visitDeclarationSpecifier, this);
   }
@@ -373,7 +384,9 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitFunctionSpecifier(ctx: FunctionSpecifierContext): string {
+  visitFunctionSpecifier(
+    ctx: FunctionSpecifierContext
+  ): VisitFunctionSpecifierReturnValue {
     throw new Error('Method not implemented.');
   }
 
@@ -513,7 +526,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitStorageClassSpecifier(ctx: StorageClassSpecifierContext): string {
+  visitStorageClassSpecifier(
+    ctx: StorageClassSpecifierContext
+  ): VisitStorageClassSpecifierReturnValue {
     throw new Error('Method not implemented.');
   }
 
@@ -555,7 +570,7 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitTypeQualifier(ctx: TypeQualifierContext): string {
+  visitTypeQualifier(ctx: TypeQualifierContext): VisitTypeQualifierReturnValue {
     throw new Error('Method not implemented.');
   }
 
@@ -563,10 +578,15 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitTypeSpecifier(ctx: TypeSpecifierContext): TypeSpecifier {
-    const validateTypeSpecifier = (typeSpecifier: string): TypeSpecifier => {
+  visitTypeSpecifier(ctx: TypeSpecifierContext): VisitTypeSpecifierReturnValue {
+    const validateTypeSpecifier = (
+      typeSpecifier: string
+    ): VisitTypeSpecifierReturnValue => {
       if (isValidTypeSpecifier(typeSpecifier)) {
-        return typeSpecifier;
+        return {
+          type: 'TypeSpecifier',
+          typeSpecifier
+        };
       }
       throw new UnsupportedKeywordError(typeSpecifier);
     };
