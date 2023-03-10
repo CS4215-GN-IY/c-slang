@@ -581,7 +581,7 @@ export class ASTBuilder implements CVisitor<any> {
       return validateTypeSpecifier('char');
     }
 
-    const isShort = ctx.Char() !== undefined;
+    const isShort = ctx.Short() !== undefined;
     if (isShort) {
       return validateTypeSpecifier('short');
     }
