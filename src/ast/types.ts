@@ -14,18 +14,13 @@ export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
 export interface BaseStatement extends BaseNode {}
 
-export type Expression = AssignmentExpression | Identifier | Literal;
+export type Expression = AssignmentExpression | Identifier;
 
 export interface BaseExpression extends BaseNode {}
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier';
   name: string;
-}
-
-export interface Literal extends BaseExpression {
-  type: 'Literal';
-  value: number | string;
 }
 
 export interface AssignmentExpression extends BaseExpression {
