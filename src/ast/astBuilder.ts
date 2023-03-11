@@ -131,7 +131,11 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
-import { constructEmptyStatement, constructIdentifier } from './constructors';
+import {
+  constructEmptyStatement,
+  constructIdentifier,
+  constructPlaceholderIdentifier
+} from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -381,7 +385,8 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitExpression(ctx: ExpressionContext): Expression {
-    throw new Error('Method not implemented.');
+    // TODO: Implement this properly
+    return constructPlaceholderIdentifier('temp');
   }
 
   visitExpressionStatement(
