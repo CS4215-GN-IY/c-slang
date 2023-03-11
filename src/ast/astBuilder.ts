@@ -2,6 +2,8 @@ import { type CVisitor } from '../lang/CVisitor';
 import {
   type AssignmentExpression,
   type BaseNode,
+  type BlockItem,
+  type BlockOrEmptyStatement,
   type Expression,
   type ExpressionOrEmptyStatement,
   type ExternalDeclaration,
@@ -128,7 +130,7 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
-import { constructIdentifier } from './constructors';
+import { constructEmptyStatement, constructIdentifier } from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -183,12 +185,23 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitBlockItem(ctx: BlockItemContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitBlockItem(ctx: BlockItemContext): BlockItem {
+    const declaration = ctx.declaration();
+    if (declaration !== undefined) {
+      return this.visitDeclaration(declaration);
+    }
+
+    const statement = ctx.statement();
+    if (statement !== undefined) {
+      return this.visitStatement(statement);
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitBlockItemList(ctx: BlockItemListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitBlockItemList(ctx: BlockItemListContext): BlockItem[] {
+    const blockItems = ctx.blockItem();
+    return blockItems.map(this.visitBlockItem, this);
   }
 
   visitCastExpression(ctx: CastExpressionContext): BaseNode {
@@ -206,8 +219,13 @@ export class ASTBuilder implements CVisitor<any> {
     return this.visitTranslationUnit(translationUnit);
   }
 
-  visitCompoundStatement(ctx: CompoundStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitCompoundStatement(ctx: CompoundStatementContext): BlockOrEmptyStatement {
+    const blockItemList = ctx.blockItemList();
+    if (blockItemList !== undefined) {
+      return this.visitBlockItemList(blockItemList);
+    }
+
+    return constructEmptyStatement();
   }
 
   visitConditionalExpression(ctx: ConditionalExpressionContext): BaseNode {
@@ -364,9 +382,7 @@ export class ASTBuilder implements CVisitor<any> {
     const expression = ctx.expression();
 
     if (expression === undefined) {
-      return {
-        type: 'EmptyStatement'
-      };
+      return constructEmptyStatement();
     }
 
     return {
@@ -470,7 +486,7 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitForExpression(ctx: ForExpressionContext): AssignmentExpression[] {
     const assignmentExpressions = ctx.assignmentExpression();
-    return assignmentExpressions.map(this.visitAssignmentExpression);
+    return assignmentExpressions.map(this.visitAssignmentExpression, this);
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {

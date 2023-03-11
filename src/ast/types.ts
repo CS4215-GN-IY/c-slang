@@ -13,12 +13,17 @@ export interface Program extends BaseNode {
 export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
 export type Statement =
+  | BlockOrEmptyStatement
   | ExpressionOrEmptyStatement
   | SelectionStatement
   | IterationStatement
   | JumpStatement;
 
 export interface BaseStatement extends BaseNode {}
+
+export type BlockOrEmptyStatement = BlockItem[] | EmptyStatement;
+
+export type BlockItem = VariableDeclaration | Statement;
 
 export type ExpressionOrEmptyStatement = EmptyStatement | ExpressionStatement;
 
