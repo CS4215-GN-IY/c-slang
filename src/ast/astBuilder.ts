@@ -1,10 +1,20 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
+  type AssignmentExpression,
   type BaseNode,
+  type BlockItem,
+  type BlockOrEmptyStatement,
+  type Expression,
+  type ExpressionOrEmptyStatement,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
+  type IterationStatement,
+  type JumpStatement,
+  type LabeledStatement,
   type Program,
+  type SelectionStatement,
+  type Statement,
   type VariableDeclaration,
   type VariableDeclarator
 } from './types';
@@ -112,6 +122,7 @@ import {
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
+  type ForCondition,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
   type VisitFunctionSpecifierReturnValue,
@@ -120,6 +131,11 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
+import {
+  constructEmptyStatement,
+  constructIdentifier,
+  constructPlaceholderIdentifier
+} from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -160,7 +176,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAssignmentExpression(ctx: AssignmentExpressionContext): BaseNode {
+  visitAssignmentExpression(
+    ctx: AssignmentExpressionContext
+  ): AssignmentExpression {
     throw new Error('Method not implemented.');
   }
 
@@ -172,12 +190,23 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitBlockItem(ctx: BlockItemContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitBlockItem(ctx: BlockItemContext): BlockItem {
+    const declaration = ctx.declaration();
+    if (declaration !== undefined) {
+      return this.visitDeclaration(declaration);
+    }
+
+    const statement = ctx.statement();
+    if (statement !== undefined) {
+      return this.visitStatement(statement);
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitBlockItemList(ctx: BlockItemListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitBlockItemList(ctx: BlockItemListContext): BlockItem[] {
+    const blockItems = ctx.blockItem();
+    return blockItems.map(this.visitBlockItem, this);
   }
 
   visitCastExpression(ctx: CastExpressionContext): BaseNode {
@@ -195,8 +224,13 @@ export class ASTBuilder implements CVisitor<any> {
     return this.visitTranslationUnit(translationUnit);
   }
 
-  visitCompoundStatement(ctx: CompoundStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitCompoundStatement(ctx: CompoundStatementContext): BlockOrEmptyStatement {
+    const blockItemList = ctx.blockItemList();
+    if (blockItemList !== undefined) {
+      return this.visitBlockItemList(blockItemList);
+    }
+
+    return constructEmptyStatement();
   }
 
   visitConditionalExpression(ctx: ConditionalExpressionContext): BaseNode {
@@ -311,15 +345,19 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitDirectDeclarator(ctx: DirectDeclaratorContext): Identifier {
-    // TODO: Rework this to deal with non-identifiers.
     const identifier = ctx.Identifier();
-    if (identifier === undefined) {
-      throw new Error('Non-identifiers are not supported yet.');
+    if (identifier !== undefined) {
+      return constructIdentifier(identifier);
     }
-    return {
-      type: 'Identifier',
-      name: identifier.toString()
-    };
+
+    const directDeclarator = ctx.directDeclarator();
+    if (directDeclarator !== undefined) {
+      return this.visitDirectDeclarator(directDeclarator);
+    }
+
+    // TODO: Add other cases in future
+
+    throw new UnreachableCaseError();
   }
 
   visitEnumSpecifier(ctx: EnumSpecifierContext): BaseNode {
@@ -346,12 +384,23 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitExpression(ctx: ExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitExpression(ctx: ExpressionContext): Expression {
+    // TODO: Implement this properly
+    return constructPlaceholderIdentifier('temp');
   }
 
-  visitExpressionStatement(ctx: ExpressionStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitExpressionStatement(
+    ctx: ExpressionStatementContext
+  ): ExpressionOrEmptyStatement {
+    const expression = ctx.expression();
+    if (expression !== undefined) {
+      return {
+        type: 'ExpressionStatement',
+        expression: this.visitExpression(expression)
+      };
+    }
+
+    return constructEmptyStatement();
   }
 
   visitExternalDeclaration(
@@ -377,22 +426,101 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitForCondition(ctx: ForConditionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForCondition(ctx: ForConditionContext): ForCondition {
+    const forDeclaration = ctx.forDeclaration();
+    const expression = ctx.expression();
+
+    if (forDeclaration !== undefined && expression !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ForCondition with both an init declaration and init expression.'
+      );
+    }
+
+    const init =
+      forDeclaration !== undefined
+        ? this.visitForDeclaration(forDeclaration)
+        : expression !== undefined
+        ? this.visitExpression(expression)
+        : undefined;
+
+    const firstForExpression = ctx.forExpression(0);
+    const test =
+      firstForExpression !== undefined
+        ? this.visitForExpression(firstForExpression)
+        : undefined;
+    const secondForExpression = ctx.forExpression(1);
+    const update =
+      secondForExpression !== undefined
+        ? this.visitForExpression(secondForExpression)
+        : undefined;
+
+    return {
+      type: 'ForCondition',
+      init,
+      test,
+      update
+    };
   }
 
-  visitForDeclaration(ctx: ForDeclarationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForDeclaration(ctx: ForDeclarationContext): VariableDeclaration {
+    const initDeclaratorList = ctx.initDeclaratorList();
+    const declarations =
+      initDeclaratorList === undefined
+        ? []
+        : this.visitInitDeclaratorList(initDeclaratorList);
+
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a Declaration without DeclarationSpecifiers.'
+      );
+    }
+    const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+      declarationSpecifiers
+    );
+    const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
+      isTypedefNameReturnValue
+    );
+    typedefNameReturnValues.forEach((typedefNameReturnValue) => {
+      declarations.push({
+        type: 'VariableDeclarator',
+        id: typedefNameReturnValue.typedefName
+      });
+    });
+
+    return {
+      type: 'VariableDeclaration',
+      // TODO: Implement this based off whether the 'const' keyword is used.
+      isConstant: false,
+      declarations
+    };
   }
 
-  visitForExpression(ctx: ForExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForExpression(ctx: ForExpressionContext): AssignmentExpression[] {
+    const assignmentExpressions = ctx.assignmentExpression();
+    return assignmentExpressions.map(this.visitAssignmentExpression, this);
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
-    // TODO: Implement this.
+    const declarator = ctx.declarator();
+    const compoundStatement = ctx.compoundStatement();
+
+    if (declarator === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a FunctionDefinition without a declarator.'
+      );
+    }
+
+    if (compoundStatement === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a FunctionDefinition without a compound statement.'
+      );
+    }
+
     return {
-      type: 'FunctionDeclaration'
+      type: 'FunctionDeclaration',
+      id: this.visitDeclarator(declarator),
+      body: this.visitCompoundStatement(compoundStatement)
     };
   }
 
@@ -460,16 +588,117 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitIterationStatement(ctx: IterationStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitIterationStatement(ctx: IterationStatementContext): IterationStatement {
+    const expression = ctx.expression();
+    const statement = ctx.statement();
+
+    const doWhileToken = ctx.Do();
+    if (
+      doWhileToken !== undefined &&
+      expression !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'DoWhileStatement',
+        test: this.visitExpression(expression),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    const whileToken = ctx.While();
+    if (
+      whileToken !== undefined &&
+      expression !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'WhileStatement',
+        test: this.visitExpression(expression),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    const forToken = ctx.For();
+    const forCondition = ctx.forCondition();
+    if (forToken !== undefined && forCondition !== undefined) {
+      return {
+        ...this.visitForCondition(forCondition),
+        type: 'ForStatement',
+        body: this.visitStatement(statement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitJumpStatement(ctx: JumpStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitJumpStatement(ctx: JumpStatementContext): JumpStatement {
+    const breakToken = ctx.Break();
+    if (breakToken !== undefined) {
+      return {
+        type: 'BreakStatement'
+      };
+    }
+
+    const continueToken = ctx.Continue();
+    if (continueToken !== undefined) {
+      return {
+        type: 'ContinueStatement'
+      };
+    }
+
+    const gotoToken = ctx.Goto();
+    const identifier = ctx.Identifier();
+    if (gotoToken !== undefined && identifier !== undefined) {
+      return {
+        type: 'GotoStatement',
+        argument: constructIdentifier(identifier)
+      };
+    }
+
+    const returnToken = ctx.Return();
+    const expression = ctx.expression();
+    if (returnToken !== undefined) {
+      return {
+        type: 'ReturnStatement',
+        argument:
+          expression !== undefined
+            ? this.visitExpression(expression)
+            : undefined
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitLabeledStatement(ctx: LabeledStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitLabeledStatement(ctx: LabeledStatementContext): LabeledStatement {
+    const caseToken = ctx.Case();
+    const defaultToken = ctx.Default();
+    const identifier = ctx.Identifier();
+    const statement = ctx.statement();
+
+    if (
+      caseToken === undefined &&
+      defaultToken === undefined &&
+      identifier !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'IdentifierStatement',
+        label: constructIdentifier(identifier),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    // TODO: Case statement when visitConstantExpression is implemented
+
+    if (defaultToken !== undefined && statement !== undefined) {
+      return {
+        type: 'DefaultStatement',
+        body: this.visitStatement(statement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitLogicalAndExpression(ctx: LogicalAndExpressionContext): BaseNode {
@@ -518,8 +747,53 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitSelectionStatement(ctx: SelectionStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitSelectionStatement(ctx: SelectionStatementContext): SelectionStatement {
+    const ifToken = ctx.If();
+    const expression = ctx.expression();
+    const firstStatement = ctx.statement(0);
+    const elseToken = ctx.Else();
+    const secondStatement = ctx.statement(1);
+
+    if (
+      ifToken !== undefined &&
+      elseToken === undefined &&
+      secondStatement !== undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered a second statement in an If without an Else.'
+      );
+    }
+
+    if (
+      ifToken !== undefined &&
+      expression !== undefined &&
+      firstStatement !== undefined
+    ) {
+      return {
+        type: 'IfStatement',
+        test: this.visitExpression(expression),
+        consequent: this.visitStatement(firstStatement),
+        alternate:
+          secondStatement !== undefined
+            ? this.visitStatement(secondStatement)
+            : undefined
+      };
+    }
+
+    const switchToken = ctx.Switch();
+    if (
+      switchToken !== undefined &&
+      expression !== undefined &&
+      firstStatement !== undefined
+    ) {
+      return {
+        type: 'SwitchStatement',
+        discriminant: this.visitExpression(expression),
+        body: this.visitStatement(firstStatement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitShiftExpression(ctx: ShiftExpressionContext): BaseNode {
@@ -530,8 +804,38 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitStatement(ctx: StatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitStatement(ctx: StatementContext): Statement {
+    const labeledStatement = ctx.labeledStatement();
+    if (labeledStatement !== undefined) {
+      return this.visitLabeledStatement(labeledStatement);
+    }
+
+    const compoundStatement = ctx.compoundStatement();
+    if (compoundStatement !== undefined) {
+      return this.visitCompoundStatement(compoundStatement);
+    }
+
+    const expressionStatement = ctx.expressionStatement();
+    if (expressionStatement !== undefined) {
+      return this.visitExpressionStatement(expressionStatement);
+    }
+
+    const selectionStatement = ctx.selectionStatement();
+    if (selectionStatement !== undefined) {
+      return this.visitSelectionStatement(selectionStatement);
+    }
+
+    const iterationStatement = ctx.iterationStatement();
+    if (iterationStatement !== undefined) {
+      return this.visitIterationStatement(iterationStatement);
+    }
+
+    const jumpStatement = ctx.jumpStatement();
+    if (jumpStatement !== undefined) {
+      return this.visitJumpStatement(jumpStatement);
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitStaticAssertDeclaration(ctx: StaticAssertDeclarationContext): BaseNode {
@@ -677,10 +981,7 @@ export class ASTBuilder implements CVisitor<any> {
         'Encountered a TypedefName without an Identifier.'
       );
     }
-    return {
-      type: 'Identifier',
-      name: identifier.toString()
-    };
+    return constructIdentifier(identifier);
   }
 
   visitUnaryExpression(ctx: UnaryExpressionContext): BaseNode {
