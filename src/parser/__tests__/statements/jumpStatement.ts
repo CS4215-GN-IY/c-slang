@@ -52,3 +52,46 @@ describe('return statement', () => {
     expect(ast).toEqual(expectedAst);
   });
 });
+
+describe('goto statement', () => {
+  it('goes to identifier', () => {
+    const code = 'int main() { x : return 0; goto x; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: [
+            {
+              type: 'IdentifierStatement',
+              label: {
+                type: 'Identifier',
+                name: 'x'
+              },
+              body: {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'Identifier',
+                  name: 'temp'
+                }
+              }
+            },
+            {
+              type: 'GotoStatement',
+              argument: {
+                type: 'Identifier',
+                name: 'x'
+              }
+            }
+          ]
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+});
