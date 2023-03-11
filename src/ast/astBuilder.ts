@@ -534,9 +534,9 @@ export class ASTBuilder implements CVisitor<any> {
     const expression = ctx.expression();
     const statement = ctx.statement();
 
-    const doWhileStatement = ctx.Do();
+    const doWhileToken = ctx.Do();
     if (
-      doWhileStatement !== undefined &&
+      doWhileToken !== undefined &&
       expression !== undefined &&
       statement !== undefined
     ) {
@@ -547,9 +547,9 @@ export class ASTBuilder implements CVisitor<any> {
       };
     }
 
-    const whileStatement = ctx.While();
+    const whileToken = ctx.While();
     if (
-      whileStatement !== undefined &&
+      whileToken !== undefined &&
       expression !== undefined &&
       statement !== undefined
     ) {
@@ -560,9 +560,9 @@ export class ASTBuilder implements CVisitor<any> {
       };
     }
 
-    const forStatement = ctx.For();
+    const forToken = ctx.For();
     const forCondition = ctx.forCondition();
-    if (forStatement !== undefined && forCondition !== undefined) {
+    if (forToken !== undefined && forCondition !== undefined) {
       return {
         ...this.visitForCondition(forCondition),
         type: 'ForStatement',
@@ -574,32 +574,32 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitJumpStatement(ctx: JumpStatementContext): JumpStatement {
-    const breakStatement = ctx.Break();
-    if (breakStatement !== undefined) {
+    const breakToken = ctx.Break();
+    if (breakToken !== undefined) {
       return {
         type: 'BreakStatement'
       };
     }
 
-    const continueStatement = ctx.Continue();
-    if (continueStatement !== undefined) {
+    const continueToken = ctx.Continue();
+    if (continueToken !== undefined) {
       return {
         type: 'ContinueStatement'
       };
     }
 
-    const gotoStatement = ctx.Goto();
+    const gotoToken = ctx.Goto();
     const identifier = ctx.Identifier();
-    if (gotoStatement !== undefined && identifier !== undefined) {
+    if (gotoToken !== undefined && identifier !== undefined) {
       return {
         type: 'GotoStatement',
         argument: constructIdentifier(identifier)
       };
     }
 
-    const returnStatement = ctx.Return();
+    const returnToken = ctx.Return();
     const expression = ctx.expression();
-    if (returnStatement !== undefined) {
+    if (returnToken !== undefined) {
       return {
         type: 'ReturnStatement',
         argument:
