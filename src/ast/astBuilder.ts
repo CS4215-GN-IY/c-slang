@@ -1,12 +1,15 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
+  type AssignmentExpression,
   type BaseNode,
   type Expression,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
+  type IterationStatement,
   type JumpStatement,
   type Program,
+  type Statement,
   type VariableDeclaration,
   type VariableDeclarator
 } from './types';
@@ -114,6 +117,7 @@ import {
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
+  type ForCondition,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
   type VisitFunctionSpecifierReturnValue,
@@ -163,7 +167,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAssignmentExpression(ctx: AssignmentExpressionContext): BaseNode {
+  visitAssignmentExpression(
+    ctx: AssignmentExpressionContext
+  ): AssignmentExpression {
     throw new Error('Method not implemented.');
   }
 
@@ -377,16 +383,79 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitForCondition(ctx: ForConditionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForCondition(ctx: ForConditionContext): ForCondition {
+    const forDeclaration = ctx.forDeclaration();
+    const expression = ctx.expression();
+
+    if (forDeclaration !== undefined && expression !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ForCondition with both an init declaration and init expression.'
+      );
+    }
+
+    const init =
+      forDeclaration !== undefined
+        ? this.visitForDeclaration(forDeclaration)
+        : expression !== undefined
+        ? this.visitExpression(expression)
+        : undefined;
+
+    const firstForExpression = ctx.forExpression(0);
+    const test =
+      firstForExpression !== undefined
+        ? this.visitForExpression(firstForExpression)
+        : undefined;
+    const secondForExpression = ctx.forExpression(1);
+    const update =
+      secondForExpression !== undefined
+        ? this.visitForExpression(secondForExpression)
+        : undefined;
+
+    return {
+      type: 'ForCondition',
+      init,
+      test,
+      update
+    };
   }
 
-  visitForDeclaration(ctx: ForDeclarationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForDeclaration(ctx: ForDeclarationContext): VariableDeclaration {
+    const initDeclaratorList = ctx.initDeclaratorList();
+    const declarations =
+      initDeclaratorList === undefined
+        ? []
+        : this.visitInitDeclaratorList(initDeclaratorList);
+
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a Declaration without DeclarationSpecifiers.'
+      );
+    }
+    const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+      declarationSpecifiers
+    );
+    const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
+      isTypedefNameReturnValue
+    );
+    typedefNameReturnValues.forEach((typedefNameReturnValue) => {
+      declarations.push({
+        type: 'VariableDeclarator',
+        id: typedefNameReturnValue.typedefName
+      });
+    });
+
+    return {
+      type: 'VariableDeclaration',
+      // TODO: Implement this based off whether the 'const' keyword is used.
+      isConstant: false,
+      declarations
+    };
   }
 
-  visitForExpression(ctx: ForExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitForExpression(ctx: ForExpressionContext): AssignmentExpression[] {
+    const assignmentExpressions = ctx.assignmentExpression();
+    return assignmentExpressions.map(this.visitAssignmentExpression);
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
@@ -460,8 +529,47 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitIterationStatement(ctx: IterationStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitIterationStatement(ctx: IterationStatementContext): IterationStatement {
+    const expression = ctx.expression();
+    const statement = ctx.statement();
+
+    const doWhileStatement = ctx.Do();
+    if (
+      doWhileStatement !== undefined &&
+      expression !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'DoWhileStatement',
+        test: this.visitExpression(expression),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    const whileStatement = ctx.While();
+    if (
+      whileStatement !== undefined &&
+      expression !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'WhileStatement',
+        test: this.visitExpression(expression),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    const forStatement = ctx.For();
+    const forCondition = ctx.forCondition();
+    if (forStatement !== undefined && forCondition !== undefined) {
+      return {
+        ...this.visitForCondition(forCondition),
+        type: 'ForStatement',
+        body: this.visitStatement(statement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitJumpStatement(ctx: JumpStatementContext): JumpStatement {
@@ -565,7 +673,7 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitStatement(ctx: StatementContext): BaseNode {
+  visitStatement(ctx: StatementContext): Statement {
     throw new Error('Method not implemented.');
   }
 

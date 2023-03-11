@@ -1,5 +1,10 @@
 import { type TypeSpecifier } from './keywordWhitelists/typeSpecifiers';
-import { type Identifier } from './types';
+import {
+  type AssignmentExpression,
+  type Expression,
+  type Identifier,
+  type VariableDeclaration
+} from './types';
 
 export interface BaseReturnValue {
   type: string;
@@ -59,4 +64,11 @@ export interface AlignmentSpecifierReturnValue extends BaseReturnValue {
   type: 'AlignmentSpecifier';
   // TODO: Implement the proper type.
   alignmentSpecifier: unknown;
+}
+
+export interface ForCondition extends BaseReturnValue {
+  type: 'ForCondition';
+  init?: VariableDeclaration | Expression;
+  test?: AssignmentExpression[];
+  update?: AssignmentExpression[];
 }

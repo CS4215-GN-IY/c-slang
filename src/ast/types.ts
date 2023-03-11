@@ -12,7 +12,34 @@ export interface Program extends BaseNode {
 
 export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
+export type Statement = IterationStatement | JumpStatement;
+
 export interface BaseStatement extends BaseNode {}
+
+export type IterationStatement =
+  | DoWhileStatement
+  | ForStatement
+  | WhileStatement;
+
+export interface DoWhileStatement extends BaseStatement {
+  type: 'DoWhileStatement';
+  test: Expression;
+  body: Statement;
+}
+
+export interface ForStatement extends BaseStatement {
+  type: 'ForStatement';
+  init?: VariableDeclaration | Expression;
+  test?: AssignmentExpression[];
+  update?: AssignmentExpression[];
+  body: Statement;
+}
+
+export interface WhileStatement extends BaseStatement {
+  type: 'WhileStatement';
+  test: Expression;
+  body: Statement;
+}
 
 export type JumpStatement =
   | BreakStatement
