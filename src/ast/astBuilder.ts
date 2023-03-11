@@ -491,9 +491,25 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
-    // TODO: Implement this.
+    const declarator = ctx.declarator();
+    const compoundStatement = ctx.compoundStatement();
+
+    if (declarator === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a FunctionDefinition without a declarator.'
+      );
+    }
+
+    if (compoundStatement === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a FunctionDefinition without a compound statement.'
+      );
+    }
+
     return {
-      type: 'FunctionDeclaration'
+      type: 'FunctionDeclaration',
+      id: this.visitDeclarator(declarator),
+      body: this.visitCompoundStatement(compoundStatement)
     };
   }
 

@@ -146,9 +146,11 @@ export type AssignmentOperator =
 
 export interface BaseDeclaration extends BaseStatement {}
 
-// TODO: Implement this.
 export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
+  // TODO: Add declaration specifiers
+  id: Identifier;
+  body: BlockOrEmptyStatement;
 }
 
 export interface VariableDeclaration extends BaseDeclaration {
