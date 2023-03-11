@@ -12,9 +12,24 @@ export interface Program extends BaseNode {
 
 export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
-export type Statement = IterationStatement | JumpStatement;
+export type Statement = SelectionStatement | IterationStatement | JumpStatement;
 
 export interface BaseStatement extends BaseNode {}
+
+export type SelectionStatement = IfStatement | SwitchStatement;
+
+export interface IfStatement extends BaseStatement {
+  type: 'IfStatement';
+  test: Expression;
+  consequent: Statement;
+  alternate?: Statement;
+}
+
+export interface SwitchStatement extends BaseStatement {
+  type: 'SwitchStatement';
+  discriminant: Expression;
+  body: Statement;
+}
 
 export type IterationStatement =
   | DoWhileStatement

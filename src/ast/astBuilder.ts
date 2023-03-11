@@ -9,6 +9,7 @@ import {
   type IterationStatement,
   type JumpStatement,
   type Program,
+  type SelectionStatement,
   type Statement,
   type VariableDeclaration,
   type VariableDeclarator
@@ -661,8 +662,53 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitSelectionStatement(ctx: SelectionStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitSelectionStatement(ctx: SelectionStatementContext): SelectionStatement {
+    const ifToken = ctx.If();
+    const expression = ctx.expression();
+    const firstStatement = ctx.statement(0);
+    const elseToken = ctx.Else();
+    const secondStatement = ctx.statement(1);
+
+    if (
+      ifToken !== undefined &&
+      elseToken === undefined &&
+      secondStatement !== undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered a second statement in an If without an Else.'
+      );
+    }
+
+    if (
+      ifToken !== undefined &&
+      expression !== undefined &&
+      firstStatement !== undefined
+    ) {
+      return {
+        type: 'IfStatement',
+        test: this.visitExpression(expression),
+        consequent: this.visitStatement(firstStatement),
+        alternate:
+          secondStatement !== undefined
+            ? this.visitStatement(secondStatement)
+            : undefined
+      };
+    }
+
+    const switchToken = ctx.Switch();
+    if (
+      switchToken !== undefined &&
+      expression !== undefined &&
+      firstStatement !== undefined
+    ) {
+      return {
+        type: 'SwitchStatement',
+        discriminant: this.visitExpression(expression),
+        body: this.visitStatement(firstStatement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitShiftExpression(ctx: ShiftExpressionContext): BaseNode {
