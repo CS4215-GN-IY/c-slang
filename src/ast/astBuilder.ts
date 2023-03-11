@@ -393,15 +393,14 @@ export class ASTBuilder implements CVisitor<any> {
     ctx: ExpressionStatementContext
   ): ExpressionOrEmptyStatement {
     const expression = ctx.expression();
-
-    if (expression === undefined) {
-      return constructEmptyStatement();
+    if (expression !== undefined) {
+      return {
+        type: 'ExpressionStatement',
+        expression: this.visitExpression(expression)
+      };
     }
 
-    return {
-      type: 'ExpressionStatement',
-      expression: this.visitExpression(expression)
-    };
+    return constructEmptyStatement();
   }
 
   visitExternalDeclaration(
@@ -690,7 +689,7 @@ export class ASTBuilder implements CVisitor<any> {
       };
     }
 
-    // TODO: Case statement when constant-expression is implemented
+    // TODO: Case statement when visitConstantExpression is implemented
 
     if (defaultToken !== undefined && statement !== undefined) {
       return {
