@@ -3,6 +3,7 @@ import {
   type AssignmentExpression,
   type BaseNode,
   type Expression,
+  type ExpressionOrEmptyStatement,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
@@ -357,8 +358,21 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitExpressionStatement(ctx: ExpressionStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitExpressionStatement(
+    ctx: ExpressionStatementContext
+  ): ExpressionOrEmptyStatement {
+    const expression = ctx.expression();
+
+    if (expression === undefined) {
+      return {
+        type: 'EmptyStatement'
+      };
+    }
+
+    return {
+      type: 'ExpressionStatement',
+      expression: this.visitExpression(expression)
+    };
   }
 
   visitExternalDeclaration(

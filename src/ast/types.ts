@@ -12,9 +12,24 @@ export interface Program extends BaseNode {
 
 export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
-export type Statement = SelectionStatement | IterationStatement | JumpStatement;
+export type Statement =
+  | ExpressionOrEmptyStatement
+  | SelectionStatement
+  | IterationStatement
+  | JumpStatement;
 
 export interface BaseStatement extends BaseNode {}
+
+export type ExpressionOrEmptyStatement = EmptyStatement | ExpressionStatement;
+
+export interface EmptyStatement extends BaseStatement {
+  type: 'EmptyStatement';
+}
+
+export interface ExpressionStatement extends BaseStatement {
+  type: 'ExpressionStatement';
+  expression: Expression;
+}
 
 export type SelectionStatement = IfStatement | SwitchStatement;
 
