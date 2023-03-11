@@ -11,6 +11,7 @@ import {
   type Identifier,
   type IterationStatement,
   type JumpStatement,
+  type LabeledStatement,
   type Program,
   type SelectionStatement,
   type Statement,
@@ -642,8 +643,35 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitLabeledStatement(ctx: LabeledStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitLabeledStatement(ctx: LabeledStatementContext): LabeledStatement {
+    const caseToken = ctx.Case();
+    const defaultToken = ctx.Default();
+    const identifier = ctx.Identifier();
+    const statement = ctx.statement();
+
+    if (
+      caseToken === undefined &&
+      defaultToken === undefined &&
+      identifier !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'IdentifierStatement',
+        label: constructIdentifier(identifier),
+        body: this.visitStatement(statement)
+      };
+    }
+
+    // TODO: Case statement when constant-expression is implemented
+
+    if (defaultToken !== undefined && statement !== undefined) {
+      return {
+        type: 'DefaultStatement',
+        body: this.visitStatement(statement)
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitLogicalAndExpression(ctx: LogicalAndExpressionContext): BaseNode {

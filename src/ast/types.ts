@@ -13,6 +13,7 @@ export interface Program extends BaseNode {
 export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
 export type Statement =
+  | LabeledStatement
   | BlockOrEmptyStatement
   | ExpressionOrEmptyStatement
   | SelectionStatement
@@ -20,6 +21,19 @@ export type Statement =
   | JumpStatement;
 
 export interface BaseStatement extends BaseNode {}
+
+export type LabeledStatement = IdentifierStatement | DefaultStatement;
+
+export interface IdentifierStatement extends BaseStatement {
+  type: 'IdentifierStatement';
+  label: Identifier;
+  body: Statement;
+}
+
+export interface DefaultStatement extends BaseStatement {
+  type: 'DefaultStatement';
+  body: Statement;
+}
 
 export type BlockOrEmptyStatement = BlockItem[] | EmptyStatement;
 
