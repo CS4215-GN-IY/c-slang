@@ -14,6 +14,30 @@ export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
 
 export interface BaseStatement extends BaseNode {}
 
+export type JumpStatement =
+  | BreakStatement
+  | ContinueStatement
+  | GotoStatement
+  | ReturnStatement;
+
+export interface BreakStatement extends BaseStatement {
+  type: 'BreakStatement';
+}
+
+export interface ContinueStatement extends BaseStatement {
+  type: 'ContinueStatement';
+}
+
+export interface GotoStatement extends BaseStatement {
+  type: 'GotoStatement';
+  argument: Identifier;
+}
+
+export interface ReturnStatement extends BaseStatement {
+  type: 'ReturnStatement';
+  argument?: Expression;
+}
+
 export type Expression = AssignmentExpression | Identifier;
 
 export interface BaseExpression extends BaseNode {}

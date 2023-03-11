@@ -1,9 +1,11 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
   type BaseNode,
+  type Expression,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
+  type JumpStatement,
   type Program,
   type VariableDeclaration,
   type VariableDeclarator
@@ -120,6 +122,7 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
+import { constructIdentifier } from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -316,10 +319,7 @@ export class ASTBuilder implements CVisitor<any> {
     if (identifier === undefined) {
       throw new Error('Non-identifiers are not supported yet.');
     }
-    return {
-      type: 'Identifier',
-      name: identifier.toString()
-    };
+    return constructIdentifier(identifier);
   }
 
   visitEnumSpecifier(ctx: EnumSpecifierContext): BaseNode {
@@ -346,7 +346,7 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitExpression(ctx: ExpressionContext): BaseNode {
+  visitExpression(ctx: ExpressionContext): Expression {
     throw new Error('Method not implemented.');
   }
 
@@ -464,8 +464,43 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitJumpStatement(ctx: JumpStatementContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitJumpStatement(ctx: JumpStatementContext): JumpStatement {
+    const breakStatement = ctx.Break();
+    if (breakStatement !== undefined) {
+      return {
+        type: 'BreakStatement'
+      };
+    }
+
+    const continueStatement = ctx.Continue();
+    if (continueStatement !== undefined) {
+      return {
+        type: 'ContinueStatement'
+      };
+    }
+
+    const gotoStatement = ctx.Goto();
+    const identifier = ctx.Identifier();
+    if (gotoStatement !== undefined && identifier !== undefined) {
+      return {
+        type: 'GotoStatement',
+        argument: constructIdentifier(identifier)
+      };
+    }
+
+    const returnStatement = ctx.Return();
+    const expression = ctx.expression();
+    if (returnStatement !== undefined) {
+      return {
+        type: 'ReturnStatement',
+        argument:
+          expression !== undefined
+            ? this.visitExpression(expression)
+            : undefined
+      };
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitLabeledStatement(ctx: LabeledStatementContext): BaseNode {
@@ -677,10 +712,7 @@ export class ASTBuilder implements CVisitor<any> {
         'Encountered a TypedefName without an Identifier.'
       );
     }
-    return {
-      type: 'Identifier',
-      name: identifier.toString()
-    };
+    return constructIdentifier(identifier);
   }
 
   visitUnaryExpression(ctx: UnaryExpressionContext): BaseNode {
