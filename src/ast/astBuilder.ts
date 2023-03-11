@@ -801,7 +801,37 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitStatement(ctx: StatementContext): Statement {
-    throw new Error('Method not implemented.');
+    const labeledStatement = ctx.labeledStatement();
+    if (labeledStatement !== undefined) {
+      return this.visitLabeledStatement(labeledStatement);
+    }
+
+    const compoundStatement = ctx.compoundStatement();
+    if (compoundStatement !== undefined) {
+      return this.visitCompoundStatement(compoundStatement);
+    }
+
+    const expressionStatement = ctx.expressionStatement();
+    if (expressionStatement !== undefined) {
+      return this.visitExpressionStatement(expressionStatement);
+    }
+
+    const selectionStatement = ctx.selectionStatement();
+    if (selectionStatement !== undefined) {
+      return this.visitSelectionStatement(selectionStatement);
+    }
+
+    const iterationStatement = ctx.iterationStatement();
+    if (iterationStatement !== undefined) {
+      return this.visitIterationStatement(iterationStatement);
+    }
+
+    const jumpStatement = ctx.jumpStatement();
+    if (jumpStatement !== undefined) {
+      return this.visitJumpStatement(jumpStatement);
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitStaticAssertDeclaration(ctx: StaticAssertDeclarationContext): BaseNode {
