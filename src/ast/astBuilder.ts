@@ -341,12 +341,19 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitDirectDeclarator(ctx: DirectDeclaratorContext): Identifier {
-    // TODO: Rework this to deal with non-identifiers.
     const identifier = ctx.Identifier();
-    if (identifier === undefined) {
-      throw new Error('Non-identifiers are not supported yet.');
+    if (identifier !== undefined) {
+      return constructIdentifier(identifier);
     }
-    return constructIdentifier(identifier);
+
+    const directDeclarator = ctx.directDeclarator();
+    if (directDeclarator !== undefined) {
+      return this.visitDirectDeclarator(directDeclarator);
+    }
+
+    // TODO: Add other cases in future
+
+    throw new UnreachableCaseError();
   }
 
   visitEnumSpecifier(ctx: EnumSpecifierContext): BaseNode {
