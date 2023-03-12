@@ -5,6 +5,7 @@ import {
   type BlockOrEmptyStatement,
   type Expression,
   type ExpressionOrEmptyStatement,
+  type ExpressionSequence,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
@@ -130,11 +131,7 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
-import {
-  constructEmptyStatement,
-  constructIdentifier,
-  constructPlaceholderIdentifier
-} from './constructors';
+import { constructEmptyStatement, constructIdentifier } from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -435,9 +432,15 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitExpression(ctx: ExpressionContext): Expression {
-    // TODO: Implement this properly
-    return constructPlaceholderIdentifier('temp');
+  visitExpression(ctx: ExpressionContext): ExpressionSequence {
+    const assignmentExpressions = ctx.assignmentExpression();
+    return {
+      type: 'ExpressionSequence',
+      expressions: assignmentExpressions.map(
+        this.visitAssignmentExpression,
+        this
+      )
+    };
   }
 
   visitExpressionStatement(
@@ -447,7 +450,7 @@ export class ASTBuilder implements CVisitor<any> {
     if (expression !== undefined) {
       return {
         type: 'ExpressionStatement',
-        expression: this.visitExpression(expression)
+        sequence: this.visitExpression(expression)
       };
     }
 
@@ -547,9 +550,15 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForExpression(ctx: ForExpressionContext): Expression[] {
+  visitForExpression(ctx: ForExpressionContext): ExpressionSequence {
     const assignmentExpressions = ctx.assignmentExpression();
-    return assignmentExpressions.map(this.visitAssignmentExpression, this);
+    return {
+      type: 'ExpressionSequence',
+      expressions: assignmentExpressions.map(
+        this.visitAssignmentExpression,
+        this
+      )
+    };
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {

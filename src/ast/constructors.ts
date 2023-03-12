@@ -13,12 +13,3 @@ export const constructEmptyStatement = (): EmptyStatement => {
     type: 'EmptyStatement'
   };
 };
-
-export const constructPlaceholderIdentifier = (
-  placeholder: string
-): Identifier => {
-  return {
-    type: 'Identifier',
-    name: placeholder
-  };
-};

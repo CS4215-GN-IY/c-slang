@@ -47,21 +47,21 @@ export interface EmptyStatement extends BaseStatement {
 
 export interface ExpressionStatement extends BaseStatement {
   type: 'ExpressionStatement';
-  expression: Expression;
+  sequence: ExpressionSequence;
 }
 
 export type SelectionStatement = IfStatement | SwitchStatement;
 
 export interface IfStatement extends BaseStatement {
   type: 'IfStatement';
-  test: Expression;
+  test: ExpressionSequence;
   consequent: Statement;
   alternate?: Statement;
 }
 
 export interface SwitchStatement extends BaseStatement {
   type: 'SwitchStatement';
-  discriminant: Expression;
+  discriminant: ExpressionSequence;
   body: Statement;
 }
 
@@ -72,21 +72,21 @@ export type IterationStatement =
 
 export interface DoWhileStatement extends BaseStatement {
   type: 'DoWhileStatement';
-  test: Expression;
+  test: ExpressionSequence;
   body: Statement;
 }
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
-  init?: VariableDeclaration | Expression;
-  test?: Expression[];
-  update?: Expression[];
+  init?: VariableDeclaration | ExpressionSequence;
+  test?: ExpressionSequence;
+  update?: ExpressionSequence;
   body: Statement;
 }
 
 export interface WhileStatement extends BaseStatement {
   type: 'WhileStatement';
-  test: Expression;
+  test: ExpressionSequence;
   body: Statement;
 }
 
@@ -111,7 +111,12 @@ export interface GotoStatement extends BaseStatement {
 
 export interface ReturnStatement extends BaseStatement {
   type: 'ReturnStatement';
-  argument?: Expression;
+  argument?: ExpressionSequence;
+}
+
+export interface ExpressionSequence extends BaseNode {
+  type: 'ExpressionSequence';
+  expressions: Expression[];
 }
 
 export type Expression = AssignmentExpression | Identifier;
