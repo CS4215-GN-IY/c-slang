@@ -889,6 +889,13 @@ export class ASTBuilder implements CVisitor<any> {
       throw new UnsupportedKeywordError('__extension__');
     }
 
+    if (
+      ctx.childCount > 0 &&
+      ctx.getChild(0).toStringTree() === '__builtin_va_arg'
+    ) {
+      throw new UnsupportedKeywordError('__builtin_va_arg');
+    }
+
     // TODO: Deal with everything else.
 
     throw new UnreachableCaseError();

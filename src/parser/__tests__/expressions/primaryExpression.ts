@@ -217,4 +217,16 @@ describe('primary expression', () => {
       "'__extension__' is a valid keyword in C17 but is not (currently) supported."
     );
   });
+
+  test("throws UnsupportedKeywordError for __builtin_va_arg'", () => {
+    const code = `
+      int main(void) {
+        // Invalid program - we only want to test that the keyword '__builtin_va_arg' is banned.
+        __builtin_va_arg(a, int);
+      }
+    `;
+    expect(() => parse(code)).toThrow(
+      "'__builtin_va_arg' is a valid keyword in C17 but is not (currently) supported."
+    );
+  });
 });
