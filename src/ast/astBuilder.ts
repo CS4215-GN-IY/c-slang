@@ -814,15 +814,30 @@ export class ASTBuilder implements CVisitor<any> {
   visitMultiplicativeExpression(
     ctx: MultiplicativeExpressionContext
   ): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const castExpression = ctx.castExpression(0);
-    if (castExpression !== undefined) {
-      return this.visitCastExpression(castExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a MultiplicativeExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with multiplicative expressions.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitCastExpression(ctx.castExpression(0));
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '*' || operator === '/' || operator === '%')) {
+        throw new BrokenInvariantError(
+          `Encountered an unknown operator in MultiplicativeExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitCastExpression(ctx.castExpression(i));
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitNestedParenthesesBlock(ctx: NestedParenthesesBlockContext): BaseNode {
