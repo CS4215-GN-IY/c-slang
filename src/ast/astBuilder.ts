@@ -134,7 +134,8 @@ import { isTypedefNameReturnValue } from './typeGuards';
 import {
   constructConstant,
   constructEmptyStatement,
-  constructIdentifier
+  constructIdentifier,
+  constructStringLiteral
 } from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
@@ -864,6 +865,16 @@ export class ASTBuilder implements CVisitor<any> {
     const constant = ctx.Constant();
     if (constant !== undefined) {
       return constructConstant(constant);
+    }
+
+    const stringLiterals = ctx.StringLiteral();
+    if (stringLiterals.length !== 0) {
+      if (stringLiterals.length > 1) {
+        throw new BrokenInvariantError(
+          'Encountered a StringLiteral with multiple strings.'
+        );
+      }
+      return constructStringLiteral(stringLiterals[0]);
     }
 
     // TODO: Deal with everything else.

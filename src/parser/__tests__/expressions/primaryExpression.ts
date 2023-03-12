@@ -161,4 +161,36 @@ describe('primary expression', () => {
     };
     expect(ast).toEqual(expectedAst);
   });
+
+  test('handles string literals', () => {
+    const code = 'int main() { "Hello world!"; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: [
+            {
+              type: 'ExpressionStatement',
+              sequence: {
+                type: 'ExpressionSequence',
+                expressions: [
+                  {
+                    type: 'StringLiteral',
+                    value: '"Hello world!"'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
 });
