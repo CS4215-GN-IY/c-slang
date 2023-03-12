@@ -877,6 +877,8 @@ export class ASTBuilder implements CVisitor<any> {
       return constructStringLiteral(stringLiterals[0]);
     }
 
+    // TODO: Deal with expressions in brackets.
+
     const genericSelection = ctx.genericSelection();
     if (genericSelection !== undefined) {
       return this.visitGenericSelection(genericSelection);
@@ -896,7 +898,12 @@ export class ASTBuilder implements CVisitor<any> {
       throw new UnsupportedKeywordError('__builtin_va_arg');
     }
 
-    // TODO: Deal with everything else.
+    if (
+      ctx.childCount > 0 &&
+      ctx.getChild(0).toStringTree() === '__builtin_offsetof'
+    ) {
+      throw new UnsupportedKeywordError('__builtin_offsetof');
+    }
 
     throw new UnreachableCaseError();
   }

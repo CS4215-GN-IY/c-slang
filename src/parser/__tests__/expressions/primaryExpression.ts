@@ -218,7 +218,7 @@ describe('primary expression', () => {
     );
   });
 
-  test("throws UnsupportedKeywordError for __builtin_va_arg'", () => {
+  test("throws UnsupportedKeywordError for '__builtin_va_arg'", () => {
     const code = `
       int main(void) {
         // Invalid program - we only want to test that the keyword '__builtin_va_arg' is banned.
@@ -227,6 +227,18 @@ describe('primary expression', () => {
     `;
     expect(() => parse(code)).toThrow(
       "'__builtin_va_arg' is a valid keyword in C17 but is not (currently) supported."
+    );
+  });
+
+  test("throws UnsupportedKeywordError for '__builtin_offsetof'", () => {
+    const code = `
+      int main(void) {
+        // Invalid program - we only want to test that the keyword '__builtin_offsetof' is banned.
+        __builtin_offsetof(int, a);
+      }
+    `;
+    expect(() => parse(code)).toThrow(
+      "'__builtin_offsetof' is a valid keyword in C17 but is not (currently) supported."
     );
   });
 });
