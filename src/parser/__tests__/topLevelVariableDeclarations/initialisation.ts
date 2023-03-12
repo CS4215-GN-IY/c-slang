@@ -119,7 +119,7 @@ describe('Top-level variable declarations (initialisation)', () => {
   });
 
   it('handles initialised variable declarations', () => {
-    const code = 'int a = 5;';
+    const code = 'int a = b;';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -133,8 +133,11 @@ describe('Top-level variable declarations (initialisation)', () => {
               id: {
                 type: 'Identifier',
                 name: 'a'
+              },
+              initialValue: {
+                type: 'Identifier',
+                name: 'b'
               }
-              // TODO: Implement initial value.
             }
           ]
         }

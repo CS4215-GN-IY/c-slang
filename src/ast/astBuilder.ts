@@ -1,6 +1,5 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
-  type AssignmentExpression,
   type BaseNode,
   type BlockItem,
   type BlockOrEmptyStatement,
@@ -158,8 +157,16 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAdditiveExpression(ctx: AdditiveExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitAdditiveExpression(ctx: AdditiveExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const multiplicativeExpression = ctx.multiplicativeExpression(0);
+    if (multiplicativeExpression !== undefined) {
+      return this.visitMultiplicativeExpression(multiplicativeExpression);
+    }
+
+    // TODO: Deal with additive expressions.
+
+    throw new UnreachableCaseError();
   }
 
   visitAlignmentSpecifier(
@@ -168,18 +175,31 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAndExpression(ctx: AndExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitAndExpression(ctx: AndExpressionContext): Expression {
+    const equalityExpression = ctx.equalityExpression(0);
+    if (equalityExpression !== undefined) {
+      return this.visitEqualityExpression(equalityExpression);
+    }
+
+    // TODO: Deal with AND expressions.
+
+    throw new UnreachableCaseError();
   }
 
   visitArgumentExpressionList(ctx: ArgumentExpressionListContext): BaseNode {
     throw new Error('Method not implemented.');
   }
 
-  visitAssignmentExpression(
-    ctx: AssignmentExpressionContext
-  ): AssignmentExpression {
-    throw new Error('Method not implemented.');
+  visitAssignmentExpression(ctx: AssignmentExpressionContext): Expression {
+    const conditionalExpression = ctx.conditionalExpression();
+    if (conditionalExpression !== undefined) {
+      return this.visitConditionalExpression(conditionalExpression);
+    }
+
+    // TODO: Deal with assignments.
+    // TODO: Deal with number sequence.
+
+    throw new UnreachableCaseError();
   }
 
   visitAssignmentOperator(ctx: AssignmentOperatorContext): BaseNode {
@@ -209,8 +229,16 @@ export class ASTBuilder implements CVisitor<any> {
     return blockItems.map(this.visitBlockItem, this);
   }
 
-  visitCastExpression(ctx: CastExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitCastExpression(ctx: CastExpressionContext): Expression {
+    const unaryExpression = ctx.unaryExpression();
+    if (unaryExpression !== undefined) {
+      return this.visitUnaryExpression(unaryExpression);
+    }
+
+    // TODO: Deal with type casting.
+    // TODO: Deal with number sequence.
+
+    throw new UnreachableCaseError();
   }
 
   visitCompilationUnit(ctx: CompilationUnitContext): Program {
@@ -233,8 +261,15 @@ export class ASTBuilder implements CVisitor<any> {
     return constructEmptyStatement();
   }
 
-  visitConditionalExpression(ctx: ConditionalExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitConditionalExpression(ctx: ConditionalExpressionContext): Expression {
+    const logicalOrExpression = ctx.logicalOrExpression();
+    if (logicalOrExpression !== undefined) {
+      return this.visitLogicalOrExpression(logicalOrExpression);
+    }
+
+    // TODO: Deal with conditionals.
+
+    throw new UnreachableCaseError();
   }
 
   visitConstantExpression(ctx: ConstantExpressionContext): BaseNode {
@@ -376,12 +411,28 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitEqualityExpression(ctx: EqualityExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitEqualityExpression(ctx: EqualityExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const relationalExpression = ctx.relationalExpression(0);
+    if (relationalExpression !== undefined) {
+      return this.visitRelationalExpression(relationalExpression);
+    }
+
+    // TODO: Deal with equality expressions.
+
+    throw new UnreachableCaseError();
   }
 
-  visitExclusiveOrExpression(ctx: ExclusiveOrExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitExclusiveOrExpression(ctx: ExclusiveOrExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const andExpression = ctx.andExpression(0);
+    if (andExpression !== undefined) {
+      return this.visitAndExpression(andExpression);
+    }
+
+    // TODO: Deal with exclusive OR operations.
+
+    throw new UnreachableCaseError();
   }
 
   visitExpression(ctx: ExpressionContext): Expression {
@@ -496,7 +547,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForExpression(ctx: ForExpressionContext): AssignmentExpression[] {
+  visitForExpression(ctx: ForExpressionContext): Expression[] {
     const assignmentExpressions = ctx.assignmentExpression();
     return assignmentExpressions.map(this.visitAssignmentExpression, this);
   }
@@ -562,15 +613,29 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitInclusiveOrExpression(ctx: InclusiveOrExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInclusiveOrExpression(ctx: InclusiveOrExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const exclusiveOrExpression = ctx.exclusiveOrExpression(0);
+    if (exclusiveOrExpression !== undefined) {
+      return this.visitExclusiveOrExpression(exclusiveOrExpression);
+    }
+
+    // TODO: Deal with inclusive OR operations.
+
+    throw new UnreachableCaseError();
   }
 
   visitInitDeclarator(ctx: InitDeclaratorContext): VariableDeclarator {
-    // TODO: Implement initial value.
+    const initializer = ctx.initializer();
+    const initialValue =
+      initializer === undefined
+        ? undefined
+        : this.visitInitializer(initializer);
+
     return {
       type: 'VariableDeclarator',
-      id: this.visitDeclarator(ctx.declarator())
+      id: this.visitDeclarator(ctx.declarator()),
+      initialValue
     };
   }
 
@@ -580,8 +645,15 @@ export class ASTBuilder implements CVisitor<any> {
     return ctx.initDeclarator().map(this.visitInitDeclarator, this);
   }
 
-  visitInitializer(ctx: InitializerContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInitializer(ctx: InitializerContext): Expression {
+    const assignmentExpression = ctx.assignmentExpression();
+    if (assignmentExpression !== undefined) {
+      return this.visitAssignmentExpression(assignmentExpression);
+    }
+
+    // TODO: Deal with initializer list.
+
+    throw new UnreachableCaseError();
   }
 
   visitInitializerList(ctx: InitializerListContext): BaseNode {
@@ -701,18 +773,42 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitLogicalAndExpression(ctx: LogicalAndExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitLogicalAndExpression(ctx: LogicalAndExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const inclusiveOrExpression = ctx.inclusiveOrExpression(0);
+    if (inclusiveOrExpression !== undefined) {
+      return this.visitInclusiveOrExpression(inclusiveOrExpression);
+    }
+
+    // TODO: Deal with logical AND operations.
+
+    throw new UnreachableCaseError();
   }
 
-  visitLogicalOrExpression(ctx: LogicalOrExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitLogicalOrExpression(ctx: LogicalOrExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const logicalAndExpression = ctx.logicalAndExpression(0);
+    if (logicalAndExpression !== undefined) {
+      return this.visitLogicalAndExpression(logicalAndExpression);
+    }
+
+    // TODO: Deal with logical OR operations.
+
+    throw new UnreachableCaseError();
   }
 
   visitMultiplicativeExpression(
     ctx: MultiplicativeExpressionContext
-  ): BaseNode {
-    throw new Error('Method not implemented.');
+  ): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const castExpression = ctx.castExpression(0);
+    if (castExpression !== undefined) {
+      return this.visitCastExpression(castExpression);
+    }
+
+    // TODO: Deal with multiplicative expressions.
+
+    throw new UnreachableCaseError();
   }
 
   visitNestedParenthesesBlock(ctx: NestedParenthesesBlockContext): BaseNode {
@@ -735,16 +831,38 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitPostfixExpression(ctx: PostfixExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitPostfixExpression(ctx: PostfixExpressionContext): Expression {
+    const primaryExpression = ctx.primaryExpression();
+    if (primaryExpression !== undefined) {
+      return this.visitPrimaryExpression(primaryExpression);
+    }
+
+    // TODO: Deal with everything else.
+
+    throw new UnreachableCaseError();
   }
 
-  visitPrimaryExpression(ctx: PrimaryExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitPrimaryExpression(ctx: PrimaryExpressionContext): Expression {
+    const identifier = ctx.Identifier();
+    if (identifier !== undefined) {
+      return constructIdentifier(identifier);
+    }
+
+    // TODO: Deal with everything else.
+
+    throw new UnreachableCaseError();
   }
 
-  visitRelationalExpression(ctx: RelationalExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitRelationalExpression(ctx: RelationalExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const shiftExpression = ctx.shiftExpression(0);
+    if (shiftExpression !== undefined) {
+      return this.visitShiftExpression(shiftExpression);
+    }
+
+    // TODO: Deal with relational expressions.
+
+    throw new UnreachableCaseError();
   }
 
   visitSelectionStatement(ctx: SelectionStatementContext): SelectionStatement {
@@ -796,8 +914,16 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitShiftExpression(ctx: ShiftExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitShiftExpression(ctx: ShiftExpressionContext): Expression {
+    // TODO: Temporarily hardcoded to make use of the first expression.
+    const additiveExpression = ctx.additiveExpression(0);
+    if (additiveExpression !== undefined) {
+      return this.visitAdditiveExpression(additiveExpression);
+    }
+
+    // TODO: Deal with shift expressions.
+
+    throw new UnreachableCaseError();
   }
 
   visitSpecifierQualifierList(ctx: SpecifierQualifierListContext): BaseNode {
@@ -984,8 +1110,15 @@ export class ASTBuilder implements CVisitor<any> {
     return constructIdentifier(identifier);
   }
 
-  visitUnaryExpression(ctx: UnaryExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitUnaryExpression(ctx: UnaryExpressionContext): Expression {
+    const postfixExpression = ctx.postfixExpression();
+    if (postfixExpression !== undefined) {
+      return this.visitPostfixExpression(postfixExpression);
+    }
+
+    // TODO: Deal with everything else.
+
+    throw new UnreachableCaseError();
   }
 
   visitUnaryOperator(ctx: UnaryOperatorContext): BaseNode {
