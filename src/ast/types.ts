@@ -121,6 +121,7 @@ export interface ExpressionSequence extends BaseNode {
 
 export type Expression =
   | AssignmentExpression
+  | BinaryExpression
   | Constant
   | Identifier
   | StringLiteral;
@@ -141,6 +142,31 @@ export interface StringLiteral extends BaseExpression {
   type: 'StringLiteral';
   value: string;
 }
+
+export interface BinaryExpression extends BaseExpression {
+  type: 'BinaryExpression';
+  operator: BinaryOperator;
+  left: Expression;
+  right: Expression;
+}
+
+export type BinaryOperator =
+  | '*'
+  | '/'
+  | '%'
+  | '+'
+  | '-'
+  | '<<'
+  | '>>'
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | '=='
+  | '!='
+  | '&'
+  | '^'
+  | '|';
 
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression';
