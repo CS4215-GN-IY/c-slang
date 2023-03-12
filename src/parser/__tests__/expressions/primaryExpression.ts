@@ -193,4 +193,16 @@ describe('primary expression', () => {
     };
     expect(ast).toEqual(expectedAst);
   });
+
+  test("throws UnsupportedKeywordError for '_Generic'", () => {
+    const code = `
+      int main(void) {
+        // Invalid program - we only want to test that the keyword '_Generic' is banned.
+        _Generic((X), long double: cbrtl, default: cbrt, float: cbrtf)(X);
+      }
+    `;
+    expect(() => parse(code)).toThrow(
+      "'_Generic' is a valid keyword in C17 but is not (currently) supported."
+    );
+  });
 });

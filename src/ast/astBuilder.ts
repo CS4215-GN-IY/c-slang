@@ -619,8 +619,8 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitGenericSelection(ctx: GenericSelectionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitGenericSelection(ctx: GenericSelectionContext): Expression {
+    throw new UnsupportedKeywordError('_Generic');
   }
 
   visitIdentifierList(ctx: IdentifierListContext): BaseNode {
@@ -875,6 +875,11 @@ export class ASTBuilder implements CVisitor<any> {
         );
       }
       return constructStringLiteral(stringLiterals[0]);
+    }
+
+    const genericSelection = ctx.genericSelection();
+    if (genericSelection !== undefined) {
+      return this.visitGenericSelection(genericSelection);
     }
 
     // TODO: Deal with everything else.
