@@ -131,7 +131,11 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import { isTypedefNameReturnValue } from './typeGuards';
-import { constructEmptyStatement, constructIdentifier } from './constructors';
+import {
+  constructConstant,
+  constructEmptyStatement,
+  constructIdentifier
+} from './constructors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -855,6 +859,11 @@ export class ASTBuilder implements CVisitor<any> {
     const identifier = ctx.Identifier();
     if (identifier !== undefined) {
       return constructIdentifier(identifier);
+    }
+
+    const constant = ctx.Constant();
+    if (constant !== undefined) {
+      return constructConstant(constant);
     }
 
     // TODO: Deal with everything else.

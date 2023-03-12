@@ -119,13 +119,18 @@ export interface ExpressionSequence extends BaseNode {
   expressions: Expression[];
 }
 
-export type Expression = AssignmentExpression | Identifier;
+export type Expression = AssignmentExpression | Constant | Identifier;
 
 export interface BaseExpression extends BaseNode {}
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier';
   name: string;
+}
+
+export interface Constant extends BaseExpression {
+  type: 'Constant';
+  value: string;
 }
 
 export interface AssignmentExpression extends BaseExpression {
