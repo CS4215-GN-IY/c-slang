@@ -160,15 +160,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitAdditiveExpression(ctx: AdditiveExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const multiplicativeExpression = ctx.multiplicativeExpression(0);
-    if (multiplicativeExpression !== undefined) {
-      return this.visitMultiplicativeExpression(multiplicativeExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an AdditiveExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with additive expressions.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitMultiplicativeExpression(
+      ctx.multiplicativeExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '+' || operator === '-')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in AdditiveExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitMultiplicativeExpression(
+        ctx.multiplicativeExpression(i)
+      );
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitAlignmentSpecifier(
@@ -826,7 +845,7 @@ export class ASTBuilder implements CVisitor<any> {
       const operator = children[i * 2 - 1].toStringTree();
       if (!(operator === '*' || operator === '/' || operator === '%')) {
         throw new BrokenInvariantError(
-          `Encountered an unknown operator in MultiplicativeExpression: '${operator}'`
+          `Encountered an unexpected operator in MultiplicativeExpression: '${operator}'`
         );
       }
       const rightExpression = this.visitCastExpression(ctx.castExpression(i));
