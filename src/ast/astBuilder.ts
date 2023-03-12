@@ -612,11 +612,11 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitGenericAssocList(ctx: GenericAssocListContext): BaseNode {
-    throw new Error('Method not implemented.');
+    throw new UnreachableCaseError();
   }
 
   visitGenericAssociation(ctx: GenericAssociationContext): BaseNode {
-    throw new Error('Method not implemented.');
+    throw new UnreachableCaseError();
   }
 
   visitGenericSelection(ctx: GenericSelectionContext): Expression {
