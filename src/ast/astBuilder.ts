@@ -882,6 +882,13 @@ export class ASTBuilder implements CVisitor<any> {
       return this.visitGenericSelection(genericSelection);
     }
 
+    if (
+      ctx.childCount > 0 &&
+      ctx.getChild(0).toStringTree() === '__extension__'
+    ) {
+      throw new UnsupportedKeywordError('__extension__');
+    }
+
     // TODO: Deal with everything else.
 
     throw new UnreachableCaseError();

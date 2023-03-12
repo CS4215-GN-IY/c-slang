@@ -205,4 +205,16 @@ describe('primary expression', () => {
       "'_Generic' is a valid keyword in C17 but is not (currently) supported."
     );
   });
+
+  test("throws UnsupportedKeywordError for '__extension__'", () => {
+    const code = `
+      int main(void) {
+        // Invalid program - we only want to test that the keyword '__extension__' is banned.
+        __extension__({});
+      }
+    `;
+    expect(() => parse(code)).toThrow(
+      "'__extension__' is a valid keyword in C17 but is not (currently) supported."
+    );
+  });
 });
