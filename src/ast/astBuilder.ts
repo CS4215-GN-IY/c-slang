@@ -197,14 +197,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitAndExpression(ctx: AndExpressionContext): Expression {
-    const equalityExpression = ctx.equalityExpression(0);
-    if (equalityExpression !== undefined) {
-      return this.visitEqualityExpression(equalityExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an AndExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with AND expressions.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitEqualityExpression(
+      ctx.equalityExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '&')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in AndExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitEqualityExpression(
+        ctx.equalityExpression(i)
+      );
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitArgumentExpressionList(ctx: ArgumentExpressionListContext): BaseNode {
