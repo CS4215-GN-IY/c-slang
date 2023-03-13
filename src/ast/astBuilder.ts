@@ -1004,15 +1004,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitShiftExpression(ctx: ShiftExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const additiveExpression = ctx.additiveExpression(0);
-    if (additiveExpression !== undefined) {
-      return this.visitAdditiveExpression(additiveExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ShiftExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with shift expressions.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitAdditiveExpression(
+      ctx.additiveExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '<<' || operator === '>>')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in ShiftExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitAdditiveExpression(
+        ctx.additiveExpression(i)
+      );
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitSpecifierQualifierList(ctx: SpecifierQualifierListContext): BaseNode {
