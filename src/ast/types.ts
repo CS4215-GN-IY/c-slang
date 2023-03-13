@@ -124,6 +124,7 @@ export type Expression =
   | BinaryExpression
   | Constant
   | Identifier
+  | LogicalExpression
   | StringLiteral;
 
 export interface BaseExpression extends BaseNode {}
@@ -167,6 +168,15 @@ export type BinaryOperator =
   | '&'
   | '^'
   | '|';
+
+export interface LogicalExpression extends BaseExpression {
+  type: 'LogicalExpression';
+  operator: LogicalOperator;
+  left: Expression;
+  right: Expression;
+}
+
+export type LogicalOperator = '&&' | '||';
 
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression';
