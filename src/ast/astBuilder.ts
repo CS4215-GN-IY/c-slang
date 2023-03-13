@@ -701,15 +701,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitInclusiveOrExpression(ctx: InclusiveOrExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const exclusiveOrExpression = ctx.exclusiveOrExpression(0);
-    if (exclusiveOrExpression !== undefined) {
-      return this.visitExclusiveOrExpression(exclusiveOrExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an InclusiveOrExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with inclusive OR operations.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitExclusiveOrExpression(
+      ctx.exclusiveOrExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '|')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in InclusiveOrExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitExclusiveOrExpression(
+        ctx.exclusiveOrExpression(i)
+      );
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitInitDeclarator(ctx: InitDeclaratorContext): VariableDeclarator {
