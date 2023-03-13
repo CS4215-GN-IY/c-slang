@@ -911,15 +911,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitLogicalOrExpression(ctx: LogicalOrExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const logicalAndExpression = ctx.logicalAndExpression(0);
-    if (logicalAndExpression !== undefined) {
-      return this.visitLogicalAndExpression(logicalAndExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a LogicalOrExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with logical OR operations.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitLogicalAndExpression(
+      ctx.logicalAndExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '||')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in LogicalOrExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitLogicalAndExpression(
+        ctx.logicalAndExpression(i)
+      );
+      leftExpression = {
+        type: 'LogicalExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitMultiplicativeExpression(
