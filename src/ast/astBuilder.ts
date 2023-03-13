@@ -433,15 +433,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitEqualityExpression(ctx: EqualityExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const relationalExpression = ctx.relationalExpression(0);
-    if (relationalExpression !== undefined) {
-      return this.visitRelationalExpression(relationalExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an EqualityExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with equality expressions.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitRelationalExpression(
+      ctx.relationalExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '==' || operator === '!=')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in EqualityExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitRelationalExpression(
+        ctx.relationalExpression(i)
+      );
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitExclusiveOrExpression(ctx: ExclusiveOrExpressionContext): Expression {
