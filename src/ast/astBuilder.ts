@@ -880,15 +880,34 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitLogicalAndExpression(ctx: LogicalAndExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const inclusiveOrExpression = ctx.inclusiveOrExpression(0);
-    if (inclusiveOrExpression !== undefined) {
-      return this.visitInclusiveOrExpression(inclusiveOrExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a LogicalAndExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with logical AND operations.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitInclusiveOrExpression(
+      ctx.inclusiveOrExpression(0)
+    );
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '&&')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in LogicalAndExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitInclusiveOrExpression(
+        ctx.inclusiveOrExpression(i)
+      );
+      leftExpression = {
+        type: 'LogicalExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitLogicalOrExpression(ctx: LogicalOrExpressionContext): Expression {
