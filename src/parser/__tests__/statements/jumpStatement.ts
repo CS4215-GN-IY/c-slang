@@ -18,8 +18,13 @@ describe('return statement', () => {
             {
               type: 'ReturnStatement',
               argument: {
-                type: 'Identifier',
-                name: 'temp'
+                type: 'ExpressionSequence',
+                expressions: [
+                  {
+                    type: 'Constant',
+                    value: '0'
+                  }
+                ]
               }
             }
           ]
@@ -76,8 +81,13 @@ describe('goto statement', () => {
               body: {
                 type: 'ReturnStatement',
                 argument: {
-                  type: 'Identifier',
-                  name: 'temp'
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'Constant',
+                      value: '0'
+                    }
+                  ]
                 }
               }
             },

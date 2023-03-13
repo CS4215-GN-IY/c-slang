@@ -1,10 +1,15 @@
 import { type TerminalNode } from 'antlr4ts/tree';
-import { type EmptyStatement, type Identifier } from './types';
+import {
+  type Constant,
+  type EmptyStatement,
+  type Identifier,
+  type StringLiteral
+} from './types';
 
-export const constructIdentifier = (identifier: TerminalNode): Identifier => {
+export const constructConstant = (constant: TerminalNode): Constant => {
   return {
-    type: 'Identifier',
-    name: identifier.toString()
+    type: 'Constant',
+    value: constant.toString()
   };
 };
 
@@ -14,11 +19,18 @@ export const constructEmptyStatement = (): EmptyStatement => {
   };
 };
 
-export const constructPlaceholderIdentifier = (
-  placeholder: string
-): Identifier => {
+export const constructIdentifier = (identifier: TerminalNode): Identifier => {
   return {
     type: 'Identifier',
-    name: placeholder
+    name: identifier.toString()
+  };
+};
+
+export const constructStringLiteral = (
+  stringLiteral: TerminalNode
+): StringLiteral => {
+  return {
+    type: 'StringLiteral',
+    value: stringLiteral.toString()
   };
 };
