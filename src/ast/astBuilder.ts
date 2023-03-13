@@ -484,15 +484,30 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitExclusiveOrExpression(ctx: ExclusiveOrExpressionContext): Expression {
-    // TODO: Temporarily hardcoded to make use of the first expression.
-    const andExpression = ctx.andExpression(0);
-    if (andExpression !== undefined) {
-      return this.visitAndExpression(andExpression);
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an ExclusiveOrExpression with no child nodes.'
+      );
     }
 
-    // TODO: Deal with exclusive OR operations.
-
-    throw new UnreachableCaseError();
+    let leftExpression = this.visitAndExpression(ctx.andExpression(0));
+    for (let i = 1; i * 2 < children.length; i++) {
+      const operator = children[i * 2 - 1].toStringTree();
+      if (!(operator === '^')) {
+        throw new BrokenInvariantError(
+          `Encountered an unexpected operator in ExclusiveOrExpression: '${operator}'`
+        );
+      }
+      const rightExpression = this.visitAndExpression(ctx.andExpression(i));
+      leftExpression = {
+        type: 'BinaryExpression',
+        operator,
+        left: leftExpression,
+        right: rightExpression
+      };
+    }
+    return leftExpression;
   }
 
   visitExpression(ctx: ExpressionContext): ExpressionSequence {
