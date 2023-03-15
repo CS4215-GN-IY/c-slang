@@ -32,8 +32,7 @@ import {
   type WhileStatement
 } from '../ast/types';
 import {
-  allocateBlockVariableDeclarations,
-  allocateExternalDeclaration,
+  allocateStackAddresses,
   constructClosure,
   getArgNumbers,
   getBlockVariableDeclarationNames,
@@ -171,7 +170,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     const blockVariableDeclarations = getBlockVariableDeclarationNames(
       closure.body
     );
-    const blockVariableAddresses = allocateBlockVariableDeclarations(
+    const blockVariableAddresses = allocateStackAddresses(
       blockVariableDeclarations.length,
       state.memory
     );
@@ -226,12 +225,12 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state: ExplicitControlEvaluatorState
   ) => {},
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
-    const declarationAddresses = allocateExternalDeclaration(
-      command.body,
+    const declarationNames = getExternalDeclarationNames(command.body);
+    const declarationAddresses = allocateStackAddresses(
+      declarationNames.length,
       state.memory
     );
-    if (declarationAddresses.length > 0) {
-      const declarationNames = getExternalDeclarationNames(command.body);
+    if (declarationNames.length > 0) {
       state.environment = extendEnvironment(
         declarationNames,
         declarationAddresses,

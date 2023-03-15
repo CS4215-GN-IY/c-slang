@@ -11,37 +11,6 @@ import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';
 
-export const allocateExternalDeclaration = (
-  declarations: ExternalDeclaration[],
-  memory: VirtualMemory
-): number[] => {
-  const allAddresses: number[] = [];
-  declarations.forEach((declaration) => {
-    switch (declaration.type) {
-      case 'FunctionDeclaration': {
-        const address = allocateUninitializedVariable(memory);
-        allAddresses.push(address);
-        break;
-      }
-      case 'VariableDeclaration': {
-        const addresses = allocateVariableDeclaration(declaration, memory);
-        allAddresses.push(...addresses);
-        break;
-      }
-    }
-  });
-  return allAddresses;
-};
-
-const allocateVariableDeclaration = (
-  variableDeclaration: VariableDeclaration,
-  memory: VirtualMemory
-): number[] => {
-  return variableDeclaration.declarations.map((variable) =>
-    allocateUninitializedVariable(memory)
-  );
-};
-
 const allocateUninitializedVariable = (memory: VirtualMemory): number => {
   const valueWhenUninitialized = 0;
   return memory.stackAllocate(valueWhenUninitialized);
@@ -74,7 +43,7 @@ export const getFunctionDeclarationName = (
   return getIdentifierName(functionDeclaration.id);
 };
 
-export const allocateBlockVariableDeclarations = (
+export const allocateStackAddresses = (
   numOfVariables: number,
   memory: VirtualMemory
 ): number[] => {
