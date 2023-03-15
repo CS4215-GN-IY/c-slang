@@ -2,7 +2,7 @@ import {
   type BaseReturnValue,
   type TypedefNameReturnValue
 } from './astBuilderInternalTypes';
-import { type BaseNode, type Identifier } from './types';
+import { type BaseNode, type Constant, type Identifier } from './types';
 
 export const isTypedefNameReturnValue = (
   returnValue: BaseReturnValue
@@ -12,4 +12,8 @@ export const isTypedefNameReturnValue = (
 
 export const isIdentifier = (node: BaseNode): node is Identifier => {
   return node.type === 'Identifier';
+};
+
+export const isConstant = (node: BaseNode): node is Constant => {
+  return node.type === 'Constant';
 };

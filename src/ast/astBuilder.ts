@@ -300,7 +300,10 @@ export class ASTBuilder implements CVisitor<any> {
   visitCompoundStatement(ctx: CompoundStatementContext): BlockOrEmptyStatement {
     const blockItemList = ctx.blockItemList();
     if (blockItemList !== undefined) {
-      return this.visitBlockItemList(blockItemList);
+      return {
+        type: 'BlockStatement',
+        body: this.visitBlockItemList(blockItemList)
+      };
     }
 
     return constructEmptyStatement();

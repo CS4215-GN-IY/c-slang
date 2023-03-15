@@ -1,19 +1,18 @@
-import { type FunctionDeclaration } from '../ast/types';
-import { type FunctionAssigmentInstr } from './types/instruction';
+import {
+  type EnvironmentInstr,
+  type FunctionApplicationInstr,
+  type FunctionAssigmentInstr,
+  type FunctionMarkInstr
+} from './types/instruction';
+import { type CallExpression } from '../ast/types';
 import { type Environment } from './environment';
-import { type Closure } from './types/interpreter';
 
-export const constructClosure = (
-  functionDeclaration: FunctionDeclaration,
+export const constructEnvironmentInstr = (
   environment: Environment
-): Closure => {
-  return {
-    // TODO: Change this when parameter list is supported
-    params: [],
-    body: functionDeclaration.body,
-    environment
-  };
-};
+): EnvironmentInstr => ({
+  type: 'Environment',
+  environment
+});
 
 export const constructFunctionAssignmentInstr = (
   nameAddress: number,
@@ -25,3 +24,16 @@ export const constructFunctionAssignmentInstr = (
     closureIdx: idx
   };
 };
+
+export const constructFunctionApplicationInstr = (
+  numOfArgs: number,
+  srcNode: CallExpression
+): FunctionApplicationInstr => ({
+  type: 'FunctionApplication',
+  functionId: srcNode.id,
+  numOfArgs: srcNode.arguments.length
+});
+
+export const constructFunctionMarkInstr = (): FunctionMarkInstr => ({
+  type: 'FunctionMark'
+});

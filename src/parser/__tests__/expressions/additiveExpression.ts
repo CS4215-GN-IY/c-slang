@@ -14,28 +14,31 @@ describe('additive expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '+',
-                    left: {
-                      type: 'Constant',
-                      value: '3'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '7'
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '+',
+                      left: {
+                        type: 'Constant',
+                        value: '3'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '7'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,28 +57,31 @@ describe('additive expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '-',
-                    left: {
-                      type: 'Constant',
-                      value: '8'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '5'
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '-',
+                      left: {
+                        type: 'Constant',
+                        value: '8'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '5'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -94,52 +100,55 @@ describe('additive expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '+',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '-',
+                      operator: '+',
                       left: {
                         type: 'BinaryExpression',
                         operator: '-',
                         left: {
                           type: 'BinaryExpression',
-                          operator: '+',
+                          operator: '-',
                           left: {
-                            type: 'Constant',
-                            value: '4'
+                            type: 'BinaryExpression',
+                            operator: '+',
+                            left: {
+                              type: 'Constant',
+                              value: '4'
+                            },
+                            right: {
+                              type: 'Constant',
+                              value: '3'
+                            }
                           },
                           right: {
                             type: 'Constant',
-                            value: '3'
+                            value: '2'
                           }
                         },
                         right: {
                           type: 'Constant',
-                          value: '2'
+                          value: '6'
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '6'
+                        value: '5'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '5'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -158,60 +167,63 @@ describe('additive expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '-',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '+',
+                      operator: '-',
                       left: {
                         type: 'BinaryExpression',
-                        operator: '*',
+                        operator: '+',
                         left: {
-                          type: 'Constant',
-                          value: '7'
+                          type: 'BinaryExpression',
+                          operator: '*',
+                          left: {
+                            type: 'Constant',
+                            value: '7'
+                          },
+                          right: {
+                            type: 'Constant',
+                            value: '3'
+                          }
                         },
                         right: {
-                          type: 'Constant',
-                          value: '3'
+                          type: 'BinaryExpression',
+                          operator: '/',
+                          left: {
+                            type: 'Constant',
+                            value: '2'
+                          },
+                          right: {
+                            type: 'Constant',
+                            value: '6'
+                          }
                         }
                       },
                       right: {
                         type: 'BinaryExpression',
-                        operator: '/',
+                        operator: '%',
                         left: {
                           type: 'Constant',
-                          value: '2'
+                          value: '5'
                         },
                         right: {
                           type: 'Constant',
-                          value: '6'
+                          value: '4'
                         }
-                      }
-                    },
-                    right: {
-                      type: 'BinaryExpression',
-                      operator: '%',
-                      left: {
-                        type: 'Constant',
-                        value: '5'
-                      },
-                      right: {
-                        type: 'Constant',
-                        value: '4'
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

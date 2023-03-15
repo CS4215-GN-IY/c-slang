@@ -5,6 +5,11 @@ import {
   type VariableDeclaration
 } from '../ast/types';
 import { type VirtualMemory } from '../memory/virtualMemory';
+import { type Environment } from './environment';
+import { type Closure } from './types/interpreter';
+import { type Value } from './types/evaluationResults';
+import { isConstant } from '../ast/typeGuards';
+import { InvalidFunctionApplication } from './errors';
 
 export const allocateExternalDeclaration = (
   declarations: ExternalDeclaration[],
@@ -79,4 +84,28 @@ export const getVariableDeclarationNames = (
 
 export const getIdentifierName = (identifier: Identifier): string => {
   return identifier.name;
+};
+
+export const constructClosure = (
+  functionDeclaration: FunctionDeclaration,
+  environment: Environment
+): Closure => {
+  return {
+    // TODO: Change this when parameter list is supported
+    params: [],
+    body: functionDeclaration.body,
+    environment
+  };
+};
+
+// Arguments should either be an integer constant, floating constant, character constant or identifier.
+export const getArgNumbers = (args: Value[]): number[] => {
+  const numbers: number[] = args.map((arg) => {
+    if (isConstant(arg) && !isNaN(Number(arg.value))) {
+      return Number(arg.value);
+    }
+    // TODO: Add support for character and address later
+    throw new InvalidFunctionApplication(`Encountered an unhandled argument.`);
+  });
+  return numbers;
 };

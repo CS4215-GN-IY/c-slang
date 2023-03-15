@@ -1,5 +1,6 @@
 import { type TerminalNode } from 'antlr4ts/tree';
 import {
+  type CallExpression,
   type Constant,
   type EmptyStatement,
   type Identifier,
@@ -32,5 +33,17 @@ export const constructStringLiteral = (
   return {
     type: 'StringLiteral',
     value: stringLiteral.toString()
+  };
+};
+
+// TODO: Add support for command line arguments in the future
+export const constructMainCallExpression = (): CallExpression => {
+  return {
+    type: 'CallExpression',
+    id: {
+      type: 'Identifier',
+      name: 'main'
+    },
+    arguments: []
   };
 };

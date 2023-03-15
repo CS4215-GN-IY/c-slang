@@ -6,8 +6,10 @@ export interface BaseNode {
 }
 
 export interface NodeMap {
+  Expression: Expression;
   FunctionDeclaration: FunctionDeclaration;
   Program: Program;
+  Statement: Statement;
   VariableDeclaration: VariableDeclaration;
 }
 
@@ -43,7 +45,12 @@ export interface DefaultStatement extends BaseStatement {
   body: Statement;
 }
 
-export type BlockOrEmptyStatement = BlockItem[] | EmptyStatement;
+export type BlockOrEmptyStatement = BlockStatement | EmptyStatement;
+
+export interface BlockStatement extends BaseStatement {
+  type: 'BlockStatement';
+  body: BlockItem[];
+}
 
 export type BlockItem = VariableDeclaration | Statement;
 

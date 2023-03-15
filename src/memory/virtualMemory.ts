@@ -16,7 +16,8 @@ export class VirtualMemory {
     SegmentAddress
   >();
 
-  readonly ebp: number;
+  private ebp: number;
+  private esp: number;
 
   /**
    * Initializes the size of each segment. Size is the number of entries allocated to the segment.
@@ -70,10 +71,29 @@ export class VirtualMemory {
       )
     );
     this.ebp = stackBaseAddress;
+    this.esp = stackBaseAddress - PageTable.ENTRY_SIZE;
   }
 
   public stackAllocate(data: number): number {
-    return this.allocate(data, Segment.STACK);
+    this.esp += PageTable.ENTRY_SIZE;
+    this.setFree(this.esp, data);
+    return this.esp;
+  }
+
+  // Sets up stack for function call and returns address of parameters
+  public stackFunctionCallAllocate(paramValues: number[]): number[] {
+    this.stackAllocate(this.ebp);
+    this.stackAllocate(this.esp);
+    this.ebp = this.esp;
+
+    const addresses: number[] = [];
+    this.esp += paramValues.length * PageTable.ENTRY_SIZE;
+    for (let i = 0; i < paramValues.length; i++) {
+      const address = this.ebp + i * PageTable.ENTRY_SIZE;
+      this.setFree(address, paramValues[i]);
+      addresses.push(address);
+    }
+    return addresses;
   }
 
   /**
@@ -105,6 +125,15 @@ export class VirtualMemory {
     l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
     segmentAddress.updateFreeAddress(address + PageTable.ENTRY_SIZE);
     return address;
+  }
+
+  /**
+   * Sets data at a free entry.
+   */
+  private setFree(address: number, data: number): void {
+    const addressIndex = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(addressIndex);
+    l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
   }
 
   /**

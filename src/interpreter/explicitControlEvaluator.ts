@@ -6,22 +6,54 @@ import {
   type ExplicitControlEvaluatorState
 } from './types/interpreter';
 import {
+  type AssignmentExpression,
+  type BinaryExpression,
+  type BlockStatement,
+  type BreakStatement,
+  type CallExpression,
+  type Constant,
+  type ContinueStatement,
+  type DefaultStatement,
+  type DoWhileStatement,
+  type EmptyStatement,
+  type ExpressionStatement,
+  type ForStatement,
   type FunctionDeclaration,
+  type GotoStatement,
+  type Identifier,
+  type IdentifierStatement,
+  type IfStatement,
+  type LogicalExpression,
   type Program,
-  type VariableDeclaration
+  type ReturnStatement,
+  type StringLiteral,
+  type SwitchStatement,
+  type VariableDeclaration,
+  type WhileStatement
 } from '../ast/types';
 import {
   allocateExternalDeclaration,
+  constructClosure,
+  getArgNumbers,
   getExternalDeclarationNames
 } from './utils';
 import { VirtualMemory } from '../memory/virtualMemory';
 import { Environment } from './environment';
-import { type FunctionAssigmentInstr } from './types/instruction';
 import {
+  type EnvironmentInstr,
+  type FunctionApplicationInstr,
+  type FunctionAssigmentInstr,
+  type FunctionMarkInstr
+} from './types/instruction';
+import {
+  constructEnvironmentInstr,
+  constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
-  constructClosure
+  constructFunctionMarkInstr
 } from './instruction';
 import { TextMemory } from '../memory/textMemory';
+import { constructMainCallExpression } from '../ast/constructors';
+import { InvalidFunctionApplication } from './errors';
 
 const microcode: AgendaItemEvaluatorMapping = {
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
@@ -42,10 +74,7 @@ const microcode: AgendaItemEvaluatorMapping = {
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
-    const closure = constructClosure(
-      command,
-      state.environment.copyOfCurrent()
-    );
+    const closure = constructClosure(command, state.environment);
     const closureIdx = state.textMemory.allocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
       state.environment.get(command.id.name),
@@ -62,7 +91,143 @@ const microcode: AgendaItemEvaluatorMapping = {
     state: ExplicitControlEvaluatorState
   ) => {
     state.memory.set(command.nameAddress, command.closureIdx);
-  }
+  },
+  CallExpression: (
+    command: CallExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    state.agenda.push(
+      constructFunctionApplicationInstr(command.arguments.length, command)
+    );
+    for (let index = 0; index < command.arguments.length; index--) {
+      state.agenda.push(command.arguments[index]);
+    }
+    state.agenda.push(command.id);
+  },
+  FunctionApplication: (
+    command: FunctionApplicationInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    // Args are in order of left to right
+    const args: Value[] = [];
+    for (let index = 0; index < command.numOfArgs; index++) {
+      args.push(state.stash.pop());
+    }
+
+    const functionAddress = state.environment.get(command.functionId.name);
+    const closureIdx = state.memory.get(functionAddress);
+    const closure = state.textMemory.get(closureIdx);
+
+    if (closure.params.length !== args.length) {
+      throw new InvalidFunctionApplication(
+        `Function takes in ${closure.params.length} arguments but ${args.length} arguments were passed in`
+      );
+    }
+
+    // TODO: Handle Tail Call in future.
+    if (
+      state.agenda.size() === 0 ||
+      state.agenda.peek().type === 'Environment'
+    ) {
+      // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
+      state.agenda.push(constructFunctionMarkInstr());
+    } else {
+      state.agenda.push(constructEnvironmentInstr(state.environment));
+      state.agenda.push(constructFunctionMarkInstr());
+    }
+
+    const paramNames = closure.params.map((param) => param.name);
+    const addresses = state.memory.stackFunctionCallAllocate(
+      getArgNumbers(args)
+    );
+    const closureEnvironment = closure.environment.copyOfCurrent();
+    closureEnvironment.extend(paramNames, addresses);
+
+    state.agenda.push(closure.body);
+    state.environment = closureEnvironment;
+  },
+  FunctionMark: (
+    command: FunctionMarkInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  Environment: (
+    command: EnvironmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  AssignmentExpression: (
+    command: AssignmentExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  BinaryExpression: (
+    command: BinaryExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {},
+  Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {},
+  LogicalExpression: (
+    command: LogicalExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  StringLiteral: (
+    command: StringLiteral,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  IdentifierStatement: (
+    command: IdentifierStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  DefaultStatement: (
+    command: DefaultStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  BlockStatement: (
+    command: BlockStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  EmptyStatement: (
+    command: EmptyStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ExpressionStatement: (
+    command: ExpressionStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  IfStatement: (
+    command: IfStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  SwitchStatement: (
+    command: SwitchStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  DoWhileStatement: (
+    command: DoWhileStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ForStatement: (
+    command: ForStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  WhileStatement: (
+    command: WhileStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  BreakStatement: (
+    command: BreakStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ContinueStatement: (
+    command: ContinueStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  GotoStatement: (
+    command: GotoStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ReturnStatement: (
+    command: ReturnStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {}
 };
 
 /**
@@ -95,6 +260,7 @@ export const evaluate = async (ast: Program): Promise<Result> => {
  */
 export const interpret = (ast: Program): Value => {
   const agenda = new Stack<AgendaItem>();
+  agenda.push(constructMainCallExpression());
   agenda.push(ast);
   const stash = new Stack<Value>();
   const environment = new Environment();
