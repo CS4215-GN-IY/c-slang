@@ -1,15 +1,28 @@
 import { type Result, type Value } from './types/evaluationResults';
 import { Stack } from '../utils/stack';
-import {AgendaItem, type ExplicitControlEvaluatorState} from './types/interpreter';
-import {FunctionDeclaration, Node, type Program, VariableDeclaration} from '../ast/types';
-import {allocateExternalDeclaration, getExternalDeclarationNames} from "./utils";
-import {VirtualMemory} from "../memory/virtualMemory";
-import {Environment} from "./environment";
-import {UnknownCommandError} from "./errors";
+import {
+  type AgendaItem,
+  type AgendaItemEvaluatorMapping,
+  type ExplicitControlEvaluatorState
+} from './types/interpreter';
+import {
+  type FunctionDeclaration,
+  type Program,
+  type VariableDeclaration
+} from '../ast/types';
+import {
+  allocateExternalDeclaration,
+  getExternalDeclarationNames
+} from './utils';
+import { VirtualMemory } from '../memory/virtualMemory';
+import { Environment } from './environment';
 
-const microcode: { [type: string]: (command: AgendaItem, state: ExplicitControlEvaluatorState) => void } = {
-  'Program': function (command: Program, state: ExplicitControlEvaluatorState) {
-    const declarationAddresses = allocateExternalDeclaration(command.body, state.memory);
+const microcode: AgendaItemEvaluatorMapping = {
+  Program: function (command: Program, state: ExplicitControlEvaluatorState) {
+    const declarationAddresses = allocateExternalDeclaration(
+      command.body,
+      state.memory
+    );
     if (declarationAddresses.length > 0) {
       const declarationNames = getExternalDeclarationNames(command.body);
       state.environment.extend(declarationNames, declarationAddresses);
@@ -19,13 +32,15 @@ const microcode: { [type: string]: (command: AgendaItem, state: ExplicitControlE
       state.agenda.push(command.body[i]);
     }
   },
-  'FunctionDeclaration': function (command: FunctionDeclaration, state: ExplicitControlEvaluatorState) {
-
-  },
-  'VariableDeclaration': function (command: VariableDeclaration, state: ExplicitControlEvaluatorState) {
-
-  }
-}
+  FunctionDeclaration: function (
+    command: FunctionDeclaration,
+    state: ExplicitControlEvaluatorState
+  ) {},
+  VariableDeclaration: function (
+    command: VariableDeclaration,
+    state: ExplicitControlEvaluatorState
+  ) {}
+};
 
 /**
  * Evaluates the abstract syntax tree using an explicit-control evaluator &
@@ -70,11 +85,9 @@ export const interpret = (ast: Program): Value => {
 
   while (agenda.size() > 0) {
     const command = agenda.pop();
-    // if (microcode.hasOwnProperty(command.type)) {
-    //   microcode[command.type](command, state);
-    // } else {
-    //   throw new UnknownCommandError(`Encountered an unknown command: ${command.type}`);
-    // }
+    // The typecast allows for mapping to a specific evaluator command type from their union type.
+    // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
+    microcode[command.type](command as any, state);
   }
 
   return undefined;

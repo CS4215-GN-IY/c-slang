@@ -1,8 +1,8 @@
-import {PageTable} from './pageTable';
-import {AddressIndex} from './addressIndex';
-import {Segment} from './segment';
-import {SegmentAddress} from './segmentAddress';
-import {MemoryError, MemoryErrorType} from './memoryError';
+import { PageTable } from './pageTable';
+import { AddressIndex } from './addressIndex';
+import { Segment } from './segment';
+import { SegmentAddress } from './segmentAddress';
+import { MemoryError, MemoryErrorType } from './memoryError';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -15,6 +15,7 @@ export class VirtualMemory {
     Segment,
     SegmentAddress
   >();
+
   readonly ebp: number;
 
   /**
@@ -133,7 +134,10 @@ export class VirtualMemory {
     const l4PageTableIdx = this.l3PageTables[l3PageTableIdx].get(
       addressIndex.l3Idx
     );
-    return this.l4PageTables[l4PageTableIdx];
+    const l5PageTableIdx = this.l4PageTables[l4PageTableIdx].get(
+      addressIndex.l4Idx
+    );
+    return this.l5PageTables[l5PageTableIdx];
   }
 
   private allocatePageTables(baseAddress: number, numOfEntries: number): void {

@@ -1,12 +1,14 @@
-import {BrokenEnvironmentError} from "./errors";
-import {EnvironmentFrame} from "./types/interpreter";
+import { BrokenEnvironmentError } from './errors';
+import { type EnvironmentFrame } from './types/interpreter';
 
 export class Environment {
-  private frames: EnvironmentFrame[] = [];
+  private readonly frames: EnvironmentFrame[] = [];
 
-  public extend (names: string[], values: number[]) {
+  public extend(names: string[], values: number[]): void {
     if (names.length !== values.length) {
-      new BrokenEnvironmentError('Encountered a different number of names and values in a frame.')
+      throw new BrokenEnvironmentError(
+        'Encountered a different number of names and values in a frame.'
+      );
     }
 
     const newFrame: EnvironmentFrame = {};

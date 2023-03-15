@@ -1,8 +1,8 @@
 import { type Stack } from '../../utils/stack';
 import { type Value } from './evaluationResults';
-import {Node} from '../../ast/types';
-import {Environment} from "../environment";
-import {VirtualMemory} from "../../memory/virtualMemory";
+import { type Node } from '../../ast/types';
+import { type Environment } from '../environment';
+import { type VirtualMemory } from '../../memory/virtualMemory';
 
 export interface ExplicitControlEvaluatorState {
   agenda: Stack<AgendaItem>;
@@ -11,15 +11,13 @@ export interface ExplicitControlEvaluatorState {
   memory: VirtualMemory;
 }
 
-export type EnvironmentFrame = { [key: string]: number };
+export type EnvironmentFrame = Record<string, number>;
 
 export type AgendaItem = Node;
 
-export interface Instr {
-  instrType: string;
-}
-
-export type CommandEvaluator = (
-  command: AgendaItem,
-  state: ExplicitControlEvaluatorState
-) => void
+export type AgendaItemEvaluatorMapping = {
+  [AgendaItemType in AgendaItem['type']]: (
+    command: Extract<AgendaItem, { type: AgendaItemType }>,
+    state: ExplicitControlEvaluatorState
+  ) => void;
+};

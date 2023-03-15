@@ -21,7 +21,7 @@ export class PageTable {
     for (i = this.freeList; i < PageTable.NUM_OF_ENTRIES - 1; i++) {
       this.memory.setFloat64(i * PageTable.ENTRY_SIZE, i + 1);
     }
-    this.memory.setFloat64(i, PageTable.EMPTY_FREE_LIST);
+    this.memory.setFloat64(i * PageTable.ENTRY_SIZE, PageTable.EMPTY_FREE_LIST);
   }
 
   /**

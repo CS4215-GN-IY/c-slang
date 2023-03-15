@@ -5,9 +5,9 @@ export interface BaseNode {
   type: string;
 }
 
-interface NodeMap {
-  Program: Program;
+export interface NodeMap {
   FunctionDeclaration: FunctionDeclaration;
+  Program: Program;
   VariableDeclaration: VariableDeclaration;
 }
 
