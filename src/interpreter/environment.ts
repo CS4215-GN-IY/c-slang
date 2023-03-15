@@ -15,6 +15,11 @@ export const extendEnvironment = (
   const newFrame: EnvironmentFrame = {};
 
   for (let i = 0; i < names.length; i++) {
+    if (names[i] in newFrame) {
+      throw new BrokenEnvironmentError(
+        'Tried to redeclare a name in the same scope.'
+      );
+    }
     newFrame[names[i]] = values[i];
   }
 

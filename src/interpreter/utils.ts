@@ -1,4 +1,5 @@
 import {
+  type BlockStatement,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
@@ -7,7 +8,7 @@ import {
 import { type VirtualMemory } from '../memory/virtualMemory';
 import { type Closure, type Environment } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
-import { isConstant } from '../ast/typeGuards';
+import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';
 
 export const allocateExternalDeclaration = (
@@ -71,6 +72,30 @@ export const getFunctionDeclarationName = (
   functionDeclaration: FunctionDeclaration
 ): string => {
   return getIdentifierName(functionDeclaration.id);
+};
+
+export const allocateBlockVariableDeclarations = (
+  numOfVariables: number,
+  memory: VirtualMemory
+): number[] => {
+  const addresses: number[] = [];
+  for (let i = 0; i < numOfVariables; i++) {
+    addresses.push(allocateUninitializedVariable(memory));
+  }
+  return addresses;
+};
+
+export const getBlockVariableDeclarationNames = (
+  block: BlockStatement
+): string[] => {
+  const allNames: string[] = [];
+  block.body.forEach((blockItem) => {
+    if (isVariableDeclaration(blockItem)) {
+      const names = getVariableDeclarationNames(blockItem);
+      allNames.push(...names);
+    }
+  });
+  return allNames;
 };
 
 export const getVariableDeclarationNames = (

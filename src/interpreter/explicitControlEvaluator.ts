@@ -32,9 +32,11 @@ import {
   type WhileStatement
 } from '../ast/types';
 import {
+  allocateBlockVariableDeclarations,
   allocateExternalDeclaration,
   constructClosure,
   getArgNumbers,
+  getBlockVariableDeclarationNames,
   getExternalDeclarationNames
 } from './utils';
 import { VirtualMemory } from '../memory/virtualMemory';
@@ -58,6 +60,7 @@ import {
   extendEnvironment,
   getEnvironmentValue
 } from './environment';
+import { isEmptyStatement } from '../ast/typeGuards';
 
 const microcode: AgendaItemEvaluatorMapping = {
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
@@ -135,6 +138,10 @@ const microcode: AgendaItemEvaluatorMapping = {
       );
     }
 
+    if (isEmptyStatement(closure.body)) {
+      return;
+    }
+
     // TODO: Handle Tail Call in future.
     if (
       state.agenda.size() === 0 ||
@@ -146,17 +153,29 @@ const microcode: AgendaItemEvaluatorMapping = {
       state.agenda.push(constructEnvironmentInstr(state.environment));
       state.agenda.push(constructFunctionMarkInstr());
     }
-    state.agenda.push(closure.body);
 
+    // Params and block variables should be in the same scope
     const paramNames = closure.params.map((param) => param.name);
-    const addresses = state.memory.stackFunctionCallAllocate(
+    const paramAddresses = state.memory.stackFunctionCallAllocate(
       getArgNumbers(args)
     );
+    const blockVariableDeclarations = getBlockVariableDeclarationNames(
+      closure.body
+    );
+    const blockVariableAddresses = allocateBlockVariableDeclarations(
+      blockVariableDeclarations.length,
+      state.memory
+    );
+
     state.environment = extendEnvironment(
-      paramNames,
-      addresses,
+      [...paramNames, ...blockVariableDeclarations],
+      [...paramAddresses, ...blockVariableAddresses],
       closure.environment
     );
+
+    for (let i = closure.body.body.length - 1; i >= 0; i--) {
+      state.agenda.push(closure.body.body[i]);
+    }
   },
   FunctionMark: (
     command: FunctionMarkInstr,
