@@ -64,47 +64,23 @@ import {
 } from './environment';
 import { isEmptyStatement } from '../ast/typeGuards';
 
-const microcode: AgendaItemEvaluatorMapping = {
-  Program: (command: Program, state: ExplicitControlEvaluatorState) => {
-    const declarationAddresses = allocateExternalDeclaration(
-      command.body,
-      state.memory
-    );
-    if (declarationAddresses.length > 0) {
-      const declarationNames = getExternalDeclarationNames(command.body);
-      state.environment = extendEnvironment(
-        declarationNames,
-        declarationAddresses,
-        state.environment
-      );
-    }
-
-    for (let i = command.body.length - 1; i >= 0; i--) {
-      state.agenda.push(command.body[i]);
-    }
-  },
-  FunctionDeclaration: (
-    command: FunctionDeclaration,
-    state: ExplicitControlEvaluatorState
-  ) => {
-    const closure = constructClosure(command, state.environment);
-    const closureIdx = state.textMemory.allocate(closure);
-    const functionAssignmentInstr = constructFunctionAssignmentInstr(
-      getEnvironmentValue(command.id.name, state.environment),
-      closureIdx
-    );
-    state.agenda.push(functionAssignmentInstr);
-  },
-  VariableDeclaration: (
-    command: VariableDeclaration,
+const evaluators: AgendaItemEvaluatorMapping = {
+  AssignmentExpression: (
+    command: AssignmentExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
-  FunctionAssignment: (
-    command: FunctionAssigmentInstr,
+  BinaryExpression: (
+    command: BinaryExpression,
     state: ExplicitControlEvaluatorState
-  ) => {
-    state.memory.set(command.nameAddress, command.closureIdx);
-  },
+  ) => {},
+  BlockStatement: (
+    command: BlockStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  BreakStatement: (
+    command: BreakStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   CallExpression: (
     command: CallExpression,
     state: ExplicitControlEvaluatorState
@@ -117,6 +93,37 @@ const microcode: AgendaItemEvaluatorMapping = {
     }
     state.agenda.push(command.id);
   },
+  Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
+    state.stash.push(command);
+  },
+  ContinueStatement: (
+    command: ContinueStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  DefaultStatement: (
+    command: DefaultStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  DoWhileStatement: (
+    command: DoWhileStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  EmptyStatement: (
+    command: EmptyStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  Environment: (
+    command: EnvironmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ExpressionStatement: (
+    command: ExpressionStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ForStatement: (
+    command: ForStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   FunctionApplication: (
     command: FunctionApplicationInstr,
     state: ExplicitControlEvaluatorState
@@ -179,6 +186,70 @@ const microcode: AgendaItemEvaluatorMapping = {
       state.agenda.push(closure.body.body[i]);
     }
   },
+  FunctionAssignment: (
+    command: FunctionAssigmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    state.memory.set(command.nameAddress, command.closureIdx);
+  },
+  FunctionDeclaration: (
+    command: FunctionDeclaration,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    const closure = constructClosure(command, state.environment);
+    const closureIdx = state.textMemory.allocate(closure);
+    const functionAssignmentInstr = constructFunctionAssignmentInstr(
+      getEnvironmentValue(command.id.name, state.environment),
+      closureIdx
+    );
+    state.agenda.push(functionAssignmentInstr);
+  },
+  FunctionMark: (
+    command: FunctionMarkInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  GotoStatement: (
+    command: GotoStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {},
+  IdentifierStatement: (
+    command: IdentifierStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  IfStatement: (
+    command: IfStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  LogicalExpression: (
+    command: LogicalExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  Program: (command: Program, state: ExplicitControlEvaluatorState) => {
+    const declarationAddresses = allocateExternalDeclaration(
+      command.body,
+      state.memory
+    );
+    if (declarationAddresses.length > 0) {
+      const declarationNames = getExternalDeclarationNames(command.body);
+      state.environment = extendEnvironment(
+        declarationNames,
+        declarationAddresses,
+        state.environment
+      );
+    }
+
+    for (let i = command.body.length - 1; i >= 0; i--) {
+      state.agenda.push(command.body[i]);
+    }
+  },
+  Reset: (command: ResetInstr, state: ExplicitControlEvaluatorState) => {
+    while (state.agenda.size() > 0) {
+      if (state.agenda.pop().type === 'FunctionMark') {
+        break;
+      }
+    }
+  },
   ReturnStatement: (
     command: ReturnStatement,
     state: ExplicitControlEvaluatorState
@@ -192,92 +263,22 @@ const microcode: AgendaItemEvaluatorMapping = {
       }
       state.agenda.push(command.argument.expressions[0]);
     }
+    // TODO: Remember to do function call tear down for the memory stack too
   },
-  Reset: (command: ResetInstr, state: ExplicitControlEvaluatorState) => {
-    while (state.agenda.size() > 0) {
-      if (state.agenda.pop().type === 'FunctionMark') {
-        break;
-      }
-    }
-  },
-  FunctionMark: (
-    command: FunctionMarkInstr,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  Environment: (
-    command: EnvironmentInstr,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  AssignmentExpression: (
-    command: AssignmentExpression,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  BinaryExpression: (
-    command: BinaryExpression,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
-    state.stash.push(command);
-  },
-  Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {},
-  LogicalExpression: (
-    command: LogicalExpression,
-    state: ExplicitControlEvaluatorState
-  ) => {},
   StringLiteral: (
     command: StringLiteral,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  IdentifierStatement: (
-    command: IdentifierStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  DefaultStatement: (
-    command: DefaultStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  BlockStatement: (
-    command: BlockStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  EmptyStatement: (
-    command: EmptyStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  ExpressionStatement: (
-    command: ExpressionStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  IfStatement: (
-    command: IfStatement,
     state: ExplicitControlEvaluatorState
   ) => {},
   SwitchStatement: (
     command: SwitchStatement,
     state: ExplicitControlEvaluatorState
   ) => {},
-  DoWhileStatement: (
-    command: DoWhileStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  ForStatement: (
-    command: ForStatement,
+  VariableDeclaration: (
+    command: VariableDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {},
   WhileStatement: (
     command: WhileStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  BreakStatement: (
-    command: BreakStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  ContinueStatement: (
-    command: ContinueStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  GotoStatement: (
-    command: GotoStatement,
     state: ExplicitControlEvaluatorState
   ) => {}
 };
@@ -328,10 +329,9 @@ export const interpret = (ast: Program): Value => {
 
   while (agenda.size() > 0) {
     const command = agenda.pop();
-    console.log(command);
     // The typecast allows for mapping to a specific evaluator command type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
-    microcode[command.type](command as any, state);
+    evaluators[command.type](command as any, state);
   }
 
   return state.stash.size() === 0 ? undefined : state.stash.peek();
