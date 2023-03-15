@@ -5,7 +5,6 @@ import {
   type Identifier,
   type Node
 } from '../../ast/types';
-import { type Environment } from '../environment';
 import { type VirtualMemory } from '../../memory/virtualMemory';
 import { type Instr } from './instruction';
 import { type TextMemory } from '../../memory/textMemory';
@@ -16,6 +15,11 @@ export interface ExplicitControlEvaluatorState {
   environment: Environment;
   memory: VirtualMemory;
   textMemory: TextMemory;
+}
+
+export interface Environment {
+  head: EnvironmentFrame;
+  tail: Environment | null;
 }
 
 export type EnvironmentFrame = Record<string, number>;

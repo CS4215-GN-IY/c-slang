@@ -5,8 +5,7 @@ import {
   type VariableDeclaration
 } from '../ast/types';
 import { type VirtualMemory } from '../memory/virtualMemory';
-import { type Environment } from './environment';
-import { type Closure } from './types/interpreter';
+import { type Closure, type Environment } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';

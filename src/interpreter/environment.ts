@@ -1,42 +1,49 @@
 import { BrokenEnvironmentError, UnboundNameError } from './errors';
-import { type EnvironmentFrame } from './types/interpreter';
+import { type Environment, type EnvironmentFrame } from './types/interpreter';
 
-/**
- * Represents C's compile time symbol table.
- */
-export class Environment {
-  private readonly frames: EnvironmentFrame[];
-
-  constructor(frames: EnvironmentFrame[] = []) {
-    this.frames = frames;
+export const extendEnvironment = (
+  names: string[],
+  values: number[],
+  environment: Environment
+): Environment => {
+  if (names.length !== values.length) {
+    throw new BrokenEnvironmentError(
+      'Encountered a different number of names and values in a frame.'
+    );
   }
 
-  public extend(names: string[], values: number[]): void {
-    if (names.length !== values.length) {
-      throw new BrokenEnvironmentError(
-        'Encountered a different number of names and values in a frame.'
-      );
+  const newFrame: EnvironmentFrame = {};
+
+  for (let i = 0; i < names.length; i++) {
+    newFrame[names[i]] = values[i];
+  }
+
+  return {
+    head: newFrame,
+    tail: environment
+  };
+};
+
+export const getEnvironmentValue = (
+  name: string,
+  environment: Environment
+): number => {
+  let currentEnvironment: Environment | null = environment;
+
+  while (currentEnvironment !== null) {
+    const frame = environment.head;
+    if (name in frame) {
+      return frame[name];
     }
-
-    const newFrame: EnvironmentFrame = {};
-    for (let i = 0; i < names.length; i++) {
-      newFrame[names[i]] = values[i];
-    }
-
-    this.frames.push(newFrame);
+    currentEnvironment = currentEnvironment.tail;
   }
 
-  public get(name: string): number {
-    for (let i = this.frames.length - 1; i >= 0; i--) {
-      if (name in this.frames[i]) {
-        return this.frames[i][name];
-      }
-    }
+  throw new UnboundNameError(`Encountered an unbound name: ${name}`);
+};
 
-    throw new UnboundNameError(`Encountered an unbound name: ${name}`);
-  }
-
-  public copyOfCurrent(): Environment {
-    return new Environment([...this.frames]);
-  }
-}
+export const constructGlobalEnvironment = (): Environment => {
+  return {
+    head: {},
+    tail: null
+  };
+};

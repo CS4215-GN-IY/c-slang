@@ -5,7 +5,7 @@ import {
   type FunctionMarkInstr
 } from './types/instruction';
 import { type CallExpression } from '../ast/types';
-import { type Environment } from './environment';
+import { type Environment } from './types/interpreter';
 
 export const constructEnvironmentInstr = (
   environment: Environment

@@ -38,7 +38,6 @@ import {
   getExternalDeclarationNames
 } from './utils';
 import { VirtualMemory } from '../memory/virtualMemory';
-import { Environment } from './environment';
 import {
   type EnvironmentInstr,
   type FunctionApplicationInstr,
@@ -54,6 +53,11 @@ import {
 import { TextMemory } from '../memory/textMemory';
 import { constructMainCallExpression } from '../ast/constructors';
 import { InvalidFunctionApplication } from './errors';
+import {
+  constructGlobalEnvironment,
+  extendEnvironment,
+  getEnvironmentValue
+} from './environment';
 
 const microcode: AgendaItemEvaluatorMapping = {
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
@@ -63,7 +67,11 @@ const microcode: AgendaItemEvaluatorMapping = {
     );
     if (declarationAddresses.length > 0) {
       const declarationNames = getExternalDeclarationNames(command.body);
-      state.environment.extend(declarationNames, declarationAddresses);
+      state.environment = extendEnvironment(
+        declarationNames,
+        declarationAddresses,
+        state.environment
+      );
     }
 
     for (let i = command.body.length - 1; i >= 0; i--) {
@@ -77,7 +85,7 @@ const microcode: AgendaItemEvaluatorMapping = {
     const closure = constructClosure(command, state.environment);
     const closureIdx = state.textMemory.allocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
-      state.environment.get(command.id.name),
+      getEnvironmentValue(command.id.name, state.environment),
       closureIdx
     );
     state.agenda.push(functionAssignmentInstr);
@@ -114,7 +122,10 @@ const microcode: AgendaItemEvaluatorMapping = {
       args.push(state.stash.pop());
     }
 
-    const functionAddress = state.environment.get(command.functionId.name);
+    const functionAddress = getEnvironmentValue(
+      command.functionId.name,
+      state.environment
+    );
     const closureIdx = state.memory.get(functionAddress);
     const closure = state.textMemory.get(closureIdx);
 
@@ -135,16 +146,17 @@ const microcode: AgendaItemEvaluatorMapping = {
       state.agenda.push(constructEnvironmentInstr(state.environment));
       state.agenda.push(constructFunctionMarkInstr());
     }
+    state.agenda.push(closure.body);
 
     const paramNames = closure.params.map((param) => param.name);
     const addresses = state.memory.stackFunctionCallAllocate(
       getArgNumbers(args)
     );
-    const closureEnvironment = closure.environment.copyOfCurrent();
-    closureEnvironment.extend(paramNames, addresses);
-
-    state.agenda.push(closure.body);
-    state.environment = closureEnvironment;
+    state.environment = extendEnvironment(
+      paramNames,
+      addresses,
+      closure.environment
+    );
   },
   FunctionMark: (
     command: FunctionMarkInstr,
@@ -263,7 +275,7 @@ export const interpret = (ast: Program): Value => {
   agenda.push(constructMainCallExpression());
   agenda.push(ast);
   const stash = new Stack<Value>();
-  const environment = new Environment();
+  const environment = constructGlobalEnvironment();
   const memory = new VirtualMemory(0, 1000, 1000, 1000);
   const textMemory = new TextMemory();
   const state: ExplicitControlEvaluatorState = {
