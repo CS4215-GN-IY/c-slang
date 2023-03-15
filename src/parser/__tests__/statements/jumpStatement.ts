@@ -14,20 +14,23 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ReturnStatement',
-              argument: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'Constant',
-                    value: '0'
-                  }
-                ]
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'Constant',
+                      value: '0'
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -46,11 +49,14 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'f'
           },
-          body: [
-            {
-              type: 'ReturnStatement'
-            }
-          ]
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ReturnStatement'
+              }
+            ]
+          }
         }
       ]
     };
@@ -71,34 +77,37 @@ describe('goto statement', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'IdentifierStatement',
-              label: {
-                type: 'Identifier',
-                name: 'x'
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'IdentifierStatement',
+                label: {
+                  type: 'Identifier',
+                  name: 'x'
+                },
+                body: {
+                  type: 'ReturnStatement',
+                  argument: {
+                    type: 'ExpressionSequence',
+                    expressions: [
+                      {
+                        type: 'Constant',
+                        value: '0'
+                      }
+                    ]
+                  }
+                }
               },
-              body: {
-                type: 'ReturnStatement',
+              {
+                type: 'GotoStatement',
                 argument: {
-                  type: 'ExpressionSequence',
-                  expressions: [
-                    {
-                      type: 'Constant',
-                      value: '0'
-                    }
-                  ]
+                  type: 'Identifier',
+                  name: 'x'
                 }
               }
-            },
-            {
-              type: 'GotoStatement',
-              argument: {
-                type: 'Identifier',
-                name: 'x'
-              }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

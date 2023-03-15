@@ -14,24 +14,27 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'CallExpression',
-                    id: {
-                      type: 'Identifier',
-                      name: 'func'
-                    },
-                    arguments: []
-                  }
-                ]
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'CallExpression',
+                      id: {
+                        type: 'Identifier',
+                        name: 'func'
+                      },
+                      arguments: []
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -50,29 +53,32 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'CallExpression',
-                    id: {
-                      type: 'Identifier',
-                      name: 'func'
-                    },
-                    arguments: [
-                      {
-                        type: 'Constant',
-                        value: '2'
-                      }
-                    ]
-                  }
-                ]
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'CallExpression',
+                      id: {
+                        type: 'Identifier',
+                        name: 'func'
+                      },
+                      arguments: [
+                        {
+                          type: 'Constant',
+                          value: '2'
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -91,20 +97,23 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'Constant',
-                    value: '2'
-                  }
-                ]
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'Constant',
+                      value: '2'
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

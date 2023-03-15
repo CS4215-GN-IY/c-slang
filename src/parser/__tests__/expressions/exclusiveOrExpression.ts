@@ -14,28 +14,31 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '^',
-                    left: {
-                      type: 'Constant',
-                      value: '4'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '5'
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '^',
+                      left: {
+                        type: 'Constant',
+                        value: '4'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '5'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,36 +57,39 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '^',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
                       operator: '^',
                       left: {
-                        type: 'Constant',
-                        value: '1'
+                        type: 'BinaryExpression',
+                        operator: '^',
+                        left: {
+                          type: 'Constant',
+                          value: '1'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '2'
+                        }
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: '3'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -102,36 +108,39 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '^',
-                    left: {
-                      type: 'Constant',
-                      value: '1'
-                    },
-                    right: {
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '&',
+                      operator: '^',
                       left: {
                         type: 'Constant',
-                        value: '2'
+                        value: '1'
                       },
                       right: {
-                        type: 'Constant',
-                        value: '3'
+                        type: 'BinaryExpression',
+                        operator: '&',
+                        left: {
+                          type: 'Constant',
+                          value: '2'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '3'
+                        }
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
