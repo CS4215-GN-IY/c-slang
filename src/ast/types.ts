@@ -130,6 +130,7 @@ export interface ExpressionSequence extends BaseNode {
 export type Expression =
   | AssignmentExpression
   | BinaryExpression
+  | CallExpression
   | Constant
   | Identifier
   | LogicalExpression
@@ -206,6 +207,12 @@ export type AssignmentOperator =
   | '&='
   | '^='
   | '|=';
+
+export interface CallExpression extends BaseExpression {
+  type: 'CallExpression';
+  id: Identifier;
+  arguments: Expression[];
+}
 
 export interface BaseDeclaration extends BaseStatement {}
 

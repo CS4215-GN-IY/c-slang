@@ -16,9 +16,15 @@ import {
 } from './utils';
 import { VirtualMemory } from '../memory/virtualMemory';
 import { Environment } from './environment';
+import { type FunctionAssigmentInstr } from './types/instruction';
+import {
+  constructFunctionAssignmentInstr,
+  constructClosure
+} from './instruction';
+import { TextMemory } from '../memory/textMemory';
 
 const microcode: AgendaItemEvaluatorMapping = {
-  Program: function (command: Program, state: ExplicitControlEvaluatorState) {
+  Program: (command: Program, state: ExplicitControlEvaluatorState) => {
     const declarationAddresses = allocateExternalDeclaration(
       command.body,
       state.memory
@@ -32,14 +38,31 @@ const microcode: AgendaItemEvaluatorMapping = {
       state.agenda.push(command.body[i]);
     }
   },
-  FunctionDeclaration: function (
+  FunctionDeclaration: (
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
-  ) {},
-  VariableDeclaration: function (
+  ) => {
+    const closure = constructClosure(
+      command,
+      state.environment.copyOfCurrent()
+    );
+    const closureIdx = state.textMemory.allocate(closure);
+    const functionAssignmentInstr = constructFunctionAssignmentInstr(
+      state.environment.get(command.id.name),
+      closureIdx
+    );
+    state.agenda.push(functionAssignmentInstr);
+  },
+  VariableDeclaration: (
     command: VariableDeclaration,
     state: ExplicitControlEvaluatorState
-  ) {}
+  ) => {},
+  FunctionAssignment: (
+    command: FunctionAssigmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    state.memory.set(command.nameAddress, command.closureIdx);
+  }
 };
 
 /**
@@ -75,16 +98,19 @@ export const interpret = (ast: Program): Value => {
   agenda.push(ast);
   const stash = new Stack<Value>();
   const environment = new Environment();
-  const memory = new VirtualMemory(1000, 1000, 1000, 1000);
+  const memory = new VirtualMemory(0, 1000, 1000, 1000);
+  const textMemory = new TextMemory();
   const state: ExplicitControlEvaluatorState = {
     agenda,
     stash,
     environment,
-    memory
+    memory,
+    textMemory
   };
 
   while (agenda.size() > 0) {
     const command = agenda.pop();
+    console.log(command);
     // The typecast allows for mapping to a specific evaluator command type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     microcode[command.type](command as any, state);
