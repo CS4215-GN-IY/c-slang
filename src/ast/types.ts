@@ -5,6 +5,14 @@ export interface BaseNode {
   type: string;
 }
 
+interface NodeMap {
+  Program: Program;
+  FunctionDeclaration: FunctionDeclaration;
+  VariableDeclaration: VariableDeclaration;
+}
+
+export type Node = NodeMap[keyof NodeMap];
+
 export interface Program extends BaseNode {
   type: 'Program';
   body: ExternalDeclaration[];

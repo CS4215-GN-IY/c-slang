@@ -1,8 +1,8 @@
-import { PageTable } from './pageTable';
-import { AddressIndex } from './addressIndex';
-import { Segment } from './segment';
-import { SegmentAddress } from './segmentAddress';
-import { MemoryError, MemoryErrorType } from './memoryError';
+import {PageTable} from './pageTable';
+import {AddressIndex} from './addressIndex';
+import {Segment} from './segment';
+import {SegmentAddress} from './segmentAddress';
+import {MemoryError, MemoryErrorType} from './memoryError';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -15,6 +15,7 @@ export class VirtualMemory {
     Segment,
     SegmentAddress
   >();
+  readonly ebp: number;
 
   /**
    * Initializes the size of each segment. Size is the number of entries allocated to the segment.
@@ -67,6 +68,11 @@ export class VirtualMemory {
         heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
       )
     );
+    this.ebp = stackBaseAddress;
+  }
+
+  public stackAllocate(data: number): number {
+    return this.allocate(data, Segment.STACK);
   }
 
   /**
