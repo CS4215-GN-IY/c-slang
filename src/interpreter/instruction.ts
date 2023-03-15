@@ -2,7 +2,8 @@ import {
   type EnvironmentInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
-  type FunctionMarkInstr
+  type FunctionMarkInstr,
+  type ResetInstr
 } from './types/instruction';
 import { type CallExpression } from '../ast/types';
 import { type Environment } from './types/interpreter';
@@ -36,4 +37,8 @@ export const constructFunctionApplicationInstr = (
 
 export const constructFunctionMarkInstr = (): FunctionMarkInstr => ({
   type: 'FunctionMark'
+});
+
+export const constructResetInstr = (): ResetInstr => ({
+  type: 'Reset'
 });

@@ -37,6 +37,49 @@ describe('return statement', () => {
     expect(ast).toEqual(expectedAst);
   });
 
+  it('handles binary expression argument', () => {
+    const code = 'int main() { return 1 + 2; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: {
+            type: 'BlockStatement',
+            body: [
+              {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '+',
+                      left: {
+                        type: 'Constant',
+                        value: '1'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '2'
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
   it('handles no argument', () => {
     const code = 'int f() { return; }';
     const ast = parse(code);

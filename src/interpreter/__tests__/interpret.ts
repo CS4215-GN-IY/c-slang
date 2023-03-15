@@ -2,10 +2,14 @@ import { parse } from '../../parser/parser';
 import { interpret } from '../explicitControlEvaluator';
 
 describe('program', () => {
-  test('function declaration', () => {
+  test('main function returning a constant', () => {
     const code = 'int main() { return 2; }';
     const ast = parse(code);
-    interpret(ast);
-    // TODO: Finish writing test properly
+    const result = interpret(ast);
+    const expectedResult = {
+      type: 'Constant',
+      value: '2'
+    };
+    expect(result).toEqual(expectedResult);
   });
 });

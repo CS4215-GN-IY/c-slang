@@ -44,13 +44,15 @@ import {
   type EnvironmentInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
-  type FunctionMarkInstr
+  type FunctionMarkInstr,
+  type ResetInstr
 } from './types/instruction';
 import {
   constructEnvironmentInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
-  constructFunctionMarkInstr
+  constructFunctionMarkInstr,
+  constructResetInstr
 } from './instruction';
 import { TextMemory } from '../memory/textMemory';
 import { constructMainCallExpression } from '../ast/constructors';
@@ -177,6 +179,27 @@ const microcode: AgendaItemEvaluatorMapping = {
       state.agenda.push(closure.body.body[i]);
     }
   },
+  ReturnStatement: (
+    command: ReturnStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    state.agenda.push(constructResetInstr());
+    if (command.argument !== undefined) {
+      if (command.argument.expressions.length > 1) {
+        throw new InvalidFunctionApplication(
+          'Encountered more than 1 return value'
+        );
+      }
+      state.agenda.push(command.argument.expressions[0]);
+    }
+  },
+  Reset: (command: ResetInstr, state: ExplicitControlEvaluatorState) => {
+    while (state.agenda.size() > 0) {
+      if (state.agenda.pop().type === 'FunctionMark') {
+        break;
+      }
+    }
+  },
   FunctionMark: (
     command: FunctionMarkInstr,
     state: ExplicitControlEvaluatorState
@@ -193,7 +216,9 @@ const microcode: AgendaItemEvaluatorMapping = {
     command: BinaryExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
-  Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {},
+  Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
+    state.stash.push(command);
+  },
   Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {},
   LogicalExpression: (
     command: LogicalExpression,
@@ -254,10 +279,6 @@ const microcode: AgendaItemEvaluatorMapping = {
   GotoStatement: (
     command: GotoStatement,
     state: ExplicitControlEvaluatorState
-  ) => {},
-  ReturnStatement: (
-    command: ReturnStatement,
-    state: ExplicitControlEvaluatorState
   ) => {}
 };
 
@@ -313,5 +334,5 @@ export const interpret = (ast: Program): Value => {
     microcode[command.type](command as any, state);
   }
 
-  return undefined;
+  return state.stash.size() === 0 ? undefined : state.stash.peek();
 };
