@@ -5,16 +5,14 @@ import {
   type Identifier,
   type Node
 } from '../../ast/types';
-import { type VirtualMemory } from '../../memory/virtualMemory';
 import { type Instr } from './instruction';
-import { type TextMemory } from '../../memory/textMemory';
+import { type Memory } from '../../memory/memory';
 
 export interface ExplicitControlEvaluatorState {
   agenda: Stack<AgendaItem>;
   stash: Stack<Value>;
   environment: Environment;
-  memory: VirtualMemory;
-  textMemory: TextMemory;
+  memory: Memory;
 }
 
 export interface Environment {

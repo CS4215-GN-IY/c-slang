@@ -38,7 +38,6 @@ import {
   getBlockVariableDeclarationNames,
   getExternalDeclarationNames
 } from './utils';
-import { VirtualMemory } from '../memory/virtualMemory';
 import {
   type ResetEnvironmentInstr,
   type FunctionApplicationInstr,
@@ -53,7 +52,6 @@ import {
   constructFunctionMarkInstr,
   constructResetInstr
 } from './instruction';
-import { TextMemory } from '../memory/textMemory';
 import { constructMainCallExpression } from '../ast/constructors';
 import { InvalidFunctionApplication } from './errors';
 import {
@@ -62,6 +60,7 @@ import {
   getEnvironmentValue
 } from './environment';
 import { isEmptyStatement } from '../ast/typeGuards';
+import { Memory } from '../memory/memory';
 
 /**
  * Evaluates the abstract syntax tree using an explicit-control evaluator &
@@ -97,14 +96,12 @@ export const interpret = (ast: Program): Value => {
   agenda.push(ast);
   const stash = new Stack<Value>();
   const environment = constructGlobalEnvironment();
-  const memory = new VirtualMemory(0, 1000, 1000, 1000);
-  const textMemory = new TextMemory();
+  const memory = new Memory(1000, 1000, 1000);
   const state: ExplicitControlEvaluatorState = {
     agenda,
     stash,
     environment,
-    memory,
-    textMemory
+    memory
   };
 
   while (agenda.size() > 0) {
@@ -188,7 +185,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       state.environment
     );
     const closureIdx = state.memory.get(functionAddress);
-    const closure = state.textMemory.get(closureIdx);
+    const closure = state.memory.textGet(closureIdx);
 
     if (closure.params.length !== args.length) {
       throw new InvalidFunctionApplication(
@@ -246,7 +243,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state: ExplicitControlEvaluatorState
   ) => {
     const closure = constructClosure(command, state.environment);
-    const closureIdx = state.textMemory.allocate(closure);
+    const closureIdx = state.memory.textAllocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
       getEnvironmentValue(command.id.name, state.environment),
       closureIdx

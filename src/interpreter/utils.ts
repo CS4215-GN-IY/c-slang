@@ -5,13 +5,13 @@ import {
   type Identifier,
   type VariableDeclaration
 } from '../ast/types';
-import { type VirtualMemory } from '../memory/virtualMemory';
 import { type Closure, type Environment } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';
+import { type Memory } from '../memory/memory';
 
-const allocateUninitializedVariable = (memory: VirtualMemory): number => {
+const allocateUninitializedVariable = (memory: Memory): number => {
   const valueWhenUninitialized = 0;
   return memory.stackAllocate(valueWhenUninitialized);
 };
@@ -45,7 +45,7 @@ export const getFunctionDeclarationName = (
 
 export const allocateStackAddresses = (
   numOfVariables: number,
-  memory: VirtualMemory
+  memory: Memory
 ): number[] => {
   const addresses: number[] = [];
   for (let i = 0; i < numOfVariables; i++) {
