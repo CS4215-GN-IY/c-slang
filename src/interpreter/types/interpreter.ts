@@ -11,16 +11,16 @@ import { type Memory } from '../../memory/memory';
 export interface ExplicitControlEvaluatorState {
   agenda: Stack<AgendaItem>;
   stash: Stack<Value>;
-  environment: Environment;
+  symbolTable: SymbolTable;
   memory: Memory;
 }
 
-export interface Environment {
-  head: EnvironmentFrame;
-  tail: Environment | null;
+export interface SymbolTable {
+  head: SymbolTableFrame;
+  tail: SymbolTable | null;
 }
 
-export type EnvironmentFrame = Record<string, number>;
+export type SymbolTableFrame = Record<string, number>;
 
 export type AgendaItem = Node | Instr;
 
@@ -34,5 +34,5 @@ export type AgendaItemEvaluatorMapping = {
 export interface Closure {
   params: Identifier[];
   body: BlockOrEmptyStatement;
-  environment: Environment;
+  environment: SymbolTable;
 }

@@ -6,10 +6,10 @@ import {
   type ResetInstr
 } from './types/instruction';
 import { type CallExpression } from '../ast/types';
-import { type Environment } from './types/interpreter';
+import { type SymbolTable } from './types/interpreter';
 
 export const constructEnvironmentInstr = (
-  environment: Environment
+  environment: SymbolTable
 ): ResetEnvironmentInstr => ({
   type: 'ResetEnvironment',
   environment

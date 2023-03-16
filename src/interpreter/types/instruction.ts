@@ -1,5 +1,5 @@
 import { type Identifier } from '../../ast/types';
-import { type Environment } from './interpreter';
+import { type SymbolTable } from './interpreter';
 
 interface BaseInstr {
   type: string;
@@ -14,7 +14,7 @@ export type Instr =
 
 export interface ResetEnvironmentInstr extends BaseInstr {
   type: 'ResetEnvironment';
-  environment: Environment;
+  environment: SymbolTable;
 }
 
 export interface FunctionApplicationInstr extends BaseInstr {

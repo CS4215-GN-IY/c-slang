@@ -5,7 +5,7 @@ import {
   type Identifier,
   type VariableDeclaration
 } from '../ast/types';
-import { type Closure, type Environment } from './types/interpreter';
+import { type Closure, type SymbolTable } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';
@@ -81,7 +81,7 @@ export const getIdentifierName = (identifier: Identifier): string => {
 
 export const constructClosure = (
   functionDeclaration: FunctionDeclaration,
-  environment: Environment
+  environment: SymbolTable
 ): Closure => {
   return {
     // TODO: Change this when parameter list is supported

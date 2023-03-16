@@ -55,10 +55,10 @@ import {
 import { constructMainCallExpression } from '../ast/constructors';
 import { InvalidFunctionApplication } from './errors';
 import {
-  constructGlobalEnvironment,
-  extendEnvironment,
-  getEnvironmentValue
-} from './environment';
+  constructInitialSymbolTable,
+  extendSymbolTable,
+  getAddressFromSymbolTable
+} from './symbolTable';
 import { isEmptyStatement } from '../ast/typeGuards';
 import { Memory } from '../memory/memory';
 
@@ -95,12 +95,12 @@ export const interpret = (ast: Program): Value => {
   agenda.push(constructMainCallExpression());
   agenda.push(ast);
   const stash = new Stack<Value>();
-  const environment = constructGlobalEnvironment();
+  const environment = constructInitialSymbolTable();
   const memory = new Memory(1000, 1000, 1000);
   const state: ExplicitControlEvaluatorState = {
     agenda,
     stash,
-    environment,
+    symbolTable: environment,
     memory
   };
 
@@ -180,9 +180,9 @@ const evaluators: AgendaItemEvaluatorMapping = {
       args.push(state.stash.pop());
     }
 
-    const functionAddress = getEnvironmentValue(
+    const functionAddress = getAddressFromSymbolTable(
       command.functionId.name,
-      state.environment
+      state.symbolTable
     );
     const closureIdx = state.memory.get(functionAddress);
     const closure = state.memory.textGet(closureIdx);
@@ -205,7 +205,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
       state.agenda.push(constructFunctionMarkInstr());
     } else {
-      state.agenda.push(constructEnvironmentInstr(state.environment));
+      state.agenda.push(constructEnvironmentInstr(state.symbolTable));
       state.agenda.push(constructFunctionMarkInstr());
     }
 
@@ -222,7 +222,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       state.memory
     );
 
-    state.environment = extendEnvironment(
+    state.symbolTable = extendSymbolTable(
       [...paramNames, ...blockVariableDeclarations],
       [...paramAddresses, ...blockVariableAddresses],
       closure.environment
@@ -242,10 +242,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
-    const closure = constructClosure(command, state.environment);
+    const closure = constructClosure(command, state.symbolTable);
     const closureIdx = state.memory.textAllocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
-      getEnvironmentValue(command.id.name, state.environment),
+      getAddressFromSymbolTable(command.id.name, state.symbolTable),
       closureIdx
     );
     state.agenda.push(functionAssignmentInstr);
@@ -278,10 +278,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
       state.memory
     );
     if (declarationNames.length > 0) {
-      state.environment = extendEnvironment(
+      state.symbolTable = extendSymbolTable(
         declarationNames,
         declarationAddresses,
-        state.environment
+        state.symbolTable
       );
     }
 

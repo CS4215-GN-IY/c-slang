@@ -1,18 +1,21 @@
 import { BrokenEnvironmentError, UnboundNameError } from './errors';
-import { type Environment, type EnvironmentFrame } from './types/interpreter';
+import { type SymbolTable, type SymbolTableFrame } from './types/interpreter';
 
-export const extendEnvironment = (
+/**
+ * Adds a new frame to the symbol table. Each frame represents a different scope.
+ */
+export const extendSymbolTable = (
   names: string[],
   values: number[],
-  environment: Environment
-): Environment => {
+  environment: SymbolTable
+): SymbolTable => {
   if (names.length !== values.length) {
     throw new BrokenEnvironmentError(
       'Encountered a different number of names and values in a frame.'
     );
   }
 
-  const newFrame: EnvironmentFrame = {};
+  const newFrame: SymbolTableFrame = {};
 
   for (let i = 0; i < names.length; i++) {
     if (names[i] in newFrame) {
@@ -29,11 +32,14 @@ export const extendEnvironment = (
   };
 };
 
-export const getEnvironmentValue = (
+/**
+ * Gets the address of a name.
+ */
+export const getAddressFromSymbolTable = (
   name: string,
-  environment: Environment
+  environment: SymbolTable
 ): number => {
-  let currentEnvironment: Environment | null = environment;
+  let currentEnvironment: SymbolTable | null = environment;
 
   while (currentEnvironment !== null) {
     const frame = environment.head;
@@ -43,10 +49,13 @@ export const getEnvironmentValue = (
     currentEnvironment = currentEnvironment.tail;
   }
 
-  throw new UnboundNameError(`Encountered an unbound name: ${name}`);
+  throw new UnboundNameError(`Encountered an undeclared name: ${name}`);
 };
 
-export const constructGlobalEnvironment = (): Environment => {
+/**
+ * Constructs the first frame of the symbol table.
+ */
+export const constructInitialSymbolTable = (): SymbolTable => {
   return {
     head: {},
     tail: null
