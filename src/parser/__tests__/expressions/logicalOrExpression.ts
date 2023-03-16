@@ -16,7 +16,7 @@ describe('logical or expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -59,7 +59,7 @@ describe('logical or expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -110,7 +110,7 @@ describe('logical or expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {

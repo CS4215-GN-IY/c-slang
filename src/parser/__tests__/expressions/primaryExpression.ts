@@ -16,7 +16,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -51,7 +51,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -86,7 +86,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -121,7 +121,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -156,7 +156,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -191,7 +191,7 @@ describe('primary expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {

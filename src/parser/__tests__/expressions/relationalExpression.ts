@@ -16,7 +16,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -59,7 +59,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -102,7 +102,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -145,7 +145,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -188,7 +188,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -287,7 +287,7 @@ describe('relational expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {

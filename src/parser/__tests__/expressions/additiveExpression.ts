@@ -16,7 +16,7 @@ describe('additive expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -59,7 +59,7 @@ describe('additive expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -102,7 +102,7 @@ describe('additive expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {
@@ -169,7 +169,7 @@ describe('additive expression', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ExpressionStatement',
                 sequence: {

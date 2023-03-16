@@ -302,7 +302,7 @@ export class ASTBuilder implements CVisitor<any> {
     if (blockItemList !== undefined) {
       return {
         type: 'BlockStatement',
-        body: this.visitBlockItemList(blockItemList)
+        items: this.visitBlockItemList(blockItemList)
       };
     }
 

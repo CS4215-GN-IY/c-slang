@@ -16,7 +16,7 @@ describe('return statement', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ReturnStatement',
                 argument: {
@@ -51,7 +51,7 @@ describe('return statement', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ReturnStatement',
                 argument: {
@@ -94,7 +94,7 @@ describe('return statement', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'ReturnStatement'
               }
@@ -122,7 +122,7 @@ describe('goto statement', () => {
           },
           body: {
             type: 'BlockStatement',
-            body: [
+            items: [
               {
                 type: 'IdentifierStatement',
                 label: {

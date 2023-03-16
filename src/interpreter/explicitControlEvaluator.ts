@@ -231,8 +231,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
       closure.environment
     );
 
-    for (let i = closure.body.body.length - 1; i >= 0; i--) {
-      state.agenda.push(closure.body.body[i]);
+    for (let i = closure.body.items.length - 1; i >= 0; i--) {
+      state.agenda.push(closure.body.items[i]);
     }
   },
   FunctionAssignment: (

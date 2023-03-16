@@ -49,7 +49,7 @@ export type BlockOrEmptyStatement = BlockStatement | EmptyStatement;
 
 export interface BlockStatement extends BaseStatement {
   type: 'BlockStatement';
-  body: BlockItem[];
+  items: BlockItem[];
 }
 
 export type BlockItem = VariableDeclaration | Statement;

@@ -58,7 +58,7 @@ export const getBlockVariableDeclarationNames = (
   block: BlockStatement
 ): string[] => {
   const allNames: string[] = [];
-  block.body.forEach((blockItem) => {
+  block.items.forEach((blockItem) => {
     if (isVariableDeclaration(blockItem)) {
       const names = getVariableDeclarationNames(blockItem);
       allNames.push(...names);
