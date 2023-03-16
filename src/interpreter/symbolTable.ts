@@ -1,30 +1,27 @@
 import { BrokenEnvironmentError, UnboundNameError } from './errors';
-import { type SymbolTable, type SymbolTableFrame } from './types/interpreter';
+import {
+  type NameAddressMapping,
+  type SymbolTable,
+  type SymbolTableFrame
+} from './types/interpreter';
 
 /**
  * Adds a new frame to the symbol table. Each frame represents a different scope.
  */
 export const extendSymbolTable = (
-  names: string[],
-  values: number[],
+  nameAddressMappings: NameAddressMapping[],
   environment: SymbolTable
 ): SymbolTable => {
-  if (names.length !== values.length) {
-    throw new BrokenEnvironmentError(
-      'Encountered a different number of names and values in a frame.'
-    );
-  }
-
   const newFrame: SymbolTableFrame = {};
 
-  for (let i = 0; i < names.length; i++) {
-    if (names[i] in newFrame) {
+  nameAddressMappings.forEach((mapping) => {
+    if (mapping.name in newFrame) {
       throw new BrokenEnvironmentError(
         'Tried to redeclare a name in the same scope.'
       );
     }
-    newFrame[names[i]] = values[i];
-  }
+    newFrame[mapping.name] = mapping.address;
+  });
 
   return {
     head: newFrame,

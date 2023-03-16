@@ -1,6 +1,10 @@
 import { VirtualMemory } from './virtualMemory';
 import { TextMemory } from './textMemory';
-import { type Closure } from '../interpreter/types/interpreter';
+import {
+  type Closure,
+  type NameAddressMapping,
+  type NameValueMapping
+} from '../interpreter/types/interpreter';
 
 export class Memory {
   private readonly virtualMemory;
@@ -24,8 +28,10 @@ export class Memory {
     return this.virtualMemory.stackAllocate(data);
   }
 
-  public stackFunctionCallAllocate(paramValues: number[]): number[] {
-    return this.virtualMemory.stackFunctionCallAllocate(paramValues);
+  public stackFunctionCallAllocate(
+    paramsWithValues: NameValueMapping[]
+  ): NameAddressMapping[] {
+    return this.virtualMemory.stackFunctionCallAllocate(paramsWithValues);
   }
 
   public textAllocate(functionInstruction: Closure): number {

@@ -5,7 +5,12 @@ import {
   type Identifier,
   type VariableDeclaration
 } from '../ast/types';
-import { type Closure, type SymbolTable } from './types/interpreter';
+import {
+  type Closure,
+  type NameAddressMapping,
+  type NameValueMapping,
+  type SymbolTable
+} from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import { InvalidFunctionApplication } from './errors';
@@ -44,14 +49,14 @@ export const getFunctionDeclarationName = (
 };
 
 export const allocateStackAddresses = (
-  numOfVariables: number,
+  names: string[],
   memory: Memory
-): number[] => {
-  const addresses: number[] = [];
-  for (let i = 0; i < numOfVariables; i++) {
-    addresses.push(allocateUninitializedVariable(memory));
-  }
-  return addresses;
+): NameAddressMapping[] => {
+  const nameAddressMapping: NameAddressMapping[] = names.map((name) => ({
+    name,
+    address: allocateUninitializedVariable(memory)
+  }));
+  return nameAddressMapping;
 };
 
 export const getBlockVariableDeclarationNames = (
@@ -92,13 +97,28 @@ export const constructClosure = (
 };
 
 // Arguments should either be an integer constant, floating constant, character constant or identifier.
-export const getArgNumbers = (args: Value[]): number[] => {
-  const numbers: number[] = args.map((arg) => {
+export const setParamArgs = (
+  params: Identifier[],
+  args: Value[]
+): NameValueMapping[] => {
+  if (params.length !== args.length) {
+    throw new InvalidFunctionApplication(
+      `Function takes in ${params.length} arguments but ${args.length} arguments were passed in`
+    );
+  }
+
+  const nameValueMappings: NameValueMapping[] = [];
+  for (let i = 0; i < params.length; i++) {
+    const arg = args[i];
     if (isConstant(arg) && !isNaN(Number(arg.value))) {
-      return Number(arg.value);
+      nameValueMappings.push({
+        name: params[i].name,
+        value: Number(arg.value)
+      });
+      continue;
     }
     // TODO: Add support for character and address later
     throw new InvalidFunctionApplication(`Encountered an unhandled argument.`);
-  });
-  return numbers;
+  }
+  return nameValueMappings;
 };

@@ -34,9 +34,9 @@ import {
 import {
   allocateStackAddresses,
   constructClosure,
-  getArgNumbers,
   getBlockVariableDeclarationNames,
-  getExternalDeclarationNames
+  getExternalDeclarationNames,
+  setParamArgs
 } from './utils';
 import {
   type ResetEnvironmentInstr,
@@ -186,12 +186,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     );
     const closureIdx = state.memory.get(functionAddress);
     const closure = state.memory.textGet(closureIdx);
-
-    if (closure.params.length !== args.length) {
-      throw new InvalidFunctionApplication(
-        `Function takes in ${closure.params.length} arguments but ${args.length} arguments were passed in`
-      );
-    }
+    const paramsWithValues = setParamArgs(closure.params, args);
 
     if (isEmptyStatement(closure.body)) {
       return;
@@ -210,21 +205,17 @@ const evaluators: AgendaItemEvaluatorMapping = {
     }
 
     // Params and block variables should be in the same scope
-    const paramNames = closure.params.map((param) => param.name);
-    const paramAddresses = state.memory.stackFunctionCallAllocate(
-      getArgNumbers(args)
-    );
+    const paramsWithAddresses =
+      state.memory.stackFunctionCallAllocate(paramsWithValues);
     const blockVariableDeclarations = getBlockVariableDeclarationNames(
       closure.body
     );
-    const blockVariableAddresses = allocateStackAddresses(
-      blockVariableDeclarations.length,
+    const blockVariableDeclarationsWithAddresses = allocateStackAddresses(
+      blockVariableDeclarations,
       state.memory
     );
-
     state.symbolTable = extendSymbolTable(
-      [...paramNames, ...blockVariableDeclarations],
-      [...paramAddresses, ...blockVariableAddresses],
+      [...paramsWithAddresses, ...blockVariableDeclarationsWithAddresses],
       closure.environment
     );
 
@@ -273,14 +264,13 @@ const evaluators: AgendaItemEvaluatorMapping = {
   ) => {},
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
     const declarationNames = getExternalDeclarationNames(command.body);
-    const declarationAddresses = allocateStackAddresses(
-      declarationNames.length,
+    const declarationsWithAddresses = allocateStackAddresses(
+      declarationNames,
       state.memory
     );
     if (declarationNames.length > 0) {
       state.symbolTable = extendSymbolTable(
-        declarationNames,
-        declarationAddresses,
+        declarationsWithAddresses,
         state.symbolTable
       );
     }

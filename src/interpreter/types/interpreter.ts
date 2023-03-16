@@ -36,3 +36,13 @@ export interface Closure {
   body: BlockOrEmptyStatement;
   environment: SymbolTable;
 }
+
+export interface NameAddressMapping {
+  name: string;
+  address: number;
+}
+
+export interface NameValueMapping {
+  name: string;
+  value: number;
+}

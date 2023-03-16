@@ -3,6 +3,10 @@ import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 import { MemoryError, MemoryErrorType } from './memoryError';
+import {
+  type NameAddressMapping,
+  type NameValueMapping
+} from '../interpreter/types/interpreter';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -81,19 +85,24 @@ export class VirtualMemory {
   }
 
   // Sets up stack for function call and returns address of parameters
-  public stackFunctionCallAllocate(paramValues: number[]): number[] {
+  public stackFunctionCallAllocate(
+    paramsWithValues: NameValueMapping[]
+  ): NameAddressMapping[] {
     this.stackAllocate(this.rbp);
     this.stackAllocate(this.rsp);
     this.rbp = this.rsp;
 
-    const addresses: number[] = [];
-    this.rsp += paramValues.length * PageTable.ENTRY_SIZE;
-    for (let i = 0; i < paramValues.length; i++) {
+    const paramWithAddresses: NameAddressMapping[] = [];
+    this.rsp += paramsWithValues.length * PageTable.ENTRY_SIZE;
+    for (let i = 0; i < paramsWithValues.length; i++) {
       const address = this.rbp + i * PageTable.ENTRY_SIZE;
-      this.setFree(address, paramValues[i]);
-      addresses.push(address);
+      this.setFree(address, paramsWithValues[i].value);
+      paramWithAddresses.push({
+        name: paramsWithValues[i].name,
+        address
+      });
     }
-    return addresses;
+    return paramWithAddresses;
   }
 
   /**
