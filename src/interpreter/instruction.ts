@@ -1,5 +1,5 @@
 import {
-  type EnvironmentInstr,
+  type ResetEnvironmentInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
@@ -10,21 +10,19 @@ import { type Environment } from './types/interpreter';
 
 export const constructEnvironmentInstr = (
   environment: Environment
-): EnvironmentInstr => ({
-  type: 'Environment',
+): ResetEnvironmentInstr => ({
+  type: 'ResetEnvironment',
   environment
 });
 
 export const constructFunctionAssignmentInstr = (
   nameAddress: number,
   idx: number
-): FunctionAssigmentInstr => {
-  return {
-    type: 'FunctionAssignment',
-    nameAddress,
-    closureIdx: idx
-  };
-};
+): FunctionAssigmentInstr => ({
+  type: 'FunctionAssignment',
+  nameAddress,
+  closureIdx: idx
+});
 
 export const constructFunctionApplicationInstr = (
   numOfArgs: number,

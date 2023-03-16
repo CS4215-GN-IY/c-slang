@@ -16,8 +16,8 @@ export class VirtualMemory {
     SegmentAddress
   >();
 
-  private ebp: number;
-  private esp: number;
+  private rbp: number;
+  private rsp: number;
 
   /**
    * Initializes the size of each segment. Size is the number of entries allocated to the segment.
@@ -70,26 +70,26 @@ export class VirtualMemory {
         heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
       )
     );
-    this.ebp = stackBaseAddress;
-    this.esp = stackBaseAddress - PageTable.ENTRY_SIZE;
+    this.rbp = stackBaseAddress;
+    this.rsp = stackBaseAddress - PageTable.ENTRY_SIZE;
   }
 
   public stackAllocate(data: number): number {
-    this.esp += PageTable.ENTRY_SIZE;
-    this.setFree(this.esp, data);
-    return this.esp;
+    this.rsp += PageTable.ENTRY_SIZE;
+    this.setFree(this.rsp, data);
+    return this.rsp;
   }
 
   // Sets up stack for function call and returns address of parameters
   public stackFunctionCallAllocate(paramValues: number[]): number[] {
-    this.stackAllocate(this.ebp);
-    this.stackAllocate(this.esp);
-    this.ebp = this.esp;
+    this.stackAllocate(this.rbp);
+    this.stackAllocate(this.rsp);
+    this.rbp = this.rsp;
 
     const addresses: number[] = [];
-    this.esp += paramValues.length * PageTable.ENTRY_SIZE;
+    this.rsp += paramValues.length * PageTable.ENTRY_SIZE;
     for (let i = 0; i < paramValues.length; i++) {
-      const address = this.ebp + i * PageTable.ENTRY_SIZE;
+      const address = this.rbp + i * PageTable.ENTRY_SIZE;
       this.setFree(address, paramValues[i]);
       addresses.push(address);
     }

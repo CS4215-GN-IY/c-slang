@@ -6,14 +6,14 @@ interface BaseInstr {
 }
 
 export type Instr =
-  | EnvironmentInstr
+  | ResetEnvironmentInstr
   | FunctionApplicationInstr
   | FunctionAssigmentInstr
   | FunctionMarkInstr
   | ResetInstr;
 
-export interface EnvironmentInstr extends BaseInstr {
-  type: 'Environment';
+export interface ResetEnvironmentInstr extends BaseInstr {
+  type: 'ResetEnvironment';
   environment: Environment;
 }
 

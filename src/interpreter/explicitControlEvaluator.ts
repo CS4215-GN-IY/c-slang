@@ -40,7 +40,7 @@ import {
 } from './utils';
 import { VirtualMemory } from '../memory/virtualMemory';
 import {
-  type EnvironmentInstr,
+  type ResetEnvironmentInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
@@ -62,6 +62,60 @@ import {
   getEnvironmentValue
 } from './environment';
 import { isEmptyStatement } from '../ast/typeGuards';
+
+/**
+ * Evaluates the abstract syntax tree using an explicit-control evaluator &
+ * returns the result of evaluation asynchronously.
+ *
+ * @param ast The abstract syntax tree to evaluate.
+ */
+export const evaluate = async (ast: Program): Promise<Result> => {
+  return await new Promise(
+    (
+      resolve: (value: Result | PromiseLike<Result>) => void,
+      _reject: (reason?: any) => void
+    ) => {
+      try {
+        const value = interpret(ast);
+        resolve({ status: 'finished', value });
+      } catch (err) {
+        resolve({ status: 'error' });
+      }
+    }
+  );
+};
+
+/**
+ * Interprets the abstract syntax tree using an explicit-control evaluator &
+ * returns the result of evaluation.
+ *
+ * @param ast The abstract syntax tree to evaluate.
+ */
+export const interpret = (ast: Program): Value => {
+  const agenda = new Stack<AgendaItem>();
+  agenda.push(constructMainCallExpression());
+  agenda.push(ast);
+  const stash = new Stack<Value>();
+  const environment = constructGlobalEnvironment();
+  const memory = new VirtualMemory(0, 1000, 1000, 1000);
+  const textMemory = new TextMemory();
+  const state: ExplicitControlEvaluatorState = {
+    agenda,
+    stash,
+    environment,
+    memory,
+    textMemory
+  };
+
+  while (agenda.size() > 0) {
+    const command = agenda.pop();
+    // The typecast allows for mapping to a specific evaluator command type from their union type.
+    // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
+    evaluators[command.type](command as any, state);
+  }
+
+  return state.stash.size() === 0 ? undefined : state.stash.peek();
+};
 
 const evaluators: AgendaItemEvaluatorMapping = {
   AssignmentExpression: (
@@ -87,8 +141,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state.agenda.push(
       constructFunctionApplicationInstr(command.arguments.length, command)
     );
-    for (let index = 0; index < command.arguments.length; index--) {
-      state.agenda.push(command.arguments[index]);
+    for (let i = 0; i < command.arguments.length; i++) {
+      state.agenda.push(command.arguments[i]);
     }
     state.agenda.push(command.id);
   },
@@ -109,10 +163,6 @@ const evaluators: AgendaItemEvaluatorMapping = {
   ) => {},
   EmptyStatement: (
     command: EmptyStatement,
-    state: ExplicitControlEvaluatorState
-  ) => {},
-  Environment: (
-    command: EnvironmentInstr,
     state: ExplicitControlEvaluatorState
   ) => {},
   ExpressionStatement: (
@@ -153,7 +203,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     // TODO: Handle Tail Call in future.
     if (
       state.agenda.size() === 0 ||
-      state.agenda.peek().type === 'Environment'
+      state.agenda.peek().type === 'ResetEnvironment'
     ) {
       // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
       state.agenda.push(constructFunctionMarkInstr());
@@ -249,6 +299,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
       }
     }
   },
+  ResetEnvironment: (
+    command: ResetEnvironmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   ReturnStatement: (
     command: ReturnStatement,
     state: ExplicitControlEvaluatorState
@@ -280,58 +334,4 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: WhileStatement,
     state: ExplicitControlEvaluatorState
   ) => {}
-};
-
-/**
- * Evaluates the abstract syntax tree using an explicit-control evaluator &
- * returns the result of evaluation asynchronously.
- *
- * @param ast The abstract syntax tree to evaluate.
- */
-export const evaluate = async (ast: Program): Promise<Result> => {
-  return await new Promise(
-    (
-      resolve: (value: Result | PromiseLike<Result>) => void,
-      _reject: (reason?: any) => void
-    ) => {
-      try {
-        const value = interpret(ast);
-        resolve({ status: 'finished', value });
-      } catch (err) {
-        resolve({ status: 'error' });
-      }
-    }
-  );
-};
-
-/**
- * Interprets the abstract syntax tree using an explicit-control evaluator &
- * returns the result of evaluation.
- *
- * @param ast The abstract syntax tree to evaluate.
- */
-export const interpret = (ast: Program): Value => {
-  const agenda = new Stack<AgendaItem>();
-  agenda.push(constructMainCallExpression());
-  agenda.push(ast);
-  const stash = new Stack<Value>();
-  const environment = constructGlobalEnvironment();
-  const memory = new VirtualMemory(0, 1000, 1000, 1000);
-  const textMemory = new TextMemory();
-  const state: ExplicitControlEvaluatorState = {
-    agenda,
-    stash,
-    environment,
-    memory,
-    textMemory
-  };
-
-  while (agenda.size() > 0) {
-    const command = agenda.pop();
-    // The typecast allows for mapping to a specific evaluator command type from their union type.
-    // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
-    evaluators[command.type](command as any, state);
-  }
-
-  return state.stash.size() === 0 ? undefined : state.stash.peek();
 };

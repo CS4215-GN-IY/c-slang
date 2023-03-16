@@ -1,5 +1,5 @@
 /**
- * Contains function instructions, as encoding it to the virtual memory text section is too difficult
+ * Contains function instructions, as encoding it to the virtual memory text section is too difficult.
  */
 import { type Closure } from '../interpreter/types/interpreter';
 
