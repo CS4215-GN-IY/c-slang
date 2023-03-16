@@ -1,4 +1,4 @@
-import { BrokenEnvironmentError, UnboundNameError } from './errors';
+import { RedeclaredNameError, UndeclaredNameError } from './errors';
 import {
   type NameAddressMapping,
   type SymbolTable,
@@ -16,7 +16,7 @@ export const extendSymbolTable = (
 
   nameAddressMappings.forEach((mapping) => {
     if (mapping.name in newFrame) {
-      throw new BrokenEnvironmentError(
+      throw new RedeclaredNameError(
         'Tried to redeclare a name in the same scope.'
       );
     }
@@ -46,7 +46,7 @@ export const getAddressFromSymbolTable = (
     currentEnvironment = currentEnvironment.tail;
   }
 
-  throw new UnboundNameError(`Encountered an undeclared name: ${name}`);
+  throw new UndeclaredNameError(`Encountered an undeclared name: ${name}`);
 };
 
 /**
