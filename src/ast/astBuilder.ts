@@ -997,13 +997,6 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitPostfixExpression(ctx: PostfixExpressionContext): Expression {
-    if (
-      ctx.childCount > 0 &&
-      ctx.getChild(0).toStringTree() === '__extension__'
-    ) {
-      throw new UnsupportedKeywordError('__extension__');
-    }
-
     const primaryExpression = ctx.primaryExpression();
     if (primaryExpression === undefined) {
       throw new BrokenInvariantError(
