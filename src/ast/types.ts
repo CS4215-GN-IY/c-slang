@@ -5,6 +5,16 @@ export interface BaseNode {
   type: string;
 }
 
+export interface NodeMap {
+  Expression: Expression;
+  FunctionDeclaration: FunctionDeclaration;
+  Program: Program;
+  Statement: Statement;
+  VariableDeclaration: VariableDeclaration;
+}
+
+export type Node = NodeMap[keyof NodeMap];
+
 export interface Program extends BaseNode {
   type: 'Program';
   body: ExternalDeclaration[];
@@ -35,7 +45,12 @@ export interface DefaultStatement extends BaseStatement {
   body: Statement;
 }
 
-export type BlockOrEmptyStatement = BlockItem[] | EmptyStatement;
+export type BlockOrEmptyStatement = BlockStatement | EmptyStatement;
+
+export interface BlockStatement extends BaseStatement {
+  type: 'BlockStatement';
+  items: BlockItem[];
+}
 
 export type BlockItem = VariableDeclaration | Statement;
 
@@ -122,6 +137,7 @@ export interface ExpressionSequence extends BaseNode {
 export type Expression =
   | AssignmentExpression
   | BinaryExpression
+  | CallExpression
   | Constant
   | Identifier
   | LogicalExpression
@@ -198,6 +214,12 @@ export type AssignmentOperator =
   | '&='
   | '^='
   | '|=';
+
+export interface CallExpression extends BaseExpression {
+  type: 'CallExpression';
+  id: Identifier;
+  arguments: Expression[];
+}
 
 export interface BaseDeclaration extends BaseStatement {}
 

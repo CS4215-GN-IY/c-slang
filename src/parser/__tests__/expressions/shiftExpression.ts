@@ -14,28 +14,31 @@ describe('shift expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '<<',
-                    left: {
-                      type: 'Constant',
-                      value: '4215'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '<<',
+                      left: {
+                        type: 'Constant',
+                        value: '4215'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '3'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,28 +57,31 @@ describe('shift expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '>>',
-                    left: {
-                      type: 'Constant',
-                      value: '4215'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '>>',
+                      left: {
+                        type: 'Constant',
+                        value: '4215'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '3'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -94,52 +100,55 @@ describe('shift expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '<<',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '>>',
+                      operator: '<<',
                       left: {
                         type: 'BinaryExpression',
                         operator: '>>',
                         left: {
                           type: 'BinaryExpression',
-                          operator: '<<',
+                          operator: '>>',
                           left: {
-                            type: 'Constant',
-                            value: '4215'
+                            type: 'BinaryExpression',
+                            operator: '<<',
+                            left: {
+                              type: 'Constant',
+                              value: '4215'
+                            },
+                            right: {
+                              type: 'Constant',
+                              value: '2'
+                            }
                           },
                           right: {
                             type: 'Constant',
-                            value: '2'
+                            value: '3'
                           }
                         },
                         right: {
                           type: 'Constant',
-                          value: '3'
+                          value: '4'
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '4'
+                        value: '5'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '5'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -158,52 +167,55 @@ describe('shift expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '>>',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '<<',
+                      operator: '>>',
                       left: {
-                        type: 'Constant',
-                        value: '4215'
+                        type: 'BinaryExpression',
+                        operator: '<<',
+                        left: {
+                          type: 'Constant',
+                          value: '4215'
+                        },
+                        right: {
+                          type: 'BinaryExpression',
+                          operator: '+',
+                          left: {
+                            type: 'Constant',
+                            value: '3'
+                          },
+                          right: {
+                            type: 'Constant',
+                            value: '4'
+                          }
+                        }
                       },
                       right: {
                         type: 'BinaryExpression',
-                        operator: '+',
+                        operator: '-',
                         left: {
                           type: 'Constant',
-                          value: '3'
+                          value: '2'
                         },
                         right: {
                           type: 'Constant',
-                          value: '4'
+                          value: '1'
                         }
                       }
-                    },
-                    right: {
-                      type: 'BinaryExpression',
-                      operator: '-',
-                      left: {
-                        type: 'Constant',
-                        value: '2'
-                      },
-                      right: {
-                        type: 'Constant',
-                        value: '1'
-                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

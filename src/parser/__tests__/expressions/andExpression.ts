@@ -14,28 +14,31 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '&',
-                    left: {
-                      type: 'Constant',
-                      value: '4'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '5'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '&',
+                      left: {
+                        type: 'Constant',
+                        value: '4'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '5'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,36 +57,39 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '&',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
                       operator: '&',
                       left: {
-                        type: 'Constant',
-                        value: '1'
+                        type: 'BinaryExpression',
+                        operator: '&',
+                        left: {
+                          type: 'Constant',
+                          value: '1'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '2'
+                        }
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: '3'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -102,44 +108,47 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '&',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '==',
+                      operator: '&',
                       left: {
-                        type: 'Constant',
-                        value: '1'
+                        type: 'BinaryExpression',
+                        operator: '==',
+                        left: {
+                          type: 'Constant',
+                          value: '1'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '2'
+                        }
                       },
                       right: {
-                        type: 'Constant',
-                        value: '2'
-                      }
-                    },
-                    right: {
-                      type: 'BinaryExpression',
-                      operator: '!=',
-                      left: {
-                        type: 'Constant',
-                        value: '3'
-                      },
-                      right: {
-                        type: 'Constant',
-                        value: '4'
+                        type: 'BinaryExpression',
+                        operator: '!=',
+                        left: {
+                          type: 'Constant',
+                          value: '3'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '4'
+                        }
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

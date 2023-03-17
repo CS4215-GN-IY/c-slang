@@ -14,28 +14,31 @@ describe('logical and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'LogicalExpression',
-                    operator: '&&',
-                    left: {
-                      type: 'Constant',
-                      value: '1'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '0'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'LogicalExpression',
+                      operator: '&&',
+                      left: {
+                        type: 'Constant',
+                        value: '1'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '0'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,36 +57,39 @@ describe('logical and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'LogicalExpression',
-                    operator: '&&',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'LogicalExpression',
                       operator: '&&',
                       left: {
-                        type: 'Constant',
-                        value: '1'
+                        type: 'LogicalExpression',
+                        operator: '&&',
+                        left: {
+                          type: 'Constant',
+                          value: '1'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '2'
+                        }
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: '3'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -102,36 +108,39 @@ describe('logical and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'LogicalExpression',
-                    operator: '&&',
-                    left: {
-                      type: 'Constant',
-                      value: '1'
-                    },
-                    right: {
-                      type: 'BinaryExpression',
-                      operator: '|',
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'LogicalExpression',
+                      operator: '&&',
                       left: {
                         type: 'Constant',
-                        value: '2'
+                        value: '1'
                       },
                       right: {
-                        type: 'Constant',
-                        value: '3'
+                        type: 'BinaryExpression',
+                        operator: '|',
+                        left: {
+                          type: 'Constant',
+                          value: '2'
+                        },
+                        right: {
+                          type: 'Constant',
+                          value: '3'
+                        }
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

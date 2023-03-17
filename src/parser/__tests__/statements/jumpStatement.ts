@@ -14,20 +14,66 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ReturnStatement',
-              argument: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'Constant',
-                    value: '0'
-                  }
-                ]
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'Constant',
+                      value: '0'
+                    }
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  it('handles binary expression argument', () => {
+    const code = 'int main() { return 1 + 2; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '+',
+                      left: {
+                        type: 'Constant',
+                        value: '1'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '2'
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       ]
     };
@@ -46,11 +92,14 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'f'
           },
-          body: [
-            {
-              type: 'ReturnStatement'
-            }
-          ]
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ReturnStatement'
+              }
+            ]
+          }
         }
       ]
     };
@@ -71,34 +120,37 @@ describe('goto statement', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'IdentifierStatement',
-              label: {
-                type: 'Identifier',
-                name: 'x'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'IdentifierStatement',
+                label: {
+                  type: 'Identifier',
+                  name: 'x'
+                },
+                body: {
+                  type: 'ReturnStatement',
+                  argument: {
+                    type: 'ExpressionSequence',
+                    expressions: [
+                      {
+                        type: 'Constant',
+                        value: '0'
+                      }
+                    ]
+                  }
+                }
               },
-              body: {
-                type: 'ReturnStatement',
+              {
+                type: 'GotoStatement',
                 argument: {
-                  type: 'ExpressionSequence',
-                  expressions: [
-                    {
-                      type: 'Constant',
-                      value: '0'
-                    }
-                  ]
+                  type: 'Identifier',
+                  name: 'x'
                 }
               }
-            },
-            {
-              type: 'GotoStatement',
-              argument: {
-                type: 'Identifier',
-                name: 'x'
-              }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

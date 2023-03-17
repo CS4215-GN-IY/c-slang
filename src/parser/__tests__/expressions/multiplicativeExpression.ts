@@ -14,28 +14,31 @@ describe('multiplicative expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '*',
-                    left: {
-                      type: 'Constant',
-                      value: '2'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '*',
+                      left: {
+                        type: 'Constant',
+                        value: '2'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '3'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -54,28 +57,31 @@ describe('multiplicative expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '/',
-                    left: {
-                      type: 'Constant',
-                      value: '10'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '/',
+                      left: {
+                        type: 'Constant',
+                        value: '10'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '3'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -94,28 +100,31 @@ describe('multiplicative expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '%',
-                    left: {
-                      type: 'Constant',
-                      value: '7'
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '3'
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '%',
+                      left: {
+                        type: 'Constant',
+                        value: '7'
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '3'
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };
@@ -134,68 +143,71 @@ describe('multiplicative expression', () => {
             type: 'Identifier',
             name: 'main'
           },
-          body: [
-            {
-              type: 'ExpressionStatement',
-              sequence: {
-                type: 'ExpressionSequence',
-                expressions: [
-                  {
-                    type: 'BinaryExpression',
-                    operator: '*',
-                    left: {
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'ExpressionSequence',
+                  expressions: [
+                    {
                       type: 'BinaryExpression',
-                      operator: '/',
+                      operator: '*',
                       left: {
                         type: 'BinaryExpression',
-                        operator: '%',
+                        operator: '/',
                         left: {
                           type: 'BinaryExpression',
                           operator: '%',
                           left: {
                             type: 'BinaryExpression',
-                            operator: '/',
+                            operator: '%',
                             left: {
                               type: 'BinaryExpression',
-                              operator: '*',
+                              operator: '/',
                               left: {
-                                type: 'Constant',
-                                value: '10'
+                                type: 'BinaryExpression',
+                                operator: '*',
+                                left: {
+                                  type: 'Constant',
+                                  value: '10'
+                                },
+                                right: {
+                                  type: 'Constant',
+                                  value: '2'
+                                }
                               },
                               right: {
                                 type: 'Constant',
-                                value: '2'
+                                value: '5'
                               }
                             },
                             right: {
                               type: 'Constant',
-                              value: '5'
+                              value: '3'
                             }
                           },
                           right: {
                             type: 'Constant',
-                            value: '3'
+                            value: '1'
                           }
                         },
                         right: {
                           type: 'Constant',
-                          value: '1'
+                          value: '4'
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '4'
+                        value: '7'
                       }
-                    },
-                    right: {
-                      type: 'Constant',
-                      value: '7'
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     };

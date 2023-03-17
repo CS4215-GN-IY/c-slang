@@ -130,13 +130,14 @@ import {
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
-import { isTypedefNameReturnValue } from './typeGuards';
+import { isIdentifier, isTypedefNameReturnValue } from './typeGuards';
 import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
   constructStringLiteral
 } from './constructors';
+import { canBeCallExpression } from './utils';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -227,8 +228,11 @@ export class ASTBuilder implements CVisitor<any> {
     return leftExpression;
   }
 
-  visitArgumentExpressionList(ctx: ArgumentExpressionListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitArgumentExpressionList(
+    ctx: ArgumentExpressionListContext
+  ): Expression[] {
+    const assignmentExpressions = ctx.assignmentExpression();
+    return assignmentExpressions.map(this.visitAssignmentExpression, this);
   }
 
   visitAssignmentExpression(ctx: AssignmentExpressionContext): Expression {
@@ -296,7 +300,10 @@ export class ASTBuilder implements CVisitor<any> {
   visitCompoundStatement(ctx: CompoundStatementContext): BlockOrEmptyStatement {
     const blockItemList = ctx.blockItemList();
     if (blockItemList !== undefined) {
-      return this.visitBlockItemList(blockItemList);
+      return {
+        type: 'BlockStatement',
+        items: this.visitBlockItemList(blockItemList)
+      };
     }
 
     return constructEmptyStatement();
@@ -992,6 +999,26 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitPostfixExpression(ctx: PostfixExpressionContext): Expression {
     const primaryExpression = ctx.primaryExpression();
+    const argExpressionList = ctx.argumentExpressionList();
+
+    if (canBeCallExpression(ctx) && primaryExpression !== undefined) {
+      const astPrimaryExpression =
+        this.visitPrimaryExpression(primaryExpression);
+      if (!isIdentifier(astPrimaryExpression)) {
+        throw new BrokenInvariantError(
+          'Encountered an ArgumentExpressionList without an Identifier'
+        );
+      }
+      return {
+        type: 'CallExpression',
+        id: astPrimaryExpression,
+        arguments:
+          argExpressionList.length > 0
+            ? this.visitArgumentExpressionList(argExpressionList[0])
+            : []
+      };
+    }
+
     if (primaryExpression !== undefined) {
       return this.visitPrimaryExpression(primaryExpression);
     }

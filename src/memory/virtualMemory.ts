@@ -3,6 +3,10 @@ import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 import { MemoryError, MemoryErrorType } from './memoryError';
+import {
+  type NameAddressMapping,
+  type NameValueMapping
+} from '../interpreter/types/interpreter';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -15,6 +19,9 @@ export class VirtualMemory {
     Segment,
     SegmentAddress
   >();
+
+  private rbp: number;
+  private rsp: number;
 
   /**
    * Initializes the size of each segment. Size is the number of entries allocated to the segment.
@@ -67,6 +74,35 @@ export class VirtualMemory {
         heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
       )
     );
+    this.rbp = stackBaseAddress;
+    this.rsp = stackBaseAddress - PageTable.ENTRY_SIZE;
+  }
+
+  public stackAllocate(data: number): number {
+    this.rsp += PageTable.ENTRY_SIZE;
+    this.setFree(this.rsp, data);
+    return this.rsp;
+  }
+
+  // Sets up stack for function call and returns address of parameters
+  public stackFunctionCallAllocate(
+    paramsWithValues: NameValueMapping[]
+  ): NameAddressMapping[] {
+    this.stackAllocate(this.rbp);
+    this.stackAllocate(this.rsp);
+    this.rbp = this.rsp;
+
+    const paramWithAddresses: NameAddressMapping[] = [];
+    this.rsp += paramsWithValues.length * PageTable.ENTRY_SIZE;
+    for (let i = 0; i < paramsWithValues.length; i++) {
+      const address = this.rbp + i * PageTable.ENTRY_SIZE;
+      this.setFree(address, paramsWithValues[i].value);
+      paramWithAddresses.push({
+        name: paramsWithValues[i].name,
+        address
+      });
+    }
+    return paramWithAddresses;
   }
 
   /**
@@ -101,6 +137,15 @@ export class VirtualMemory {
   }
 
   /**
+   * Sets data at a free entry.
+   */
+  private setFree(address: number, data: number): void {
+    const addressIndex = AddressIndex.fromAddress(address);
+    const l5PageTable = this.getL5PageTable(addressIndex);
+    l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
+  }
+
+  /**
    * Updates entry at address to store data.
    * The address must have been allocated previously. It cannot be a free address.
    */
@@ -127,7 +172,10 @@ export class VirtualMemory {
     const l4PageTableIdx = this.l3PageTables[l3PageTableIdx].get(
       addressIndex.l3Idx
     );
-    return this.l4PageTables[l4PageTableIdx];
+    const l5PageTableIdx = this.l4PageTables[l4PageTableIdx].get(
+      addressIndex.l4Idx
+    );
+    return this.l5PageTables[l5PageTableIdx];
   }
 
   private allocatePageTables(baseAddress: number, numOfEntries: number): void {

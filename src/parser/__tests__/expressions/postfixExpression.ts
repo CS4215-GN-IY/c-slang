@@ -1,9 +1,9 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types';
 
-describe('logical or expression', () => {
-  test('handles logical OR', () => {
-    const code = 'int main() { 1 || 0; }';
+describe('postfix expression', () => {
+  test('handles function calls without arguments', () => {
+    const code = 'int main() { func(); }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -23,16 +23,12 @@ describe('logical or expression', () => {
                   type: 'ExpressionSequence',
                   expressions: [
                     {
-                      type: 'LogicalExpression',
-                      operator: '||',
-                      left: {
-                        type: 'Constant',
-                        value: '1'
+                      type: 'CallExpression',
+                      id: {
+                        type: 'Identifier',
+                        name: 'func'
                       },
-                      right: {
-                        type: 'Constant',
-                        value: '0'
-                      }
+                      arguments: []
                     }
                   ]
                 }
@@ -45,8 +41,8 @@ describe('logical or expression', () => {
     expect(ast).toEqual(expectedAst);
   });
 
-  test('is left associative', () => {
-    const code = 'int main() { 1 || 2 || 3; }';
+  test('handles function calls with arguments', () => {
+    const code = 'int main() { func(2); }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -66,24 +62,17 @@ describe('logical or expression', () => {
                   type: 'ExpressionSequence',
                   expressions: [
                     {
-                      type: 'LogicalExpression',
-                      operator: '||',
-                      left: {
-                        type: 'LogicalExpression',
-                        operator: '||',
-                        left: {
-                          type: 'Constant',
-                          value: '1'
-                        },
-                        right: {
+                      type: 'CallExpression',
+                      id: {
+                        type: 'Identifier',
+                        name: 'func'
+                      },
+                      arguments: [
+                        {
                           type: 'Constant',
                           value: '2'
                         }
-                      },
-                      right: {
-                        type: 'Constant',
-                        value: '3'
-                      }
+                      ]
                     }
                   ]
                 }
@@ -96,8 +85,8 @@ describe('logical or expression', () => {
     expect(ast).toEqual(expectedAst);
   });
 
-  test('has lower precedence than &&', () => {
-    const code = 'int main() { 1 || 2 && 3; }';
+  test('handles constants', () => {
+    const code = 'int main() { 2; }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -117,24 +106,8 @@ describe('logical or expression', () => {
                   type: 'ExpressionSequence',
                   expressions: [
                     {
-                      type: 'LogicalExpression',
-                      operator: '||',
-                      left: {
-                        type: 'Constant',
-                        value: '1'
-                      },
-                      right: {
-                        type: 'LogicalExpression',
-                        operator: '&&',
-                        left: {
-                          type: 'Constant',
-                          value: '2'
-                        },
-                        right: {
-                          type: 'Constant',
-                          value: '3'
-                        }
-                      }
+                      type: 'Constant',
+                      value: '2'
                     }
                   ]
                 }
