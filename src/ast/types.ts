@@ -135,6 +135,7 @@ export interface ExpressionSequence extends BaseNode {
 }
 
 export type Expression =
+  | ArrayAccessExpression
   | AssignmentExpression
   | BinaryExpression
   | CallExpression
@@ -147,7 +148,9 @@ export type Expression =
   | ExpressionSequence
   | Identifier
   | LogicalExpression
-  | StringLiteral;
+  | MemberExpression
+  | StringLiteral
+  | UpdateExpression;
 
 export interface BaseExpression extends BaseNode {}
 
@@ -165,6 +168,36 @@ export interface StringLiteral extends BaseExpression {
   type: 'StringLiteral';
   value: string;
 }
+
+export interface ArrayAccessExpression extends BaseExpression {
+  type: 'ArrayAccessExpression';
+  expression: Expression;
+  indexBeingAccessed: Expression;
+}
+
+export interface CallExpression extends BaseExpression {
+  type: 'CallExpression';
+  callee: Expression;
+  arguments: Expression[];
+}
+
+export interface MemberExpression extends BaseExpression {
+  type: 'MemberExpression';
+  expression: Expression;
+  member: Identifier;
+  // True if '->', false if '.'
+  isPointerAccess: boolean;
+}
+
+export interface UpdateExpression extends BaseExpression {
+  type: 'UpdateExpression';
+  operator: UpdateOperator;
+  operand: Expression;
+  // True if prefix, false if postfix.
+  isPrefix: boolean;
+}
+
+export type UpdateOperator = '++' | '--';
 
 export interface BinaryExpression extends BaseExpression {
   type: 'BinaryExpression';
@@ -220,12 +253,6 @@ export type AssignmentOperator =
   | '&='
   | '^='
   | '|=';
-
-export interface CallExpression extends BaseExpression {
-  type: 'CallExpression';
-  id: Identifier;
-  arguments: Expression[];
-}
 
 export interface BaseDeclaration extends BaseStatement {}
 

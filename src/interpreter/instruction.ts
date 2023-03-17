@@ -7,6 +7,8 @@ import {
 } from './types/instruction';
 import { type CallExpression } from '../ast/types';
 import { type SymbolTable } from './types/interpreter';
+import { isIdentifier } from '../ast/typeGuards';
+import { InvalidFunctionApplicationError } from './errors';
 
 export const constructEnvironmentInstr = (
   environment: SymbolTable
@@ -27,11 +29,17 @@ export const constructFunctionAssignmentInstr = (
 export const constructFunctionApplicationInstr = (
   numOfArgs: number,
   srcNode: CallExpression
-): FunctionApplicationInstr => ({
-  type: 'FunctionApplication',
-  functionId: srcNode.id,
-  numOfArgs: srcNode.arguments.length
-});
+): FunctionApplicationInstr => {
+  const callee = srcNode.callee;
+  if (!isIdentifier(callee)) {
+    throw new InvalidFunctionApplicationError('Cannot call non-identifier.');
+  }
+  return {
+    type: 'FunctionApplication',
+    functionId: callee,
+    numOfArgs: srcNode.arguments.length
+  };
+};
 
 export const constructFunctionMarkInstr = (): FunctionMarkInstr => ({
   type: 'FunctionMark'

@@ -6,6 +6,7 @@ import {
   type ExplicitControlEvaluatorState
 } from './types/interpreter';
 import {
+  type ArrayAccessExpression,
   type AssignmentExpression,
   type BinaryExpression,
   type BlockStatement,
@@ -25,10 +26,12 @@ import {
   type IdentifierStatement,
   type IfStatement,
   type LogicalExpression,
+  type MemberExpression,
   type Program,
   type ReturnStatement,
   type StringLiteral,
   type SwitchStatement,
+  type UpdateExpression,
   type VariableDeclaration,
   type WhileStatement
 } from '../ast/types';
@@ -54,7 +57,7 @@ import {
   constructResetInstr
 } from './instruction';
 import { constructMainCallExpression } from '../ast/constructors';
-import { InvalidFunctionApplication } from './errors';
+import { InvalidFunctionApplicationError } from './errors';
 import {
   constructInitialSymbolTable,
   extendSymbolTable,
@@ -116,6 +119,10 @@ export const interpret = (ast: Program): Value => {
 };
 
 const evaluators: AgendaItemEvaluatorMapping = {
+  ArrayAccessExpression: (
+    command: ArrayAccessExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   AssignmentExpression: (
     command: AssignmentExpression,
     state: ExplicitControlEvaluatorState
@@ -142,7 +149,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     for (let i = 0; i < command.arguments.length; i++) {
       state.agenda.push(command.arguments[i]);
     }
-    state.agenda.push(command.id);
+    state.agenda.push(command.callee);
   },
   Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
     state.stash.push(command);
@@ -267,6 +274,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: LogicalExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
+  MemberExpression: (
+    command: MemberExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
     const declarationNames = getExternalDeclarationNames(command.body);
     const declarationsWithAddresses = allocateStackAddresses(
@@ -302,7 +313,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state.agenda.push(constructResetInstr());
     if (command.argument !== undefined) {
       if (command.argument.expressions.length > 1) {
-        throw new InvalidFunctionApplication(
+        throw new InvalidFunctionApplicationError(
           'Encountered more than 1 return value'
         );
       }
@@ -316,6 +327,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
   ) => {},
   SwitchStatement: (
     command: SwitchStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  UpdateExpression: (
+    command: UpdateExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
   VariableDeclaration: (
