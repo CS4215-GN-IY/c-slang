@@ -62,21 +62,21 @@ export interface EmptyStatement extends BaseStatement {
 
 export interface ExpressionStatement extends BaseStatement {
   type: 'ExpressionStatement';
-  sequence: ExpressionSequence;
+  sequence: SequenceExpression;
 }
 
 export type SelectionStatement = IfStatement | SwitchStatement;
 
 export interface IfStatement extends BaseStatement {
   type: 'IfStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   consequent: Statement;
   alternate?: Statement;
 }
 
 export interface SwitchStatement extends BaseStatement {
   type: 'SwitchStatement';
-  discriminant: ExpressionSequence;
+  discriminant: SequenceExpression;
   body: Statement;
 }
 
@@ -87,21 +87,21 @@ export type IterationStatement =
 
 export interface DoWhileStatement extends BaseStatement {
   type: 'DoWhileStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   body: Statement;
 }
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
-  init?: VariableDeclaration | ExpressionSequence;
-  test?: ExpressionSequence;
-  update?: ExpressionSequence;
+  init?: VariableDeclaration | SequenceExpression;
+  test?: SequenceExpression;
+  update?: SequenceExpression;
   body: Statement;
 }
 
 export interface WhileStatement extends BaseStatement {
   type: 'WhileStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   body: Statement;
 }
 
@@ -126,11 +126,11 @@ export interface GotoStatement extends BaseStatement {
 
 export interface ReturnStatement extends BaseStatement {
   type: 'ReturnStatement';
-  argument?: ExpressionSequence;
+  argument?: SequenceExpression;
 }
 
-export interface ExpressionSequence extends BaseNode {
-  type: 'ExpressionSequence';
+export interface SequenceExpression extends BaseNode {
+  type: 'SequenceExpression';
   expressions: Expression[];
 }
 
@@ -140,15 +140,10 @@ export type Expression =
   | BinaryExpression
   | CallExpression
   | Constant
-  // An ExpressionSequence is also an Expression because there can be sequences of expressions within
-  // parentheses that are delimited by comma. For example, (8 - 2, a *= 3, 7 - 4) * 3 evaluates to 6.
-  // The result of evaluating the last expression in the sequence of expressions in the parentheses is
-  // used. However, we still need to evaluate the previous expressions in the sequence as they can
-  // possibly have side effects.
-  | ExpressionSequence
   | Identifier
   | LogicalExpression
   | MemberExpression
+  | SequenceExpression
   | StringLiteral
   | UpdateExpression;
 

@@ -5,7 +5,7 @@ import {
   type BlockOrEmptyStatement,
   type Expression,
   type ExpressionOrEmptyStatement,
-  type ExpressionSequence,
+  type SequenceExpression,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
@@ -516,10 +516,10 @@ export class ASTBuilder implements CVisitor<any> {
     return leftExpression;
   }
 
-  visitExpression(ctx: ExpressionContext): ExpressionSequence {
+  visitExpression(ctx: ExpressionContext): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
-      type: 'ExpressionSequence',
+      type: 'SequenceExpression',
       expressions: assignmentExpressions.map(
         this.visitAssignmentExpression,
         this
@@ -634,10 +634,10 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForExpression(ctx: ForExpressionContext): ExpressionSequence {
+  visitForExpression(ctx: ForExpressionContext): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
-      type: 'ExpressionSequence',
+      type: 'SequenceExpression',
       expressions: assignmentExpressions.map(
         this.visitAssignmentExpression,
         this

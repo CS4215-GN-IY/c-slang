@@ -20,7 +20,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Identifier',
@@ -55,7 +55,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -90,7 +90,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -125,7 +125,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -160,7 +160,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -195,7 +195,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'StringLiteral',
@@ -230,13 +230,13 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
                       operator: '*',
                       left: {
-                        type: 'ExpressionSequence',
+                        type: 'SequenceExpression',
                         expressions: [
                           {
                             type: 'BinaryExpression',
@@ -286,13 +286,13 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
                       operator: '*',
                       left: {
-                        type: 'ExpressionSequence',
+                        type: 'SequenceExpression',
                         expressions: [
                           {
                             type: 'BinaryExpression',

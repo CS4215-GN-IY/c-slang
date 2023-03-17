@@ -20,7 +20,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -55,7 +55,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'ArrayAccessExpression',
@@ -64,7 +64,7 @@ describe('postfix expression', () => {
                         name: 'arr'
                       },
                       indexBeingAccessed: {
-                        type: 'ExpressionSequence',
+                        type: 'SequenceExpression',
                         expressions: [
                           {
                             type: 'Constant',
@@ -102,7 +102,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'ArrayAccessExpression',
@@ -115,7 +115,7 @@ describe('postfix expression', () => {
                             name: 'arr'
                           },
                           indexBeingAccessed: {
-                            type: 'ExpressionSequence',
+                            type: 'SequenceExpression',
                             expressions: [
                               {
                                 type: 'Constant',
@@ -125,7 +125,7 @@ describe('postfix expression', () => {
                           }
                         },
                         indexBeingAccessed: {
-                          type: 'ExpressionSequence',
+                          type: 'SequenceExpression',
                           expressions: [
                             {
                               type: 'BinaryExpression',
@@ -143,7 +143,7 @@ describe('postfix expression', () => {
                         }
                       },
                       indexBeingAccessed: {
-                        type: 'ExpressionSequence',
+                        type: 'SequenceExpression',
                         expressions: [
                           {
                             type: 'BinaryExpression',
@@ -201,7 +201,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'CallExpression',
@@ -240,7 +240,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'CallExpression',
@@ -300,7 +300,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'CallExpression',
@@ -361,7 +361,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'MemberExpression',
@@ -404,7 +404,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'MemberExpression',
@@ -447,7 +447,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'UpdateExpression',
@@ -487,7 +487,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'UpdateExpression',
@@ -527,7 +527,7 @@ describe('postfix expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'UpdateExpression',
@@ -550,7 +550,7 @@ describe('postfix expression', () => {
                             ]
                           },
                           indexBeingAccessed: {
-                            type: 'ExpressionSequence',
+                            type: 'SequenceExpression',
                             expressions: [
                               {
                                 type: 'Constant',
