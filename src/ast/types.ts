@@ -139,6 +139,12 @@ export type Expression =
   | BinaryExpression
   | CallExpression
   | Constant
+  // An ExpressionSequence is also an Expression because there can be sequences of expressions within
+  // parentheses that are delimited by comma. For example, (8 - 2, a *= 3, 7 - 4) * 3 evaluates to 6.
+  // The result of evaluating the last expression in the sequence of expressions in the parentheses is
+  // used. However, we still need to evaluate the previous expressions in the sequence as they can
+  // possibly have side effects.
+  | ExpressionSequence
   | Identifier
   | LogicalExpression
   | StringLiteral;

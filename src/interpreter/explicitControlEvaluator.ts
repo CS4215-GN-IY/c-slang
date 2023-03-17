@@ -16,6 +16,7 @@ import {
   type DefaultStatement,
   type DoWhileStatement,
   type EmptyStatement,
+  type ExpressionSequence,
   type ExpressionStatement,
   type ForStatement,
   type FunctionDeclaration,
@@ -160,6 +161,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
   ) => {},
   EmptyStatement: (
     command: EmptyStatement,
+    state: ExplicitControlEvaluatorState
+  ) => {},
+  ExpressionSequence: (
+    command: ExpressionSequence,
     state: ExplicitControlEvaluatorState
   ) => {},
   ExpressionStatement: (

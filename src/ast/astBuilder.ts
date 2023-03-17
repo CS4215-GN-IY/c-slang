@@ -1049,7 +1049,10 @@ export class ASTBuilder implements CVisitor<any> {
       return constructStringLiteral(stringLiterals[0]);
     }
 
-    // TODO: Deal with expressions in brackets.
+    const parenthesisedExpression = ctx.expression();
+    if (parenthesisedExpression !== undefined) {
+      return this.visitExpression(parenthesisedExpression);
+    }
 
     const genericSelection = ctx.genericSelection();
     if (genericSelection !== undefined) {
