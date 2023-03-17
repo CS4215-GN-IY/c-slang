@@ -65,10 +65,6 @@ import {
   type ForExpressionContext,
   type FunctionDefinitionContext,
   type FunctionSpecifierContext,
-  type GccAttributeContext,
-  type GccAttributeListContext,
-  type GccAttributeSpecifierContext,
-  type GccDeclaratorExtensionContext,
   type GenericAssociationContext,
   type GenericAssocListContext,
   type GenericSelectionContext,
@@ -111,8 +107,7 @@ import {
   type TypeQualifierListContext,
   type TypeSpecifierContext,
   type UnaryExpressionContext,
-  type UnaryOperatorContext,
-  type VcSpecificModiferContext
+  type UnaryOperatorContext
 } from '../lang/CParser';
 import {
   BrokenInvariantError,
@@ -675,22 +670,6 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitGccAttribute(ctx: GccAttributeContext): BaseNode {
-    throw new Error('Method not implemented.');
-  }
-
-  visitGccAttributeList(ctx: GccAttributeListContext): BaseNode {
-    throw new Error('Method not implemented.');
-  }
-
-  visitGccAttributeSpecifier(ctx: GccAttributeSpecifierContext): BaseNode {
-    throw new Error('Method not implemented.');
-  }
-
-  visitGccDeclaratorExtension(ctx: GccDeclaratorExtensionContext): BaseNode {
-    throw new Error('Method not implemented.');
-  }
-
   visitGenericAssocList(ctx: GenericAssocListContext): BaseNode {
     throw new UnreachableCaseError();
   }
@@ -1058,13 +1037,6 @@ export class ASTBuilder implements CVisitor<any> {
 
     if (
       ctx.childCount > 0 &&
-      ctx.getChild(0).toStringTree() === '__extension__'
-    ) {
-      throw new UnsupportedKeywordError('__extension__');
-    }
-
-    if (
-      ctx.childCount > 0 &&
       ctx.getChild(0).toStringTree() === '__builtin_va_arg'
     ) {
       throw new UnsupportedKeywordError('__builtin_va_arg');
@@ -1390,10 +1362,6 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitUnaryOperator(ctx: UnaryOperatorContext): BaseNode {
-    throw new Error('Method not implemented.');
-  }
-
-  visitVcSpecificModifer(ctx: VcSpecificModiferContext): BaseNode {
     throw new Error('Method not implemented.');
   }
 }

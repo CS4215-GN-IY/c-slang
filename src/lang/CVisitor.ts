@@ -51,11 +51,6 @@ import { FunctionSpecifierContext } from './CParser';
 import { AlignmentSpecifierContext } from './CParser';
 import { DeclaratorContext } from './CParser';
 import { DirectDeclaratorContext } from './CParser';
-import { VcSpecificModiferContext } from './CParser';
-import { GccDeclaratorExtensionContext } from './CParser';
-import { GccAttributeSpecifierContext } from './CParser';
-import { GccAttributeListContext } from './CParser';
-import { GccAttributeContext } from './CParser';
 import { NestedParenthesesBlockContext } from './CParser';
 import { PointerContext } from './CParser';
 import { TypeQualifierListContext } from './CParser';
@@ -443,41 +438,6 @@ export interface CVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitDirectDeclarator?: (ctx: DirectDeclaratorContext) => Result;
-
-  /**
-   * Visit a parse tree produced by `CParser.vcSpecificModifer`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitVcSpecificModifer?: (ctx: VcSpecificModiferContext) => Result;
-
-  /**
-   * Visit a parse tree produced by `CParser.gccDeclaratorExtension`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitGccDeclaratorExtension?: (ctx: GccDeclaratorExtensionContext) => Result;
-
-  /**
-   * Visit a parse tree produced by `CParser.gccAttributeSpecifier`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitGccAttributeSpecifier?: (ctx: GccAttributeSpecifierContext) => Result;
-
-  /**
-   * Visit a parse tree produced by `CParser.gccAttributeList`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitGccAttributeList?: (ctx: GccAttributeListContext) => Result;
-
-  /**
-   * Visit a parse tree produced by `CParser.gccAttribute`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitGccAttribute?: (ctx: GccAttributeContext) => Result;
 
   /**
    * Visit a parse tree produced by `CParser.nestedParenthesesBlock`.
