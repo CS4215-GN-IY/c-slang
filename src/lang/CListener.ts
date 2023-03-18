@@ -51,11 +51,6 @@ import { FunctionSpecifierContext } from './CParser';
 import { AlignmentSpecifierContext } from './CParser';
 import { DeclaratorContext } from './CParser';
 import { DirectDeclaratorContext } from './CParser';
-import { VcSpecificModiferContext } from './CParser';
-import { GccDeclaratorExtensionContext } from './CParser';
-import { GccAttributeSpecifierContext } from './CParser';
-import { GccAttributeListContext } from './CParser';
-import { GccAttributeContext } from './CParser';
 import { NestedParenthesesBlockContext } from './CParser';
 import { PointerContext } from './CParser';
 import { TypeQualifierListContext } from './CParser';
@@ -636,61 +631,6 @@ export interface CListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitDirectDeclarator?: (ctx: DirectDeclaratorContext) => void;
-
-  /**
-   * Enter a parse tree produced by `CParser.vcSpecificModifer`.
-   * @param ctx the parse tree
-   */
-  enterVcSpecificModifer?: (ctx: VcSpecificModiferContext) => void;
-  /**
-   * Exit a parse tree produced by `CParser.vcSpecificModifer`.
-   * @param ctx the parse tree
-   */
-  exitVcSpecificModifer?: (ctx: VcSpecificModiferContext) => void;
-
-  /**
-   * Enter a parse tree produced by `CParser.gccDeclaratorExtension`.
-   * @param ctx the parse tree
-   */
-  enterGccDeclaratorExtension?: (ctx: GccDeclaratorExtensionContext) => void;
-  /**
-   * Exit a parse tree produced by `CParser.gccDeclaratorExtension`.
-   * @param ctx the parse tree
-   */
-  exitGccDeclaratorExtension?: (ctx: GccDeclaratorExtensionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `CParser.gccAttributeSpecifier`.
-   * @param ctx the parse tree
-   */
-  enterGccAttributeSpecifier?: (ctx: GccAttributeSpecifierContext) => void;
-  /**
-   * Exit a parse tree produced by `CParser.gccAttributeSpecifier`.
-   * @param ctx the parse tree
-   */
-  exitGccAttributeSpecifier?: (ctx: GccAttributeSpecifierContext) => void;
-
-  /**
-   * Enter a parse tree produced by `CParser.gccAttributeList`.
-   * @param ctx the parse tree
-   */
-  enterGccAttributeList?: (ctx: GccAttributeListContext) => void;
-  /**
-   * Exit a parse tree produced by `CParser.gccAttributeList`.
-   * @param ctx the parse tree
-   */
-  exitGccAttributeList?: (ctx: GccAttributeListContext) => void;
-
-  /**
-   * Enter a parse tree produced by `CParser.gccAttribute`.
-   * @param ctx the parse tree
-   */
-  enterGccAttribute?: (ctx: GccAttributeContext) => void;
-  /**
-   * Exit a parse tree produced by `CParser.gccAttribute`.
-   * @param ctx the parse tree
-   */
-  exitGccAttribute?: (ctx: GccAttributeContext) => void;
 
   /**
    * Enter a parse tree produced by `CParser.nestedParenthesesBlock`.
