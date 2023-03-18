@@ -170,10 +170,6 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: EmptyStatement,
     state: ExplicitControlEvaluatorState
   ) => {},
-  SequenceExpression: (
-    command: SequenceExpression,
-    state: ExplicitControlEvaluatorState
-  ) => {},
   ExpressionStatement: (
     command: ExpressionStatement,
     state: ExplicitControlEvaluatorState
@@ -321,6 +317,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
     }
     // TODO: Remember to do function call tear down for the memory stack too
   },
+  SequenceExpression: (
+    command: SequenceExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   StringLiteral: (
     command: StringLiteral,
     state: ExplicitControlEvaluatorState
