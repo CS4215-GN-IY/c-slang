@@ -20,7 +20,7 @@ describe('return statement', () => {
               {
                 type: 'ReturnStatement',
                 argument: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -55,7 +55,7 @@ describe('return statement', () => {
               {
                 type: 'ReturnStatement',
                 argument: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -132,7 +132,7 @@ describe('goto statement', () => {
                 body: {
                   type: 'ReturnStatement',
                   argument: {
-                    type: 'ExpressionSequence',
+                    type: 'SequenceExpression',
                     expressions: [
                       {
                         type: 'Constant',

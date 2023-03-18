@@ -40,7 +40,7 @@ export const constructStringLiteral = (
 export const constructMainCallExpression = (): CallExpression => {
   return {
     type: 'CallExpression',
-    id: {
+    callee: {
       type: 'Identifier',
       name: 'main'
     },

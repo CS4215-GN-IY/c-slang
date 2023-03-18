@@ -20,7 +20,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -63,7 +63,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -106,7 +106,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -149,7 +149,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -192,7 +192,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -291,7 +291,7 @@ describe('relational expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',

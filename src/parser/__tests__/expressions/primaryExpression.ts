@@ -20,7 +20,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Identifier',
@@ -55,7 +55,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -90,7 +90,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -125,7 +125,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -160,7 +160,7 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'Constant',
@@ -195,11 +195,135 @@ describe('primary expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'StringLiteral',
                       value: '"Hello world!"'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles expressions in parentheses', () => {
+    const code = 'int main() { (7 - 3) * 2; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'SequenceExpression',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '*',
+                      left: {
+                        type: 'SequenceExpression',
+                        expressions: [
+                          {
+                            type: 'BinaryExpression',
+                            operator: '-',
+                            left: {
+                              type: 'Constant',
+                              value: '7'
+                            },
+                            right: {
+                              type: 'Constant',
+                              value: '3'
+                            }
+                          }
+                        ]
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '2'
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles expression sequences in parentheses', () => {
+    const code = 'int main() { (8 / 4, 7 - 3) * 2; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'main'
+          },
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ExpressionStatement',
+                sequence: {
+                  type: 'SequenceExpression',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '*',
+                      left: {
+                        type: 'SequenceExpression',
+                        expressions: [
+                          {
+                            type: 'BinaryExpression',
+                            operator: '/',
+                            left: {
+                              type: 'Constant',
+                              value: '8'
+                            },
+                            right: {
+                              type: 'Constant',
+                              value: '4'
+                            }
+                          },
+                          {
+                            type: 'BinaryExpression',
+                            operator: '-',
+                            left: {
+                              type: 'Constant',
+                              value: '7'
+                            },
+                            right: {
+                              type: 'Constant',
+                              value: '3'
+                            }
+                          }
+                        ]
+                      },
+                      right: {
+                        type: 'Constant',
+                        value: '2'
+                      }
                     }
                   ]
                 }

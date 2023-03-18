@@ -5,7 +5,7 @@ import {
   type BlockOrEmptyStatement,
   type Expression,
   type ExpressionOrEmptyStatement,
-  type ExpressionSequence,
+  type SequenceExpression,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
@@ -125,14 +125,13 @@ import {
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
-import { isIdentifier, isTypedefNameReturnValue } from './typeGuards';
+import { isTypedefNameReturnValue } from './typeGuards';
 import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
   constructStringLiteral
 } from './constructors';
-import { canBeCallExpression } from './utils';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -512,10 +511,10 @@ export class ASTBuilder implements CVisitor<any> {
     return leftExpression;
   }
 
-  visitExpression(ctx: ExpressionContext): ExpressionSequence {
+  visitExpression(ctx: ExpressionContext): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
-      type: 'ExpressionSequence',
+      type: 'SequenceExpression',
       expressions: assignmentExpressions.map(
         this.visitAssignmentExpression,
         this
@@ -630,10 +629,10 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForExpression(ctx: ForExpressionContext): ExpressionSequence {
+  visitForExpression(ctx: ForExpressionContext): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
-      type: 'ExpressionSequence',
+      type: 'SequenceExpression',
       expressions: assignmentExpressions.map(
         this.visitAssignmentExpression,
         this
@@ -978,33 +977,97 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitPostfixExpression(ctx: PostfixExpressionContext): Expression {
     const primaryExpression = ctx.primaryExpression();
-    const argExpressionList = ctx.argumentExpressionList();
+    if (primaryExpression === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a PostfixExpression without a PrimaryExpression.'
+      );
+    }
 
-    if (canBeCallExpression(ctx) && primaryExpression !== undefined) {
-      const astPrimaryExpression =
-        this.visitPrimaryExpression(primaryExpression);
-      if (!isIdentifier(astPrimaryExpression)) {
-        throw new BrokenInvariantError(
-          'Encountered an ArgumentExpressionList without an Identifier'
-        );
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a PostfixExpression with no child nodes.'
+      );
+    }
+
+    let expression = this.visitPrimaryExpression(primaryExpression);
+    // Skip the first child as it is the primary expression.
+    let currChildIdx = 1;
+    let currArrayAccessIndexExpressionIdx = 0;
+    let currArgumentExpressionListIdx = 0;
+    let currIdentifierIdx = 0;
+    while (currChildIdx < children.length) {
+      const operator = children[currChildIdx].toStringTree();
+      switch (operator) {
+        case '[': {
+          const arrayAccessIndexExpression = ctx.expression(
+            currArrayAccessIndexExpressionIdx++
+          );
+          const indexBeingAccessed = this.visitExpression(
+            arrayAccessIndexExpression
+          );
+          expression = {
+            type: 'ArrayAccessExpression',
+            expression,
+            indexBeingAccessed
+          };
+          // Skip over "'[' expression ']'".
+          currChildIdx += 3;
+          break;
+        }
+        case '(': {
+          // If a function call has no arguments, no ArgumentExpressionList is present.
+          const hasArguments =
+            children[currChildIdx + 1].toStringTree() !== ')';
+          const argumentExpressionList = hasArguments
+            ? ctx.argumentExpressionList(currArgumentExpressionListIdx++)
+            : undefined;
+          const args =
+            argumentExpressionList === undefined
+              ? []
+              : this.visitArgumentExpressionList(argumentExpressionList);
+          expression = {
+            type: 'CallExpression',
+            callee: expression,
+            arguments: args
+          };
+          // Skip over "'(' argumentExpressionList? ')'".
+          currChildIdx += 2 + args.length;
+          break;
+        }
+        case '.':
+        case '->': {
+          const member = ctx.Identifier(currIdentifierIdx++);
+          expression = {
+            type: 'MemberExpression',
+            expression,
+            member: constructIdentifier(member),
+            isPointerAccess: operator === '->'
+          };
+          // Skip over "('.' | '->') Identifier".
+          currChildIdx += 2;
+          break;
+        }
+        case '++':
+        case '--': {
+          expression = {
+            type: 'UpdateExpression',
+            operator,
+            operand: expression,
+            isPrefix: false
+          };
+          // Skip over "('++' | '--')".
+          currChildIdx++;
+          break;
+        }
+        default:
+          throw new BrokenInvariantError(
+            `Encountered an unexpected operator in PostfixExpression: '${operator}'`
+          );
       }
-      return {
-        type: 'CallExpression',
-        id: astPrimaryExpression,
-        arguments:
-          argExpressionList.length > 0
-            ? this.visitArgumentExpressionList(argExpressionList[0])
-            : []
-      };
     }
 
-    if (primaryExpression !== undefined) {
-      return this.visitPrimaryExpression(primaryExpression);
-    }
-
-    // TODO: Deal with everything else.
-
-    throw new UnreachableCaseError();
+    return expression;
   }
 
   visitPrimaryExpression(ctx: PrimaryExpressionContext): Expression {
@@ -1028,7 +1091,10 @@ export class ASTBuilder implements CVisitor<any> {
       return constructStringLiteral(stringLiterals[0]);
     }
 
-    // TODO: Deal with expressions in brackets.
+    const parenthesisedExpression = ctx.expression();
+    if (parenthesisedExpression !== undefined) {
+      return this.visitExpression(parenthesisedExpression);
+    }
 
     const genericSelection = ctx.genericSelection();
     if (genericSelection !== undefined) {

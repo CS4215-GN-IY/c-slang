@@ -62,21 +62,21 @@ export interface EmptyStatement extends BaseStatement {
 
 export interface ExpressionStatement extends BaseStatement {
   type: 'ExpressionStatement';
-  sequence: ExpressionSequence;
+  sequence: SequenceExpression;
 }
 
 export type SelectionStatement = IfStatement | SwitchStatement;
 
 export interface IfStatement extends BaseStatement {
   type: 'IfStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   consequent: Statement;
   alternate?: Statement;
 }
 
 export interface SwitchStatement extends BaseStatement {
   type: 'SwitchStatement';
-  discriminant: ExpressionSequence;
+  discriminant: SequenceExpression;
   body: Statement;
 }
 
@@ -87,21 +87,21 @@ export type IterationStatement =
 
 export interface DoWhileStatement extends BaseStatement {
   type: 'DoWhileStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   body: Statement;
 }
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
-  init?: VariableDeclaration | ExpressionSequence;
-  test?: ExpressionSequence;
-  update?: ExpressionSequence;
+  init?: VariableDeclaration | SequenceExpression;
+  test?: SequenceExpression;
+  update?: SequenceExpression;
   body: Statement;
 }
 
 export interface WhileStatement extends BaseStatement {
   type: 'WhileStatement';
-  test: ExpressionSequence;
+  test: SequenceExpression;
   body: Statement;
 }
 
@@ -126,22 +126,26 @@ export interface GotoStatement extends BaseStatement {
 
 export interface ReturnStatement extends BaseStatement {
   type: 'ReturnStatement';
-  argument?: ExpressionSequence;
+  argument?: SequenceExpression;
 }
 
-export interface ExpressionSequence extends BaseNode {
-  type: 'ExpressionSequence';
+export interface SequenceExpression extends BaseNode {
+  type: 'SequenceExpression';
   expressions: Expression[];
 }
 
 export type Expression =
+  | ArrayAccessExpression
   | AssignmentExpression
   | BinaryExpression
   | CallExpression
   | Constant
   | Identifier
   | LogicalExpression
-  | StringLiteral;
+  | MemberExpression
+  | SequenceExpression
+  | StringLiteral
+  | UpdateExpression;
 
 export interface BaseExpression extends BaseNode {}
 
@@ -159,6 +163,36 @@ export interface StringLiteral extends BaseExpression {
   type: 'StringLiteral';
   value: string;
 }
+
+export interface ArrayAccessExpression extends BaseExpression {
+  type: 'ArrayAccessExpression';
+  expression: Expression;
+  indexBeingAccessed: Expression;
+}
+
+export interface CallExpression extends BaseExpression {
+  type: 'CallExpression';
+  callee: Expression;
+  arguments: Expression[];
+}
+
+export interface MemberExpression extends BaseExpression {
+  type: 'MemberExpression';
+  expression: Expression;
+  member: Identifier;
+  // True if '->', false if '.'
+  isPointerAccess: boolean;
+}
+
+export interface UpdateExpression extends BaseExpression {
+  type: 'UpdateExpression';
+  operator: UpdateOperator;
+  operand: Expression;
+  // True if prefix, false if postfix.
+  isPrefix: boolean;
+}
+
+export type UpdateOperator = '++' | '--';
 
 export interface BinaryExpression extends BaseExpression {
   type: 'BinaryExpression';
@@ -214,12 +248,6 @@ export type AssignmentOperator =
   | '&='
   | '^='
   | '|=';
-
-export interface CallExpression extends BaseExpression {
-  type: 'CallExpression';
-  id: Identifier;
-  arguments: Expression[];
-}
 
 export interface BaseDeclaration extends BaseStatement {}
 

@@ -13,7 +13,7 @@ import {
 } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
-import { InvalidFunctionApplication } from './errors';
+import { InvalidFunctionApplicationError } from './errors';
 import { type Memory } from '../memory/memory';
 
 const allocateUninitializedVariable = (memory: Memory): number => {
@@ -102,7 +102,7 @@ export const setParamArgs = (
   args: Value[]
 ): NameValueMapping[] => {
   if (params.length !== args.length) {
-    throw new InvalidFunctionApplication(
+    throw new InvalidFunctionApplicationError(
       `Function takes in ${params.length} arguments but ${args.length} arguments were passed in`
     );
   }
@@ -118,7 +118,9 @@ export const setParamArgs = (
       continue;
     }
     // TODO: Add support for character and address later
-    throw new InvalidFunctionApplication(`Encountered an unhandled argument.`);
+    throw new InvalidFunctionApplicationError(
+      `Encountered an unhandled argument.`
+    );
   }
   return nameValueMappings;
 };

@@ -20,7 +20,7 @@ describe('inclusive or expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -63,7 +63,7 @@ describe('inclusive or expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',
@@ -114,7 +114,7 @@ describe('inclusive or expression', () => {
               {
                 type: 'ExpressionStatement',
                 sequence: {
-                  type: 'ExpressionSequence',
+                  type: 'SequenceExpression',
                   expressions: [
                     {
                       type: 'BinaryExpression',

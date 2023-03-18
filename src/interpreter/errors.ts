@@ -4,4 +4,4 @@ export class RedeclaredNameError extends InterpreterError {}
 
 export class UndeclaredNameError extends InterpreterError {}
 
-export class InvalidFunctionApplication extends InterpreterError {}
+export class InvalidFunctionApplicationError extends InterpreterError {}
