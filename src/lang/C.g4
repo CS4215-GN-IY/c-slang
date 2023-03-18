@@ -36,7 +36,6 @@ primaryExpression
     |   StringLiteral+
     |   '(' expression ')'
     |   genericSelection
-    |   '__extension__'? '(' compoundStatement ')' // Blocks (GCC extension)
     |   '__builtin_va_arg' '(' unaryExpression ',' typeName ')'
     |   '__builtin_offsetof' '(' typeName ',' unaryExpression ')'
     ;
@@ -54,14 +53,11 @@ genericAssociation
     ;
 
 postfixExpression
-    :
-    (   primaryExpression
-    |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
-    )
+    :   primaryExpression
     ('[' expression ']'
-    | '(' argumentExpressionList? ')'
-    | ('.' | '->') Identifier
-    | ('++' | '--')
+    |   '(' argumentExpressionList? ')'
+    |   ('.' | '->') Identifier
+    |   ('++' | '--')
     )*
     ;
 
@@ -75,7 +71,6 @@ unaryExpression
     (postfixExpression
     |   unaryOperator castExpression
     |   ('sizeof' | '_Alignof') '(' typeName ')'
-    |   '&&' Identifier // GCC extension address of label
     )
     ;
 
@@ -84,7 +79,7 @@ unaryOperator
     ;
 
 castExpression
-    :   '__extension__'? '(' typeName ')' castExpression
+    :   '(' typeName ')' castExpression
     |   unaryExpression
     |   DigitSequence // for
     ;
@@ -204,12 +199,10 @@ typeSpecifier
     |   '__m128'
     |   '__m128d'
     |   '__m128i')
-    |   '__extension__' '(' ('__m128' | '__m128d' | '__m128i') ')'
     |   atomicTypeSpecifier
     |   structOrUnionSpecifier
     |   enumSpecifier
     |   typedefName
-    |   '__typeof__' '(' constantExpression ')' // GCC extension
     ;
 
 structOrUnionSpecifier
@@ -275,11 +268,7 @@ typeQualifier
 
 functionSpecifier
     :   ('inline'
-    |   '_Noreturn'
-    |   '__inline__' // GCC extension
-    |   '__stdcall')
-    |   gccAttributeSpecifier
-    |   '__declspec' '(' Identifier ')'
+    |   '_Noreturn')
     ;
 
 alignmentSpecifier
@@ -287,7 +276,7 @@ alignmentSpecifier
     ;
 
 declarator
-    :   pointer? directDeclarator gccDeclaratorExtension*
+    :   pointer? directDeclarator
     ;
 
 directDeclarator
@@ -300,36 +289,6 @@ directDeclarator
     |   directDeclarator '(' parameterTypeList ')'
     |   directDeclarator '(' identifierList? ')'
     |   Identifier ':' DigitSequence  // bit field
-    |   vcSpecificModifer Identifier // Visual C Extension
-    |   '(' vcSpecificModifer declarator ')' // Visual C Extension
-    ;
-
-vcSpecificModifer
-    :   ('__cdecl'
-    |   '__clrcall'
-    |   '__stdcall'
-    |   '__fastcall'
-    |   '__thiscall'
-    |   '__vectorcall')
-    ;
-
-
-gccDeclaratorExtension
-    :   '__asm' '(' StringLiteral+ ')'
-    |   gccAttributeSpecifier
-    ;
-
-gccAttributeSpecifier
-    :   '__attribute__' '(' '(' gccAttributeList ')' ')'
-    ;
-
-gccAttributeList
-    :   gccAttribute? (',' gccAttribute?)*
-    ;
-
-gccAttribute
-    :   ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
-        ('(' argumentExpressionList? ')')?
     ;
 
 nestedParenthesesBlock
@@ -369,21 +328,21 @@ typeName
 
 abstractDeclarator
     :   pointer
-    |   pointer? directAbstractDeclarator gccDeclaratorExtension*
+    |   pointer? directAbstractDeclarator
     ;
 
 directAbstractDeclarator
-    :   '(' abstractDeclarator ')' gccDeclaratorExtension*
+    :   '(' abstractDeclarator ')'
     |   '[' typeQualifierList? assignmentExpression? ']'
     |   '[' 'static' typeQualifierList? assignmentExpression ']'
     |   '[' typeQualifierList 'static' assignmentExpression ']'
     |   '[' '*' ']'
-    |   '(' parameterTypeList? ')' gccDeclaratorExtension*
+    |   '(' parameterTypeList? ')'
     |   directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
     |   directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
     |   directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
     |   directAbstractDeclarator '[' '*' ']'
-    |   directAbstractDeclarator '(' parameterTypeList? ')' gccDeclaratorExtension*
+    |   directAbstractDeclarator '(' parameterTypeList? ')'
     ;
 
 typedefName
@@ -479,7 +438,6 @@ jumpStatement
     :   ('goto' Identifier
     |   ('continue'| 'break')
     |   'return' expression?
-    |   'goto' unaryExpression // GCC extension
     )
     ';'
     ;
