@@ -81,7 +81,6 @@ unaryOperator
 castExpression
     :   '(' typeName ')' castExpression
     |   unaryExpression
-    |   DigitSequence // for
     ;
 
 multiplicativeExpression
@@ -131,7 +130,6 @@ conditionalExpression
 assignmentExpression
     :   conditionalExpression
     |   unaryExpression assignmentOperator assignmentExpression
-    |   DigitSequence // for
     ;
 
 assignmentOperator
