@@ -38,7 +38,7 @@ import {
 import {
   allocateStackAddresses,
   typeCheckBinaryOperation,
-  checkNumber,
+  typeCheckNumber,
   constructClosure,
   evaluateBinaryExpression,
   getBlockNames,
@@ -166,9 +166,9 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state.stash.push(evaluateBinaryExpression(command.operator, left, right));
   },
   Branch: (command: BranchInstr, state: ExplicitControlEvaluatorState) => {
-    const test = state.stash.pop();
-    checkNumber(test);
-    if (isTrue(test)) {
+    const predicate = state.stash.pop();
+    typeCheckNumber(predicate);
+    if (isTrue(predicate)) {
       state.agenda.push(command.consequent);
     } else {
       state.agenda.push(command.alternate);

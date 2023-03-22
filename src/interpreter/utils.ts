@@ -23,6 +23,7 @@ import {
   UnsupportedBinaryOperatorError
 } from './errors';
 import { type Memory } from '../memory/memory';
+import { FALSE_VALUE } from '../utils/constants';
 
 const allocateUninitializedVariable = (memory: Memory): number => {
   const valueWhenUninitialized = 0;
@@ -233,12 +234,12 @@ export function evaluateBinaryExpression(
   }
 }
 
-export const checkNumber = (val: Value): void => {
+export const typeCheckNumber = (val: Value): void => {
   if (!isNumber(val)) {
     throw new TypeError('number', typeOf(val), TypeErrorSide.NA);
   }
 };
 
 export const isTrue = (num: number): boolean => {
-  return num !== 0;
+  return num !== FALSE_VALUE;
 };

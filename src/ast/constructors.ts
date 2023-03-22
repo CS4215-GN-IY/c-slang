@@ -6,6 +6,7 @@ import {
   type Identifier,
   type StringLiteral
 } from './types';
+import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
 export const constructConstant = (constant: TerminalNode): Constant => {
   const constantLiteral = constant.toString().trim();
@@ -25,14 +26,14 @@ export const constructConstant = (constant: TerminalNode): Constant => {
 export const constructFalseConstant = (): Constant => {
   return {
     type: 'Constant',
-    value: 0
+    value: FALSE_VALUE
   };
 };
 
 export const constructTrueConstant = (): Constant => {
   return {
     type: 'Constant',
-    value: 1
+    value: ARBITRARY_TRUE_VALUE
   };
 };
 

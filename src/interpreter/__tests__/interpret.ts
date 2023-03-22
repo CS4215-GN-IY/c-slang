@@ -1,5 +1,6 @@
 import { parse } from '../../parser/parser';
 import { interpret } from '../explicitControlEvaluator';
+import { FALSE_VALUE } from '../../utils/constants';
 
 describe('program', () => {
   test('main function returning a constant', () => {
@@ -46,7 +47,7 @@ describe('program', () => {
     const code = 'int main() { return 1 && 2; }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).not.toEqual(falseVal);
   });
 
@@ -54,7 +55,7 @@ describe('program', () => {
     const code = 'int main() { return 0 && 2; }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).toEqual(falseVal);
   });
 
@@ -62,7 +63,7 @@ describe('program', () => {
     const code = 'int main() { return 2 && (3 - 3); }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).toEqual(falseVal);
   });
 
@@ -70,7 +71,7 @@ describe('program', () => {
     const code = 'int main() { return 1 || 0; }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).not.toEqual(falseVal);
   });
 
@@ -78,7 +79,7 @@ describe('program', () => {
     const code = 'int main() { return 0 || (4 - 1); }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).not.toEqual(falseVal);
   });
 
@@ -86,7 +87,7 @@ describe('program', () => {
     const code = 'int main() { return 0 || (3 - 3); }';
     const ast = parse(code);
     const result = interpret(ast);
-    const falseVal = 0;
+    const falseVal = FALSE_VALUE;
     expect(result).toEqual(falseVal);
   });
 
