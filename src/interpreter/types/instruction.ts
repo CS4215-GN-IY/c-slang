@@ -16,7 +16,7 @@ export type Instr =
   | FunctionApplicationInstr
   | FunctionAssigmentInstr
   | FunctionMarkInstr
-  | ResetEnvironmentInstr
+  | ResetSymbolTableInstr
   | ResetInstr
   | VariableAssignmentInstr;
 
@@ -47,9 +47,9 @@ export interface FunctionMarkInstr extends BaseInstr {
   type: 'FunctionMark';
 }
 
-export interface ResetEnvironmentInstr extends BaseInstr {
-  type: 'ResetEnvironment';
-  environment: SymbolTable;
+export interface ResetSymbolTableInstr extends BaseInstr {
+  type: 'ResetSymbolTable';
+  symbolTable: SymbolTable;
 }
 
 export interface ResetInstr extends BaseInstr {

@@ -1,5 +1,5 @@
 import {
-  type ResetEnvironmentInstr,
+  type ResetSymbolTableInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
@@ -34,11 +34,11 @@ export const constructBranchInstr = (
   alternate
 });
 
-export const constructResetEnvironmentInstr = (
+export const constructResetSymbolTableInstr = (
   environment: SymbolTable
-): ResetEnvironmentInstr => ({
-  type: 'ResetEnvironment',
-  environment
+): ResetSymbolTableInstr => ({
+  type: 'ResetSymbolTable',
+  symbolTable: environment
 });
 
 export const constructFunctionAssignmentInstr = (

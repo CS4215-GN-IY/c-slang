@@ -48,7 +48,7 @@ import {
   setParamArgs
 } from './utils';
 import {
-  type ResetEnvironmentInstr,
+  type ResetSymbolTableInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
@@ -60,7 +60,7 @@ import {
 import {
   constructBinaryOperationInstr,
   constructBranchInstr,
-  constructResetEnvironmentInstr,
+  constructResetSymbolTableInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
   constructFunctionMarkInstr,
@@ -179,7 +179,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: BlockStatement,
     state: ExplicitControlEvaluatorState
   ) => {
-    state.agenda.push(constructResetEnvironmentInstr(state.symbolTable));
+    state.agenda.push(constructResetSymbolTableInstr(state.symbolTable));
     state.symbolTable = extendSymbolTable(state.symbolTable);
     const declarationNames = getBlockNames(command.items);
     const declarationsWithAddresses = allocateStackAddresses(
@@ -259,12 +259,12 @@ const evaluators: AgendaItemEvaluatorMapping = {
     // TODO: Handle Tail Call in future.
     if (
       state.agenda.size() === 0 ||
-      state.agenda.peek().type === 'ResetEnvironment'
+      state.agenda.peek().type === 'ResetSymbolTable'
     ) {
       // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
       state.agenda.push(constructFunctionMarkInstr());
     } else {
-      state.agenda.push(constructResetEnvironmentInstr(state.symbolTable));
+      state.agenda.push(constructResetSymbolTableInstr(state.symbolTable));
       state.agenda.push(constructFunctionMarkInstr());
     }
 
@@ -375,8 +375,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
       }
     }
   },
-  ResetEnvironment: (
-    command: ResetEnvironmentInstr,
+  ResetSymbolTable: (
+    command: ResetSymbolTableInstr,
     state: ExplicitControlEvaluatorState
   ) => {},
   ReturnStatement: (
