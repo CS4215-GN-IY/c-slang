@@ -41,9 +41,9 @@ import {
   checkNumber,
   constructClosure,
   evaluateBinaryExpression,
+  getBlockNames,
   getBlockVariableDeclarationNames,
   getExternalDeclarationNames,
-  getVariableDeclarationNames,
   isTrue,
   setParamArgs
 } from './utils';
@@ -60,7 +60,7 @@ import {
 import {
   constructBinaryOpInstr,
   constructBranchInstr,
-  constructEnvironmentInstr,
+  constructResetEnvironmentInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
   constructFunctionMarkInstr,
@@ -77,8 +77,10 @@ import {
   InvalidFunctionIdentifierError
 } from './errors';
 import {
+  addEntriesToSymbolTable,
   constructInitialSymbolTable,
   extendSymbolTable,
+  extendSymbolTableWithEntries,
   getAddressFromSymbolTable,
   getEntryFromSymbolTable
 } from './symbolTable';
@@ -174,7 +176,20 @@ const evaluators: AgendaItemEvaluatorMapping = {
   BlockStatement: (
     command: BlockStatement,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    state.agenda.push(constructResetEnvironmentInstr(state.symbolTable));
+    state.symbolTable = extendSymbolTable(state.symbolTable);
+    const declarationNames = getBlockNames(command.items);
+    const declarationsWithAddresses = allocateStackAddresses(
+      declarationNames,
+      state.memory
+    );
+    addEntriesToSymbolTable(declarationsWithAddresses, state.symbolTable);
+
+    for (let i = command.items.length - 1; i >= 0; i--) {
+      state.agenda.push(command.items[i]);
+    }
+  },
   BreakStatement: (
     command: BreakStatement,
     state: ExplicitControlEvaluatorState
@@ -247,7 +262,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
       state.agenda.push(constructFunctionMarkInstr());
     } else {
-      state.agenda.push(constructEnvironmentInstr(state.symbolTable));
+      state.agenda.push(constructResetEnvironmentInstr(state.symbolTable));
       state.agenda.push(constructFunctionMarkInstr());
     }
 
@@ -261,7 +276,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       blockVariableDeclarations,
       state.memory
     );
-    state.symbolTable = extendSymbolTable(
+    state.symbolTable = extendSymbolTableWithEntries(
       [...paramsWithAddresses, ...blockVariableDeclarationsWithAddresses],
       closure.environment
     );
@@ -280,6 +295,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
+    // Declarations names should have been added to the symbol table by the parent scope
+    // Only need to handle assignment.
     const closure = constructClosure(command, state.symbolTable);
     const closureIdx = state.memory.textAllocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
@@ -337,17 +354,13 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state: ExplicitControlEvaluatorState
   ) => {},
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
+    state.symbolTable = extendSymbolTable(state.symbolTable);
     const declarationNames = getExternalDeclarationNames(command.body);
     const declarationsWithAddresses = allocateStackAddresses(
       declarationNames,
       state.memory
     );
-    if (declarationNames.length > 0) {
-      state.symbolTable = extendSymbolTable(
-        declarationsWithAddresses,
-        state.symbolTable
-      );
-    }
+    addEntriesToSymbolTable(declarationsWithAddresses, state.symbolTable);
 
     for (let i = command.body.length - 1; i >= 0; i--) {
       state.agenda.push(command.body[i]);
@@ -411,17 +424,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: VariableDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
-    const declarationNames = getVariableDeclarationNames(command);
-    const declarationsWithAddresses = allocateStackAddresses(
-      declarationNames,
-      state.memory
-    );
-    if (declarationNames.length > 0) {
-      state.symbolTable = extendSymbolTable(
-        declarationsWithAddresses,
-        state.symbolTable
-      );
-    }
+    // Declarations names should have been added to the symbol table by the parent scope
+    // Only need to handle assignment.
     for (let i = command.declarations.length - 1; i >= 0; i--) {
       const initialValue = command.declarations[i].initialValue;
       if (isNotUndefined(initialValue)) {

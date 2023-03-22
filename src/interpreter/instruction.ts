@@ -34,7 +34,7 @@ export const constructBranchInstr = (
   alternate
 });
 
-export const constructEnvironmentInstr = (
+export const constructResetEnvironmentInstr = (
   environment: SymbolTable
 ): ResetEnvironmentInstr => ({
   type: 'ResetEnvironment',

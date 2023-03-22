@@ -1,5 +1,6 @@
 import {
   type BinaryOperator,
+  type BlockItem,
   type BlockStatement,
   type ExternalDeclaration,
   type FunctionDeclaration,
@@ -25,6 +26,20 @@ import { type Memory } from '../memory/memory';
 const allocateUninitializedVariable = (memory: Memory): number => {
   const valueWhenUninitialized = 0;
   return memory.stackAllocate(valueWhenUninitialized);
+};
+
+export const getBlockNames = (items: BlockItem[]): DeclarationName[] => {
+  const allNames: DeclarationName[] = [];
+  items.forEach((item) => {
+    switch (item.type) {
+      case 'VariableDeclaration': {
+        const names = getVariableDeclarationNames(item);
+        allNames.push(...names);
+        break;
+      }
+    }
+  });
+  return allNames;
 };
 
 export const getExternalDeclarationNames = (
