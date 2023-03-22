@@ -24,6 +24,7 @@ import {
 } from './errors';
 import { type Memory } from '../memory/memory';
 import { FALSE_VALUE } from '../utils/constants';
+import { type TypeofResult } from './types/utils';
 
 const allocateUninitializedVariable = (memory: Memory): number => {
   const valueWhenUninitialized = 0;
@@ -155,7 +156,7 @@ export const setParamArgs = (
   return nameValueMappings;
 };
 
-const typeOf = (v: Value): string => typeof v;
+const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 
