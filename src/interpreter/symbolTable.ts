@@ -58,26 +58,6 @@ export const extendSymbolTableWithEntries = (
 };
 
 /**
- * Gets the address of a name.
- */
-export const getAddressFromSymbolTable = (
-  name: string,
-  symbolTable: SymbolTable
-): number => {
-  let currentEnvironment: SymbolTable | null = symbolTable;
-
-  while (currentEnvironment !== null) {
-    const frame = symbolTable.head;
-    if (name in frame) {
-      return frame[name].address;
-    }
-    currentEnvironment = currentEnvironment.tail;
-  }
-
-  throw new UndeclaredNameError(`Encountered an undeclared name: ${name}`);
-};
-
-/**
  * Gets the entry of a name.
  */
 export const getEntryFromSymbolTable = (

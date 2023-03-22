@@ -22,7 +22,7 @@ export const constructBinaryOperationInstr = (
   symbol: BinaryOperator
 ): BinaryOperationInstr => ({
   type: 'BinaryOperation',
-  symbol
+  operator: symbol
 });
 
 export const constructBranchInstr = (

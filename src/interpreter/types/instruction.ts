@@ -22,7 +22,7 @@ export type Instr =
 
 export interface BinaryOperationInstr extends BaseInstr {
   type: 'BinaryOperation';
-  symbol: BinaryOperator;
+  operator: BinaryOperator;
 }
 
 export interface BranchInstr extends BaseInstr {

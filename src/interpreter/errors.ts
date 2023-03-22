@@ -1,5 +1,19 @@
 export class InterpreterError extends Error {}
 
+export class UnsupportedBinaryOperatorError extends InterpreterError {
+  constructor(operator: string) {
+    super(`Encountered unsupported binary operator: ${operator}`);
+  }
+}
+
+export class InvalidFunctionApplicationError extends InterpreterError {}
+
+export class InvalidFunctionIdentifierError extends InterpreterError {
+  constructor() {
+    super('Illegal interpretation of function identifier');
+  }
+}
+
 export class RedeclaredNameError extends InterpreterError {}
 
 export enum TypeErrorSide {
@@ -15,11 +29,3 @@ export class TypeError extends InterpreterError {
 }
 
 export class UndeclaredNameError extends InterpreterError {}
-
-export class InvalidFunctionApplicationError extends InterpreterError {}
-
-export class InvalidFunctionIdentifierError extends InterpreterError {
-  constructor() {
-    super('Illegal interpretation of function identifier');
-  }
-}

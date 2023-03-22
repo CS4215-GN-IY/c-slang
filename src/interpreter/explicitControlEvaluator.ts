@@ -37,7 +37,7 @@ import {
 } from '../ast/types';
 import {
   allocateStackAddresses,
-  checkBinaryOperation,
+  typeCheckBinaryOperation,
   checkNumber,
   constructClosure,
   evaluateBinaryExpression,
@@ -81,7 +81,6 @@ import {
   constructInitialSymbolTable,
   extendSymbolTable,
   extendSymbolTableWithEntries,
-  getAddressFromSymbolTable,
   getEntryFromSymbolTable
 } from './symbolTable';
 import { isEmptyStatement } from '../ast/typeGuards';
@@ -163,8 +162,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
   ) => {
     const right = state.stash.pop();
     const left = state.stash.pop();
-    checkBinaryOperation(command.symbol, left, right);
-    state.stash.push(evaluateBinaryExpression(command.symbol, left, right));
+    typeCheckBinaryOperation(command.operator, left, right);
+    state.stash.push(evaluateBinaryExpression(command.operator, left, right));
   },
   Branch: (command: BranchInstr, state: ExplicitControlEvaluatorState) => {
     const test = state.stash.pop();
@@ -244,10 +243,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
       args.push(state.stash.pop());
     }
 
-    const functionAddress = getAddressFromSymbolTable(
+    const functionAddress = getEntryFromSymbolTable(
       command.functionId.name,
       state.symbolTable
-    );
+    ).address;
     const closureIdx = state.memory.get(functionAddress);
     const closure = state.memory.textGet(closureIdx);
     const paramsWithValues = setParamArgs(closure.params, args);
@@ -302,7 +301,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     const closure = constructClosure(command, state.symbolTable);
     const closureIdx = state.memory.textAllocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
-      getAddressFromSymbolTable(command.id.name, state.symbolTable),
+      getEntryFromSymbolTable(command.id.name, state.symbolTable).address,
       closureIdx
     );
     state.agenda.push(functionAssignmentInstr);
@@ -418,7 +417,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: VariableAssignmentInstr,
     state: ExplicitControlEvaluatorState
   ) => {
-    const address = getAddressFromSymbolTable(command.name, state.symbolTable);
+    const address = getEntryFromSymbolTable(
+      command.name,
+      state.symbolTable
+    ).address;
     const value = state.stash.pop();
     state.memory.set(address, value);
   },

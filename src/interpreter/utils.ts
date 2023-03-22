@@ -19,7 +19,8 @@ import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import {
   InvalidFunctionApplicationError,
   TypeError,
-  TypeErrorSide
+  TypeErrorSide,
+  UnsupportedBinaryOperatorError
 } from './errors';
 import { type Memory } from '../memory/memory';
 
@@ -153,20 +154,11 @@ export const setParamArgs = (
   return nameValueMappings;
 };
 
-const typeOf = (v: Value): string => {
-  if (v === null) {
-    return 'null';
-  } else if (Array.isArray(v)) {
-    return 'array';
-  } else {
-    return typeof v;
-  }
-};
-
+const typeOf = (v: Value): string => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 
-export const checkBinaryOperation = (
+export const typeCheckBinaryOperation = (
   operator: BinaryOperator,
   left: Value,
   right: Value
@@ -203,13 +195,14 @@ export const checkBinaryOperation = (
       }
       break;
     default:
+      throw new UnsupportedBinaryOperatorError(operator);
   }
 };
 
 export function evaluateBinaryExpression(
   operator: BinaryOperator,
-  left: any,
-  right: any
+  left: Value,
+  right: Value
 ): Value {
   switch (operator) {
     case '+':
@@ -236,7 +229,7 @@ export function evaluateBinaryExpression(
     case '>=':
       return left >= right;
     default:
-      return undefined;
+      throw new UnsupportedBinaryOperatorError(operator);
   }
 }
 
