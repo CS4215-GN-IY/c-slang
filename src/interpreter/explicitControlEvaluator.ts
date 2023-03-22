@@ -37,34 +37,55 @@ import {
 } from '../ast/types';
 import {
   allocateStackAddresses,
+  typeCheckBinaryOperation,
+  typeCheckNumber,
   constructClosure,
+  evaluateBinaryExpression,
+  getBlockNames,
   getBlockVariableDeclarationNames,
   getExternalDeclarationNames,
+  isTrue,
   setParamArgs
 } from './utils';
 import {
-  type ResetEnvironmentInstr,
+  type ResetSymbolTableInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
-  type ResetInstr
+  type ResetInstr,
+  type BinaryOperationInstr,
+  type BranchInstr,
+  type VariableAssignmentInstr
 } from './types/instruction';
 import {
-  constructEnvironmentInstr,
+  constructBinaryOperationInstr,
+  constructBranchInstr,
+  constructResetSymbolTableInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
   constructFunctionMarkInstr,
-  constructResetInstr
+  constructResetInstr,
+  constructVariableAssignmentInstr
 } from './instruction';
-import { constructMainCallExpression } from '../ast/constructors';
-import { InvalidFunctionApplicationError } from './errors';
 import {
+  constructFalseConstant,
+  constructMainCallExpression,
+  constructTrueConstant
+} from '../ast/constructors';
+import {
+  InvalidFunctionApplicationError,
+  InvalidFunctionIdentifierError
+} from './errors';
+import {
+  addEntriesToSymbolTable,
   constructInitialSymbolTable,
   extendSymbolTable,
-  getAddressFromSymbolTable
+  extendSymbolTableWithEntries,
+  getEntryFromSymbolTable
 } from './symbolTable';
 import { isEmptyStatement } from '../ast/typeGuards';
 import { Memory } from '../memory/memory';
+import { isNotUndefined } from '../utils/typeGuards';
 
 /**
  * Evaluates the abstract syntax tree using an explicit-control evaluator &
@@ -130,11 +151,46 @@ const evaluators: AgendaItemEvaluatorMapping = {
   BinaryExpression: (
     command: BinaryExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    state.agenda.push(constructBinaryOperationInstr(command.operator));
+    state.agenda.push(command.right);
+    state.agenda.push(command.left);
+  },
+  BinaryOperation: (
+    command: BinaryOperationInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    const right = state.stash.pop();
+    const left = state.stash.pop();
+    typeCheckBinaryOperation(command.operator, left, right);
+    state.stash.push(evaluateBinaryExpression(command.operator, left, right));
+  },
+  Branch: (command: BranchInstr, state: ExplicitControlEvaluatorState) => {
+    const predicate = state.stash.pop();
+    typeCheckNumber(predicate);
+    if (isTrue(predicate)) {
+      state.agenda.push(command.consequent);
+    } else {
+      state.agenda.push(command.alternate);
+    }
+  },
   BlockStatement: (
     command: BlockStatement,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    state.agenda.push(constructResetSymbolTableInstr(state.symbolTable));
+    state.symbolTable = extendSymbolTable(state.symbolTable);
+    const declarationNames = getBlockNames(command.items);
+    const declarationsWithAddresses = allocateStackAddresses(
+      declarationNames,
+      state.memory
+    );
+    addEntriesToSymbolTable(declarationsWithAddresses, state.symbolTable);
+
+    for (let i = command.items.length - 1; i >= 0; i--) {
+      state.agenda.push(command.items[i]);
+    }
+  },
   BreakStatement: (
     command: BreakStatement,
     state: ExplicitControlEvaluatorState
@@ -149,10 +205,9 @@ const evaluators: AgendaItemEvaluatorMapping = {
     for (let i = 0; i < command.arguments.length; i++) {
       state.agenda.push(command.arguments[i]);
     }
-    state.agenda.push(command.callee);
   },
   Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
-    state.stash.push(command);
+    state.stash.push(command.value);
   },
   ContinueStatement: (
     command: ContinueStatement,
@@ -188,10 +243,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
       args.push(state.stash.pop());
     }
 
-    const functionAddress = getAddressFromSymbolTable(
+    const functionAddress = getEntryFromSymbolTable(
       command.functionId.name,
       state.symbolTable
-    );
+    ).address;
     const closureIdx = state.memory.get(functionAddress);
     const closure = state.memory.textGet(closureIdx);
     const paramsWithValues = setParamArgs(closure.params, args);
@@ -203,12 +258,12 @@ const evaluators: AgendaItemEvaluatorMapping = {
     // TODO: Handle Tail Call in future.
     if (
       state.agenda.size() === 0 ||
-      state.agenda.peek().type === 'ResetEnvironment'
+      state.agenda.peek().type === 'ResetSymbolTable'
     ) {
       // Don't need current environment, push FunctionMarkInstr only and not EnvironmentInstr
       state.agenda.push(constructFunctionMarkInstr());
     } else {
-      state.agenda.push(constructEnvironmentInstr(state.symbolTable));
+      state.agenda.push(constructResetSymbolTableInstr(state.symbolTable));
       state.agenda.push(constructFunctionMarkInstr());
     }
 
@@ -222,7 +277,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
       blockVariableDeclarations,
       state.memory
     );
-    state.symbolTable = extendSymbolTable(
+    state.symbolTable = extendSymbolTableWithEntries(
       [...paramsWithAddresses, ...blockVariableDeclarationsWithAddresses],
       closure.environment
     );
@@ -241,10 +296,12 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
+    // Declaration names should have been added to the symbol table by the parent scope.
+    // Only need to handle assignment.
     const closure = constructClosure(command, state.symbolTable);
     const closureIdx = state.memory.textAllocate(closure);
     const functionAssignmentInstr = constructFunctionAssignmentInstr(
-      getAddressFromSymbolTable(command.id.name, state.symbolTable),
+      getEntryFromSymbolTable(command.id.name, state.symbolTable).address,
       closureIdx
     );
     state.agenda.push(functionAssignmentInstr);
@@ -257,7 +314,18 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: GotoStatement,
     state: ExplicitControlEvaluatorState
   ) => {},
-  Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {},
+  Identifier: (command: Identifier, state: ExplicitControlEvaluatorState) => {
+    const symbolTableEntry = getEntryFromSymbolTable(
+      command.name,
+      state.symbolTable
+    );
+    if (symbolTableEntry.nameType === 'Variable') {
+      state.stash.push(state.memory.get(symbolTableEntry.address));
+    }
+    if (symbolTableEntry.nameType === 'Function') {
+      throw new InvalidFunctionIdentifierError();
+    }
+  },
   IdentifierStatement: (
     command: IdentifierStatement,
     state: ExplicitControlEvaluatorState
@@ -269,23 +337,31 @@ const evaluators: AgendaItemEvaluatorMapping = {
   LogicalExpression: (
     command: LogicalExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    if (command.operator === '&&') {
+      state.agenda.push(
+        constructBranchInstr(command.right, constructFalseConstant())
+      );
+    }
+    if (command.operator === '||') {
+      state.agenda.push(
+        constructBranchInstr(constructTrueConstant(), command.right)
+      );
+    }
+    state.agenda.push(command.left);
+  },
   MemberExpression: (
     command: MemberExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
   Program: (command: Program, state: ExplicitControlEvaluatorState) => {
+    state.symbolTable = extendSymbolTable(state.symbolTable);
     const declarationNames = getExternalDeclarationNames(command.body);
     const declarationsWithAddresses = allocateStackAddresses(
       declarationNames,
       state.memory
     );
-    if (declarationNames.length > 0) {
-      state.symbolTable = extendSymbolTable(
-        declarationsWithAddresses,
-        state.symbolTable
-      );
-    }
+    addEntriesToSymbolTable(declarationsWithAddresses, state.symbolTable);
 
     for (let i = command.body.length - 1; i >= 0; i--) {
       state.agenda.push(command.body[i]);
@@ -298,8 +374,8 @@ const evaluators: AgendaItemEvaluatorMapping = {
       }
     }
   },
-  ResetEnvironment: (
-    command: ResetEnvironmentInstr,
+  ResetSymbolTable: (
+    command: ResetSymbolTableInstr,
     state: ExplicitControlEvaluatorState
   ) => {},
   ReturnStatement: (
@@ -320,7 +396,11 @@ const evaluators: AgendaItemEvaluatorMapping = {
   SequenceExpression: (
     command: SequenceExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    for (let i = command.expressions.length - 1; i >= 0; i--) {
+      state.agenda.push(command.expressions[i]);
+    }
+  },
   StringLiteral: (
     command: StringLiteral,
     state: ExplicitControlEvaluatorState
@@ -333,10 +413,33 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: UpdateExpression,
     state: ExplicitControlEvaluatorState
   ) => {},
+  VariableAssignment: (
+    command: VariableAssignmentInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
+    const address = getEntryFromSymbolTable(
+      command.name,
+      state.symbolTable
+    ).address;
+    const value = state.stash.pop();
+    state.memory.set(address, value);
+  },
   VariableDeclaration: (
     command: VariableDeclaration,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    // Declaration names should have been added to the symbol table by the parent scope.
+    // Only need to handle assignment.
+    for (let i = command.declarations.length - 1; i >= 0; i--) {
+      const initialValue = command.declarations[i].initialValue;
+      if (isNotUndefined(initialValue)) {
+        state.agenda.push(
+          constructVariableAssignmentInstr(command.declarations[i].id.name)
+        );
+        state.agenda.push(initialValue);
+      }
+    }
+  },
   WhileStatement: (
     command: WhileStatement,
     state: ExplicitControlEvaluatorState

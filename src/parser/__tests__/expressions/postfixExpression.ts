@@ -24,7 +24,7 @@ describe('postfix expression', () => {
                   expressions: [
                     {
                       type: 'Constant',
-                      value: '2'
+                      value: 2
                     }
                   ]
                 }
@@ -68,7 +68,7 @@ describe('postfix expression', () => {
                         expressions: [
                           {
                             type: 'Constant',
-                            value: '2'
+                            value: 2
                           }
                         ]
                       }
@@ -119,7 +119,7 @@ describe('postfix expression', () => {
                             expressions: [
                               {
                                 type: 'Constant',
-                                value: '2'
+                                value: 2
                               }
                             ]
                           }
@@ -132,11 +132,11 @@ describe('postfix expression', () => {
                               operator: '*',
                               left: {
                                 type: 'Constant',
-                                value: '5'
+                                value: 5
                               },
                               right: {
                                 type: 'Constant',
-                                value: '3'
+                                value: 3
                               }
                             }
                           ]
@@ -150,7 +150,7 @@ describe('postfix expression', () => {
                             operator: '-',
                             left: {
                               type: 'Constant',
-                              value: '9'
+                              value: 9
                             },
                             right: {
                               type: 'Identifier',
@@ -162,11 +162,11 @@ describe('postfix expression', () => {
                             operator: '+',
                             left: {
                               type: 'Constant',
-                              value: '3'
+                              value: 3
                             },
                             right: {
                               type: 'Constant',
-                              value: '4'
+                              value: 4
                             }
                           }
                         ]
@@ -251,7 +251,7 @@ describe('postfix expression', () => {
                       arguments: [
                         {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         },
                         {
                           type: 'Identifier',
@@ -262,11 +262,11 @@ describe('postfix expression', () => {
                           operator: '*',
                           left: {
                             type: 'Constant',
-                            value: '5'
+                            value: 5
                           },
                           right: {
                             type: 'Constant',
-                            value: '3'
+                            value: 3
                           }
                         }
                       ]
@@ -315,7 +315,7 @@ describe('postfix expression', () => {
                           arguments: [
                             {
                               type: 'Constant',
-                              value: '3'
+                              value: 3
                             }
                           ]
                         },
@@ -324,11 +324,11 @@ describe('postfix expression', () => {
                       arguments: [
                         {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         },
                         {
                           type: 'Constant',
-                          value: '7'
+                          value: 7
                         }
                       ]
                     }
@@ -545,7 +545,7 @@ describe('postfix expression', () => {
                             arguments: [
                               {
                                 type: 'Constant',
-                                value: '4215'
+                                value: 4215
                               }
                             ]
                           },
@@ -554,7 +554,7 @@ describe('postfix expression', () => {
                             expressions: [
                               {
                                 type: 'Constant',
-                                value: '7'
+                                value: 7
                               }
                             ]
                           }

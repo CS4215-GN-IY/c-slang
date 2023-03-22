@@ -156,7 +156,7 @@ export interface Identifier extends BaseExpression {
 
 export interface Constant extends BaseExpression {
   type: 'Constant';
-  value: string;
+  value: string | number;
 }
 
 export interface StringLiteral extends BaseExpression {

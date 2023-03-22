@@ -27,11 +27,11 @@ describe('and expression', () => {
                       operator: '&',
                       left: {
                         type: 'Constant',
-                        value: '4'
+                        value: 4
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -73,16 +73,16 @@ describe('and expression', () => {
                         operator: '&',
                         left: {
                           type: 'Constant',
-                          value: '1'
+                          value: 1
                         },
                         right: {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '3'
+                        value: 3
                       }
                     }
                   ]
@@ -124,11 +124,11 @@ describe('and expression', () => {
                         operator: '==',
                         left: {
                           type: 'Constant',
-                          value: '1'
+                          value: 1
                         },
                         right: {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         }
                       },
                       right: {
@@ -136,11 +136,11 @@ describe('and expression', () => {
                         operator: '!=',
                         left: {
                           type: 'Constant',
-                          value: '3'
+                          value: 3
                         },
                         right: {
                           type: 'Constant',
-                          value: '4'
+                          value: 4
                         }
                       }
                     }

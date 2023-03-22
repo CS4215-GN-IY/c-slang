@@ -59,7 +59,7 @@ describe('primary expression', () => {
                   expressions: [
                     {
                       type: 'Constant',
-                      value: '4215'
+                      value: 4215
                     }
                   ]
                 }
@@ -94,42 +94,7 @@ describe('primary expression', () => {
                   expressions: [
                     {
                       type: 'Constant',
-                      value: '123.45'
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      ]
-    };
-    expect(ast).toEqual(expectedAst);
-  });
-
-  test('handles integer constants', () => {
-    const code = 'int main() { 4215; }';
-    const ast = parse(code);
-    const expectedAst: Program = {
-      type: 'Program',
-      body: [
-        {
-          type: 'FunctionDeclaration',
-          id: {
-            type: 'Identifier',
-            name: 'main'
-          },
-          body: {
-            type: 'BlockStatement',
-            items: [
-              {
-                type: 'ExpressionStatement',
-                sequence: {
-                  type: 'SequenceExpression',
-                  expressions: [
-                    {
-                      type: 'Constant',
-                      value: '4215'
+                      value: 123.45
                     }
                   ]
                 }
@@ -243,18 +208,18 @@ describe('primary expression', () => {
                             operator: '-',
                             left: {
                               type: 'Constant',
-                              value: '7'
+                              value: 7
                             },
                             right: {
                               type: 'Constant',
-                              value: '3'
+                              value: 3
                             }
                           }
                         ]
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: 2
                       }
                     }
                   ]
@@ -299,11 +264,11 @@ describe('primary expression', () => {
                             operator: '/',
                             left: {
                               type: 'Constant',
-                              value: '8'
+                              value: 8
                             },
                             right: {
                               type: 'Constant',
-                              value: '4'
+                              value: 4
                             }
                           },
                           {
@@ -311,18 +276,18 @@ describe('primary expression', () => {
                             operator: '-',
                             left: {
                               type: 'Constant',
-                              value: '7'
+                              value: 7
                             },
                             right: {
                               type: 'Constant',
-                              value: '3'
+                              value: 3
                             }
                           }
                         ]
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: 2
                       }
                     }
                   ]

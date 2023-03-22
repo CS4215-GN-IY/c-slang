@@ -1,45 +1,73 @@
 import { RedeclaredNameError, UndeclaredNameError } from './errors';
 import {
-  type NameAddressMapping,
+  type DeclarationNameWithAddress,
   type SymbolTable,
-  type SymbolTableFrame
+  type SymbolTableFrame,
+  type SymbolTableFrameEntry
 } from './types/interpreter';
+
+export const extendSymbolTable = (symbolTable: SymbolTable): SymbolTable => {
+  return {
+    head: {},
+    tail: symbolTable
+  };
+};
+
+export const addEntriesToSymbolTable = (
+  declarationNames: DeclarationNameWithAddress[],
+  symbolTable: SymbolTable
+): void => {
+  declarationNames.forEach((mapping) => {
+    if (mapping.name in symbolTable.head) {
+      throw new RedeclaredNameError(
+        'Tried to redeclare a name in the same scope.'
+      );
+    }
+    symbolTable.head[mapping.name] = {
+      address: mapping.address,
+      nameType: mapping.nameType
+    };
+  });
+};
 
 /**
  * Adds a new frame to the symbol table. Each frame represents a different scope.
  */
-export const extendSymbolTable = (
-  nameAddressMappings: NameAddressMapping[],
-  environment: SymbolTable
+export const extendSymbolTableWithEntries = (
+  declarationNames: DeclarationNameWithAddress[],
+  symbolTable: SymbolTable
 ): SymbolTable => {
   const newFrame: SymbolTableFrame = {};
 
-  nameAddressMappings.forEach((mapping) => {
+  declarationNames.forEach((mapping) => {
     if (mapping.name in newFrame) {
       throw new RedeclaredNameError(
         'Tried to redeclare a name in the same scope.'
       );
     }
-    newFrame[mapping.name] = mapping.address;
+    newFrame[mapping.name] = {
+      address: mapping.address,
+      nameType: mapping.nameType
+    };
   });
 
   return {
     head: newFrame,
-    tail: environment
+    tail: symbolTable
   };
 };
 
 /**
- * Gets the address of a name.
+ * Gets the entry of a name.
  */
-export const getAddressFromSymbolTable = (
+export const getEntryFromSymbolTable = (
   name: string,
-  environment: SymbolTable
-): number => {
-  let currentEnvironment: SymbolTable | null = environment;
+  symbolTable: SymbolTable
+): SymbolTableFrameEntry => {
+  let currentEnvironment: SymbolTable | null = symbolTable;
 
   while (currentEnvironment !== null) {
-    const frame = environment.head;
+    const frame = symbolTable.head;
     if (name in frame) {
       return frame[name];
     }

@@ -4,8 +4,8 @@ import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 import { MemoryError, MemoryErrorType } from './memoryError';
 import {
-  type NameAddressMapping,
-  type NameValueMapping
+  type DeclarationNameWithAddress,
+  type DeclarationNameWithValue
 } from '../interpreter/types/interpreter';
 
 export class VirtualMemory {
@@ -86,19 +86,20 @@ export class VirtualMemory {
 
   // Sets up stack for function call and returns address of parameters
   public stackFunctionCallAllocate(
-    paramsWithValues: NameValueMapping[]
-  ): NameAddressMapping[] {
+    paramsWithValues: DeclarationNameWithValue[]
+  ): DeclarationNameWithAddress[] {
     this.stackAllocate(this.rbp);
     this.stackAllocate(this.rsp);
     this.rbp = this.rsp;
 
-    const paramWithAddresses: NameAddressMapping[] = [];
+    const paramWithAddresses: DeclarationNameWithAddress[] = [];
     this.rsp += paramsWithValues.length * PageTable.ENTRY_SIZE;
     for (let i = 0; i < paramsWithValues.length; i++) {
       const address = this.rbp + i * PageTable.ENTRY_SIZE;
       this.setFree(address, paramsWithValues[i].value);
       paramWithAddresses.push({
         name: paramsWithValues[i].name,
+        nameType: paramsWithValues[i].nameType,
         address
       });
     }

@@ -1,20 +1,44 @@
 import {
-  type ResetEnvironmentInstr,
+  type ResetSymbolTableInstr,
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
-  type ResetInstr
+  type ResetInstr,
+  type BinaryOperationInstr,
+  type BranchInstr,
+  type VariableAssignmentInstr
 } from './types/instruction';
-import { type CallExpression } from '../ast/types';
+import {
+  type BinaryOperator,
+  type CallExpression,
+  type Expression,
+  type Statement
+} from '../ast/types';
 import { type SymbolTable } from './types/interpreter';
 import { isIdentifier } from '../ast/typeGuards';
 import { InvalidFunctionApplicationError } from './errors';
 
-export const constructEnvironmentInstr = (
+export const constructBinaryOperationInstr = (
+  symbol: BinaryOperator
+): BinaryOperationInstr => ({
+  type: 'BinaryOperation',
+  operator: symbol
+});
+
+export const constructBranchInstr = (
+  consequent: Expression | Statement,
+  alternate: Expression | Statement
+): BranchInstr => ({
+  type: 'Branch',
+  consequent,
+  alternate
+});
+
+export const constructResetSymbolTableInstr = (
   environment: SymbolTable
-): ResetEnvironmentInstr => ({
-  type: 'ResetEnvironment',
-  environment
+): ResetSymbolTableInstr => ({
+  type: 'ResetSymbolTable',
+  symbolTable: environment
 });
 
 export const constructFunctionAssignmentInstr = (
@@ -47,4 +71,11 @@ export const constructFunctionMarkInstr = (): FunctionMarkInstr => ({
 
 export const constructResetInstr = (): ResetInstr => ({
   type: 'Reset'
+});
+
+export const constructVariableAssignmentInstr = (
+  name: string
+): VariableAssignmentInstr => ({
+  type: 'VariableAssignment',
+  name
 });

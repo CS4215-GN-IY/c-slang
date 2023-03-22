@@ -24,7 +24,7 @@ describe('return statement', () => {
                   expressions: [
                     {
                       type: 'Constant',
-                      value: '0'
+                      value: 0
                     }
                   ]
                 }
@@ -62,11 +62,11 @@ describe('return statement', () => {
                       operator: '+',
                       left: {
                         type: 'Constant',
-                        value: '1'
+                        value: 1
                       },
                       right: {
                         type: 'Constant',
-                        value: '2'
+                        value: 2
                       }
                     }
                   ]
@@ -136,7 +136,7 @@ describe('goto statement', () => {
                     expressions: [
                       {
                         type: 'Constant',
-                        value: '0'
+                        value: 0
                       }
                     ]
                   }
