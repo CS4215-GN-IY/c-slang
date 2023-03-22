@@ -8,8 +8,9 @@ import {
 } from '../ast/types';
 import {
   type Closure,
-  type NameAddressMapping,
-  type NameValueMapping,
+  type DeclarationName,
+  type DeclarationNameWithAddress,
+  type DeclarationNameWithValue,
   type SymbolTable
 } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
@@ -28,8 +29,8 @@ const allocateUninitializedVariable = (memory: Memory): number => {
 
 export const getExternalDeclarationNames = (
   declarations: ExternalDeclaration[]
-): string[] => {
-  const allNames: string[] = [];
+): DeclarationName[] => {
+  const allNames: DeclarationName[] = [];
   declarations.forEach((declaration) => {
     switch (declaration.type) {
       case 'FunctionDeclaration': {
@@ -49,25 +50,30 @@ export const getExternalDeclarationNames = (
 
 export const getFunctionDeclarationName = (
   functionDeclaration: FunctionDeclaration
-): string => {
-  return getIdentifierName(functionDeclaration.id);
+): DeclarationName => {
+  return {
+    name: getIdentifierName(functionDeclaration.id),
+    nameType: 'Function'
+  };
 };
 
 export const allocateStackAddresses = (
-  names: string[],
+  names: DeclarationName[],
   memory: Memory
-): NameAddressMapping[] => {
-  const nameAddressMapping: NameAddressMapping[] = names.map((name) => ({
-    name,
-    address: allocateUninitializedVariable(memory)
-  }));
+): DeclarationNameWithAddress[] => {
+  const nameAddressMapping: DeclarationNameWithAddress[] = names.map(
+    (name) => ({
+      ...name,
+      address: allocateUninitializedVariable(memory)
+    })
+  );
   return nameAddressMapping;
 };
 
 export const getBlockVariableDeclarationNames = (
   block: BlockStatement
-): string[] => {
-  const allNames: string[] = [];
+): DeclarationName[] => {
+  const allNames: DeclarationName[] = [];
   block.items.forEach((blockItem) => {
     if (isVariableDeclaration(blockItem)) {
       const names = getVariableDeclarationNames(blockItem);
@@ -79,10 +85,11 @@ export const getBlockVariableDeclarationNames = (
 
 export const getVariableDeclarationNames = (
   variableDeclaration: VariableDeclaration
-): string[] => {
-  return variableDeclaration.declarations.map((declarator) =>
-    getIdentifierName(declarator.id)
-  );
+): DeclarationName[] => {
+  return variableDeclaration.declarations.map((declarator) => ({
+    name: getIdentifierName(declarator.id),
+    nameType: 'Variable'
+  }));
 };
 
 export const getIdentifierName = (identifier: Identifier): string => {
@@ -105,19 +112,20 @@ export const constructClosure = (
 export const setParamArgs = (
   params: Identifier[],
   args: Value[]
-): NameValueMapping[] => {
+): DeclarationNameWithValue[] => {
   if (params.length !== args.length) {
     throw new InvalidFunctionApplicationError(
       `Function takes in ${params.length} arguments but ${args.length} arguments were passed in`
     );
   }
 
-  const nameValueMappings: NameValueMapping[] = [];
+  const nameValueMappings: DeclarationNameWithValue[] = [];
   for (let i = 0; i < params.length; i++) {
     const arg = args[i];
     if (isConstant(arg) && !isNaN(Number(arg.value))) {
       nameValueMappings.push({
         name: params[i].name,
+        nameType: 'Variable',
         value: Number(arg.value)
       });
       continue;

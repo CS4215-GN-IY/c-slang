@@ -17,7 +17,8 @@ export type Instr =
   | FunctionAssigmentInstr
   | FunctionMarkInstr
   | ResetEnvironmentInstr
-  | ResetInstr;
+  | ResetInstr
+  | VariableAssignmentInstr;
 
 export interface BinaryOpInstr extends BaseInstr {
   type: 'BinaryOp';
@@ -53,4 +54,9 @@ export interface ResetEnvironmentInstr extends BaseInstr {
 
 export interface ResetInstr extends BaseInstr {
   type: 'Reset';
+}
+
+export interface VariableAssignmentInstr extends BaseInstr {
+  type: 'VariableAssignment';
+  name: string;
 }

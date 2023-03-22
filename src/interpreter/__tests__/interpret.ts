@@ -89,4 +89,20 @@ describe('program', () => {
     const falseVal = 0;
     expect(result).toEqual(falseVal);
   });
+
+  test('handles variable declarations and identifiers', () => {
+    const code = 'int main() { int a; int b = 5; return b; }';
+    const ast = parse(code);
+    const result = interpret(ast);
+    const expectedResult = 5;
+    expect(result).toEqual(expectedResult);
+  });
+
+  test('handles function declarations and identifiers', () => {
+    const code = 'int main() { int a; int b = 5; return b; }';
+    const ast = parse(code);
+    const result = interpret(ast);
+    const expectedResult = 5;
+    expect(result).toEqual(expectedResult);
+  });
 });

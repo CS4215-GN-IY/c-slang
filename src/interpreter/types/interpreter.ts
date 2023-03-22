@@ -20,7 +20,12 @@ export interface SymbolTable {
   tail: SymbolTable | null;
 }
 
-export type SymbolTableFrame = Record<string, number>;
+export type SymbolTableFrame = Record<string, SymbolTableFrameEntry>;
+
+export interface SymbolTableFrameEntry {
+  address: number;
+  nameType: 'Function' | 'Variable';
+}
 
 export type AgendaItem = Node | Instr;
 
@@ -37,12 +42,15 @@ export interface Closure {
   environment: SymbolTable;
 }
 
-export interface NameAddressMapping {
+export interface DeclarationName {
   name: string;
+  nameType: 'Function' | 'Variable';
+}
+
+export interface DeclarationNameWithAddress extends DeclarationName {
   address: number;
 }
 
-export interface NameValueMapping {
-  name: string;
+export interface DeclarationNameWithValue extends DeclarationName {
   value: number;
 }

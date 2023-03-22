@@ -5,7 +5,8 @@ import {
   type FunctionMarkInstr,
   type ResetInstr,
   type BinaryOpInstr,
-  type BranchInstr
+  type BranchInstr,
+  type VariableAssignmentInstr
 } from './types/instruction';
 import {
   type BinaryOperator,
@@ -70,4 +71,11 @@ export const constructFunctionMarkInstr = (): FunctionMarkInstr => ({
 
 export const constructResetInstr = (): ResetInstr => ({
   type: 'Reset'
+});
+
+export const constructVariableAssignmentInstr = (
+  name: string
+): VariableAssignmentInstr => ({
+  type: 'VariableAssignment',
+  name
 });

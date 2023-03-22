@@ -2,8 +2,8 @@ import { VirtualMemory } from './virtualMemory';
 import { TextMemory } from './textMemory';
 import {
   type Closure,
-  type NameAddressMapping,
-  type NameValueMapping
+  type DeclarationNameWithAddress,
+  type DeclarationNameWithValue
 } from '../interpreter/types/interpreter';
 
 export class Memory {
@@ -29,8 +29,8 @@ export class Memory {
   }
 
   public stackFunctionCallAllocate(
-    paramsWithValues: NameValueMapping[]
-  ): NameAddressMapping[] {
+    paramsWithValues: DeclarationNameWithValue[]
+  ): DeclarationNameWithAddress[] {
     return this.virtualMemory.stackFunctionCallAllocate(paramsWithValues);
   }
 
