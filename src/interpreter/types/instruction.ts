@@ -1,4 +1,9 @@
-import { type BinaryOperator, type Identifier } from '../../ast/types';
+import {
+  type BinaryOperator,
+  type Expression,
+  type Identifier,
+  type Statement
+} from '../../ast/types';
 import { type SymbolTable } from './interpreter';
 
 interface BaseInstr {
@@ -7,6 +12,7 @@ interface BaseInstr {
 
 export type Instr =
   | BinaryOpInstr
+  | BranchInstr
   | FunctionApplicationInstr
   | FunctionAssigmentInstr
   | FunctionMarkInstr
@@ -16,6 +22,12 @@ export type Instr =
 export interface BinaryOpInstr extends BaseInstr {
   type: 'BinaryOp';
   symbol: BinaryOperator;
+}
+
+export interface BranchInstr extends BaseInstr {
+  type: 'Branch';
+  consequent: Expression | Statement;
+  alternate: Expression | Statement;
 }
 
 export interface FunctionApplicationInstr extends BaseInstr {

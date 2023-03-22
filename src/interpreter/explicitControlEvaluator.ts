@@ -38,10 +38,12 @@ import {
 import {
   allocateStackAddresses,
   checkBinaryOp,
+  checkNumber,
   constructClosure,
   evaluateBinaryExpression,
   getBlockVariableDeclarationNames,
   getExternalDeclarationNames,
+  isTrue,
   setParamArgs
 } from './utils';
 import {
@@ -50,17 +52,23 @@ import {
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
   type ResetInstr,
-  type BinaryOpInstr
+  type BinaryOpInstr,
+  type BranchInstr
 } from './types/instruction';
 import {
   constructBinaryOpInstr,
+  constructBranchInstr,
   constructEnvironmentInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
   constructFunctionMarkInstr,
   constructResetInstr
 } from './instruction';
-import { constructMainCallExpression } from '../ast/constructors';
+import {
+  constructFalseConstant,
+  constructMainCallExpression,
+  constructTrueConstant
+} from '../ast/constructors';
 import { InvalidFunctionApplicationError } from './errors';
 import {
   constructInitialSymbolTable,
@@ -145,6 +153,15 @@ const evaluators: AgendaItemEvaluatorMapping = {
     const left = state.stash.pop();
     checkBinaryOp(command.symbol, left, right);
     state.stash.push(evaluateBinaryExpression(command.symbol, left, right));
+  },
+  Branch: (command: BranchInstr, state: ExplicitControlEvaluatorState) => {
+    const test = state.stash.pop();
+    checkNumber(test);
+    if (isTrue(test)) {
+      state.agenda.push(command.consequent);
+    } else {
+      state.agenda.push(command.alternate);
+    }
   },
   BlockStatement: (
     command: BlockStatement,
@@ -284,7 +301,19 @@ const evaluators: AgendaItemEvaluatorMapping = {
   LogicalExpression: (
     command: LogicalExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    if (command.operator === '&&') {
+      state.agenda.push(
+        constructBranchInstr(command.right, constructFalseConstant())
+      );
+    }
+    if (command.operator === '||') {
+      state.agenda.push(
+        constructBranchInstr(constructTrueConstant(), command.right)
+      );
+    }
+    state.agenda.push(command.left);
+  },
   MemberExpression: (
     command: MemberExpression,
     state: ExplicitControlEvaluatorState

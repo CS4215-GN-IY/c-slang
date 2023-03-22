@@ -3,6 +3,7 @@ export class InterpreterError extends Error {}
 export class RedeclaredNameError extends InterpreterError {}
 
 export enum TypeErrorSide {
+  NA = '',
   LHS = ' on left hand side of operation',
   RHS = ' on right hand side of operation'
 }

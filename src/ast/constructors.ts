@@ -22,6 +22,20 @@ export const constructConstant = (constant: TerminalNode): Constant => {
   };
 };
 
+export const constructFalseConstant = (): Constant => {
+  return {
+    type: 'Constant',
+    value: 0
+  };
+};
+
+export const constructTrueConstant = (): Constant => {
+  return {
+    type: 'Constant',
+    value: 1
+  };
+};
+
 export const constructEmptyStatement = (): EmptyStatement => {
   return {
     type: 'EmptyStatement'

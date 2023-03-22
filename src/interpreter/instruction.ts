@@ -4,9 +4,15 @@ import {
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
   type ResetInstr,
-  type BinaryOpInstr
+  type BinaryOpInstr,
+  type BranchInstr
 } from './types/instruction';
-import { type BinaryOperator, type CallExpression } from '../ast/types';
+import {
+  type BinaryOperator,
+  type CallExpression,
+  type Expression,
+  type Statement
+} from '../ast/types';
 import { type SymbolTable } from './types/interpreter';
 import { isIdentifier } from '../ast/typeGuards';
 import { InvalidFunctionApplicationError } from './errors';
@@ -16,6 +22,15 @@ export const constructBinaryOpInstr = (
 ): BinaryOpInstr => ({
   type: 'BinaryOp',
   symbol
+});
+
+export const constructBranchInstr = (
+  consequent: Expression | Statement,
+  alternate: Expression | Statement
+): BranchInstr => ({
+  type: 'Branch',
+  consequent,
+  alternate
 });
 
 export const constructEnvironmentInstr = (

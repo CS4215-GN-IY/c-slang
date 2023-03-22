@@ -216,3 +216,13 @@ export function evaluateBinaryExpression(
       return undefined;
   }
 }
+
+export const checkNumber = (val: Value): void => {
+  if (!isNumber(val)) {
+    throw new TypeError('number', typeOf(val), TypeErrorSide.NA);
+  }
+};
+
+export const isTrue = (num: number): boolean => {
+  return num !== 0;
+};
