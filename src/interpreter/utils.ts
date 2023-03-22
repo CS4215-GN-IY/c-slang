@@ -1,4 +1,5 @@
 import {
+  type BinaryOperator,
   type BlockStatement,
   type ExternalDeclaration,
   type FunctionDeclaration,
@@ -13,7 +14,11 @@ import {
 } from './types/interpreter';
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
-import { InvalidFunctionApplicationError } from './errors';
+import {
+  InvalidFunctionApplicationError,
+  TypeError,
+  TypeErrorSide
+} from './errors';
 import { type Memory } from '../memory/memory';
 
 const allocateUninitializedVariable = (memory: Memory): number => {
@@ -124,3 +129,90 @@ export const setParamArgs = (
   }
   return nameValueMappings;
 };
+
+const typeOf = (v: Value): string => {
+  if (v === null) {
+    return 'null';
+  } else if (Array.isArray(v)) {
+    return 'array';
+  } else {
+    return typeof v;
+  }
+};
+
+const isNumber = (v: Value): v is number => typeOf(v) === 'number';
+const isString = (v: Value): v is string => typeOf(v) === 'string';
+
+export const checkBinaryOp = (
+  operator: BinaryOperator,
+  left: Value,
+  right: Value
+): void => {
+  switch (operator) {
+    case '-':
+    case '*':
+    case '/':
+    case '%':
+      if (!isNumber(left)) {
+        throw new TypeError('number', typeOf(left), TypeErrorSide.LHS);
+      }
+      if (!isNumber(right)) {
+        throw new TypeError('number', typeOf(right), TypeErrorSide.RHS);
+      }
+      break;
+    case '+':
+    case '<':
+    case '<=':
+    case '>':
+    case '>=':
+      if (!isNumber(left) && !isString(left)) {
+        throw new TypeError(
+          'string or number',
+          typeOf(left),
+          TypeErrorSide.LHS
+        );
+      }
+      if (isNumber(left) && !isNumber(right)) {
+        throw new TypeError('number', typeOf(right), TypeErrorSide.RHS);
+      }
+      if (isString(left) && !isString(right)) {
+        throw new TypeError('string', typeOf(right), TypeErrorSide.RHS);
+      }
+      break;
+    default:
+  }
+};
+
+export function evaluateBinaryExpression(
+  operator: BinaryOperator,
+  left: any,
+  right: any
+): Value {
+  switch (operator) {
+    case '+':
+      // Separate typeguards are required due to typescript rules: https://typescript-eslint.io/rules/restrict-plus-operands/
+      return isNumber(left) && isNumber(right)
+        ? left + right
+        : isString(left) && isString(right)
+        ? left + right
+        : undefined;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      return left / right;
+    case '%':
+      return left % right;
+    case '<=':
+      return left <= right;
+    case '<':
+      return left < right;
+    case '>':
+      return left > right;
+    case '>=':
+      return left >= right;
+    default:
+      return undefined;
+  }
+}

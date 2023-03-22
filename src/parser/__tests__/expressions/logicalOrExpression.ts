@@ -27,11 +27,11 @@ describe('logical or expression', () => {
                       operator: '||',
                       left: {
                         type: 'Constant',
-                        value: '1'
+                        value: 1
                       },
                       right: {
                         type: 'Constant',
-                        value: '0'
+                        value: 0
                       }
                     }
                   ]
@@ -73,16 +73,16 @@ describe('logical or expression', () => {
                         operator: '||',
                         left: {
                           type: 'Constant',
-                          value: '1'
+                          value: 1
                         },
                         right: {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '3'
+                        value: 3
                       }
                     }
                   ]
@@ -121,18 +121,18 @@ describe('logical or expression', () => {
                       operator: '||',
                       left: {
                         type: 'Constant',
-                        value: '1'
+                        value: 1
                       },
                       right: {
                         type: 'LogicalExpression',
                         operator: '&&',
                         left: {
                           type: 'Constant',
-                          value: '2'
+                          value: 2
                         },
                         right: {
                           type: 'Constant',
-                          value: '3'
+                          value: 3
                         }
                       }
                     }

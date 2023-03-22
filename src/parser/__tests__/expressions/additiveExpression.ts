@@ -27,11 +27,11 @@ describe('additive expression', () => {
                       operator: '+',
                       left: {
                         type: 'Constant',
-                        value: '3'
+                        value: 3
                       },
                       right: {
                         type: 'Constant',
-                        value: '7'
+                        value: 7
                       }
                     }
                   ]
@@ -70,11 +70,11 @@ describe('additive expression', () => {
                       operator: '-',
                       left: {
                         type: 'Constant',
-                        value: '8'
+                        value: 8
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -122,26 +122,26 @@ describe('additive expression', () => {
                             operator: '+',
                             left: {
                               type: 'Constant',
-                              value: '4'
+                              value: 4
                             },
                             right: {
                               type: 'Constant',
-                              value: '3'
+                              value: 3
                             }
                           },
                           right: {
                             type: 'Constant',
-                            value: '2'
+                            value: 2
                           }
                         },
                         right: {
                           type: 'Constant',
-                          value: '6'
+                          value: 6
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -186,11 +186,11 @@ describe('additive expression', () => {
                           operator: '*',
                           left: {
                             type: 'Constant',
-                            value: '7'
+                            value: 7
                           },
                           right: {
                             type: 'Constant',
-                            value: '3'
+                            value: 3
                           }
                         },
                         right: {
@@ -198,11 +198,11 @@ describe('additive expression', () => {
                           operator: '/',
                           left: {
                             type: 'Constant',
-                            value: '2'
+                            value: 2
                           },
                           right: {
                             type: 'Constant',
-                            value: '6'
+                            value: 6
                           }
                         }
                       },
@@ -211,11 +211,11 @@ describe('additive expression', () => {
                         operator: '%',
                         left: {
                           type: 'Constant',
-                          value: '5'
+                          value: 5
                         },
                         right: {
                           type: 'Constant',
-                          value: '4'
+                          value: 4
                         }
                       }
                     }

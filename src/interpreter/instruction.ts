@@ -3,12 +3,20 @@ import {
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
-  type ResetInstr
+  type ResetInstr,
+  type BinaryOpInstr
 } from './types/instruction';
-import { type CallExpression } from '../ast/types';
+import { type BinaryOperator, type CallExpression } from '../ast/types';
 import { type SymbolTable } from './types/interpreter';
 import { isIdentifier } from '../ast/typeGuards';
 import { InvalidFunctionApplicationError } from './errors';
+
+export const constructBinaryOpInstr = (
+  symbol: BinaryOperator
+): BinaryOpInstr => ({
+  type: 'BinaryOp',
+  symbol
+});
 
 export const constructEnvironmentInstr = (
   environment: SymbolTable

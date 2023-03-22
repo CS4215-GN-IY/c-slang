@@ -8,9 +8,17 @@ import {
 } from './types';
 
 export const constructConstant = (constant: TerminalNode): Constant => {
+  const constantLiteral = constant.toString().trim();
+  const value =
+    constantLiteral === ''
+      ? constantLiteral
+      : !isNaN(Number(constantLiteral))
+      ? Number(constantLiteral)
+      : constantLiteral;
+
   return {
     type: 'Constant',
-    value: constant.toString()
+    value
   };
 };
 

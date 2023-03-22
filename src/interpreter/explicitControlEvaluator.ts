@@ -37,7 +37,9 @@ import {
 } from '../ast/types';
 import {
   allocateStackAddresses,
+  checkBinaryOp,
   constructClosure,
+  evaluateBinaryExpression,
   getBlockVariableDeclarationNames,
   getExternalDeclarationNames,
   setParamArgs
@@ -47,9 +49,11 @@ import {
   type FunctionApplicationInstr,
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
-  type ResetInstr
+  type ResetInstr,
+  type BinaryOpInstr
 } from './types/instruction';
 import {
+  constructBinaryOpInstr,
   constructEnvironmentInstr,
   constructFunctionApplicationInstr,
   constructFunctionAssignmentInstr,
@@ -110,6 +114,7 @@ export const interpret = (ast: Program): Value => {
 
   while (agenda.size() > 0) {
     const command = agenda.pop();
+    console.log(command);
     // The typecast allows for mapping to a specific evaluator command type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     evaluators[command.type](command as any, state);
@@ -130,7 +135,17 @@ const evaluators: AgendaItemEvaluatorMapping = {
   BinaryExpression: (
     command: BinaryExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    state.agenda.push(constructBinaryOpInstr(command.operator));
+    state.agenda.push(command.right);
+    state.agenda.push(command.left);
+  },
+  BinaryOp: (command: BinaryOpInstr, state: ExplicitControlEvaluatorState) => {
+    const right = state.stash.pop();
+    const left = state.stash.pop();
+    checkBinaryOp(command.symbol, left, right);
+    state.stash.push(evaluateBinaryExpression(command.symbol, left, right));
+  },
   BlockStatement: (
     command: BlockStatement,
     state: ExplicitControlEvaluatorState
@@ -152,7 +167,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state.agenda.push(command.callee);
   },
   Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
-    state.stash.push(command);
+    state.stash.push(command.value);
   },
   ContinueStatement: (
     command: ContinueStatement,
@@ -320,7 +335,11 @@ const evaluators: AgendaItemEvaluatorMapping = {
   SequenceExpression: (
     command: SequenceExpression,
     state: ExplicitControlEvaluatorState
-  ) => {},
+  ) => {
+    for (let i = command.expressions.length - 1; i >= 0; i--) {
+      state.agenda.push(command.expressions[i]);
+    }
+  },
   StringLiteral: (
     command: StringLiteral,
     state: ExplicitControlEvaluatorState

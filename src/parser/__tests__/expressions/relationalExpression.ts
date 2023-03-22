@@ -27,11 +27,11 @@ describe('relational expression', () => {
                       operator: '<',
                       left: {
                         type: 'Constant',
-                        value: '4'
+                        value: 4
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -70,11 +70,11 @@ describe('relational expression', () => {
                       operator: '>',
                       left: {
                         type: 'Constant',
-                        value: '4'
+                        value: 4
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -113,11 +113,11 @@ describe('relational expression', () => {
                       operator: '<=',
                       left: {
                         type: 'Constant',
-                        value: '4'
+                        value: 4
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -156,11 +156,11 @@ describe('relational expression', () => {
                       operator: '>=',
                       left: {
                         type: 'Constant',
-                        value: '4'
+                        value: 4
                       },
                       right: {
                         type: 'Constant',
-                        value: '5'
+                        value: 5
                       }
                     }
                   ]
@@ -220,46 +220,46 @@ describe('relational expression', () => {
                                     operator: '<',
                                     left: {
                                       type: 'Constant',
-                                      value: '1'
+                                      value: 1
                                     },
                                     right: {
                                       type: 'Constant',
-                                      value: '2'
+                                      value: 2
                                     }
                                   },
                                   right: {
                                     type: 'Constant',
-                                    value: '3'
+                                    value: 3
                                   }
                                 },
                                 right: {
                                   type: 'Constant',
-                                  value: '4'
+                                  value: 4
                                 }
                               },
                               right: {
                                 type: 'Constant',
-                                value: '5'
+                                value: 5
                               }
                             },
                             right: {
                               type: 'Constant',
-                              value: '6'
+                              value: 6
                             }
                           },
                           right: {
                             type: 'Constant',
-                            value: '7'
+                            value: 7
                           }
                         },
                         right: {
                           type: 'Constant',
-                          value: '8'
+                          value: 8
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '9'
+                        value: 9
                       }
                     }
                   ]
@@ -307,24 +307,24 @@ describe('relational expression', () => {
                             operator: '<',
                             left: {
                               type: 'Constant',
-                              value: '1'
+                              value: 1
                             },
                             right: {
                               type: 'BinaryExpression',
                               operator: '<<',
                               left: {
                                 type: 'Constant',
-                                value: '2'
+                                value: 2
                               },
                               right: {
                                 type: 'Constant',
-                                value: '3'
+                                value: 3
                               }
                             }
                           },
                           right: {
                             type: 'Constant',
-                            value: '4'
+                            value: 4
                           }
                         },
                         right: {
@@ -332,17 +332,17 @@ describe('relational expression', () => {
                           operator: '>>',
                           left: {
                             type: 'Constant',
-                            value: '5'
+                            value: 5
                           },
                           right: {
                             type: 'Constant',
-                            value: '6'
+                            value: 6
                           }
                         }
                       },
                       right: {
                         type: 'Constant',
-                        value: '7'
+                        value: 7
                       }
                     }
                   ]
