@@ -166,7 +166,7 @@ const typeOf = (v: Value): string => {
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 
-export const checkBinaryOp = (
+export const checkBinaryOperation = (
   operator: BinaryOperator,
   left: Value,
   right: Value

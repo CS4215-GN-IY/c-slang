@@ -37,7 +37,7 @@ import {
 } from '../ast/types';
 import {
   allocateStackAddresses,
-  checkBinaryOp,
+  checkBinaryOperation,
   checkNumber,
   constructClosure,
   evaluateBinaryExpression,
@@ -53,12 +53,12 @@ import {
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
   type ResetInstr,
-  type BinaryOpInstr,
+  type BinaryOperationInstr,
   type BranchInstr,
   type VariableAssignmentInstr
 } from './types/instruction';
 import {
-  constructBinaryOpInstr,
+  constructBinaryOperationInstr,
   constructBranchInstr,
   constructResetEnvironmentInstr,
   constructFunctionApplicationInstr,
@@ -132,7 +132,6 @@ export const interpret = (ast: Program): Value => {
 
   while (agenda.size() > 0) {
     const command = agenda.pop();
-    console.log(command);
     // The typecast allows for mapping to a specific evaluator command type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     evaluators[command.type](command as any, state);
@@ -154,14 +153,17 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: BinaryExpression,
     state: ExplicitControlEvaluatorState
   ) => {
-    state.agenda.push(constructBinaryOpInstr(command.operator));
+    state.agenda.push(constructBinaryOperationInstr(command.operator));
     state.agenda.push(command.right);
     state.agenda.push(command.left);
   },
-  BinaryOp: (command: BinaryOpInstr, state: ExplicitControlEvaluatorState) => {
+  BinaryOperation: (
+    command: BinaryOperationInstr,
+    state: ExplicitControlEvaluatorState
+  ) => {
     const right = state.stash.pop();
     const left = state.stash.pop();
-    checkBinaryOp(command.symbol, left, right);
+    checkBinaryOperation(command.symbol, left, right);
     state.stash.push(evaluateBinaryExpression(command.symbol, left, right));
   },
   Branch: (command: BranchInstr, state: ExplicitControlEvaluatorState) => {
@@ -295,7 +297,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: FunctionDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
-    // Declarations names should have been added to the symbol table by the parent scope
+    // Declaration names should have been added to the symbol table by the parent scope.
     // Only need to handle assignment.
     const closure = constructClosure(command, state.symbolTable);
     const closureIdx = state.memory.textAllocate(closure);
@@ -424,7 +426,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     command: VariableDeclaration,
     state: ExplicitControlEvaluatorState
   ) => {
-    // Declarations names should have been added to the symbol table by the parent scope
+    // Declaration names should have been added to the symbol table by the parent scope.
     // Only need to handle assignment.
     for (let i = command.declarations.length - 1; i >= 0; i--) {
       const initialValue = command.declarations[i].initialValue;

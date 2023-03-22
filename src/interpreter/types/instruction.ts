@@ -11,7 +11,7 @@ interface BaseInstr {
 }
 
 export type Instr =
-  | BinaryOpInstr
+  | BinaryOperationInstr
   | BranchInstr
   | FunctionApplicationInstr
   | FunctionAssigmentInstr
@@ -20,8 +20,8 @@ export type Instr =
   | ResetInstr
   | VariableAssignmentInstr;
 
-export interface BinaryOpInstr extends BaseInstr {
-  type: 'BinaryOp';
+export interface BinaryOperationInstr extends BaseInstr {
+  type: 'BinaryOperation';
   symbol: BinaryOperator;
 }
 

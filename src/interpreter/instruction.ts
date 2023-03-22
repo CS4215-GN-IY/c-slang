@@ -4,7 +4,7 @@ import {
   type FunctionAssigmentInstr,
   type FunctionMarkInstr,
   type ResetInstr,
-  type BinaryOpInstr,
+  type BinaryOperationInstr,
   type BranchInstr,
   type VariableAssignmentInstr
 } from './types/instruction';
@@ -18,10 +18,10 @@ import { type SymbolTable } from './types/interpreter';
 import { isIdentifier } from '../ast/typeGuards';
 import { InvalidFunctionApplicationError } from './errors';
 
-export const constructBinaryOpInstr = (
+export const constructBinaryOperationInstr = (
   symbol: BinaryOperator
-): BinaryOpInstr => ({
-  type: 'BinaryOp',
+): BinaryOperationInstr => ({
+  type: 'BinaryOperation',
   symbol
 });
 
