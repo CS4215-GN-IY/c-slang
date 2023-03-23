@@ -16,7 +16,8 @@ import {
   type SelectionStatement,
   type Statement,
   type VariableDeclaration,
-  type VariableDeclarator
+  type VariableDeclarator,
+  type UnaryOperator
 } from './types';
 import {
   type ErrorNode,
@@ -1314,7 +1315,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitTypeName(ctx: TypeNameContext): BaseNode {
+  visitTypeName(ctx: TypeNameContext): Expression {
     throw new Error('Method not implemented.');
   }
 
@@ -1417,17 +1418,108 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitUnaryExpression(ctx: UnaryExpressionContext): Expression {
+    let expression: Expression | undefined;
+
     const postfixExpression = ctx.postfixExpression();
     if (postfixExpression !== undefined) {
-      return this.visitPostfixExpression(postfixExpression);
+      expression = this.visitPostfixExpression(postfixExpression);
     }
 
-    // TODO: Deal with everything else.
+    if (expression === undefined) {
+      const unaryOperator = ctx.unaryOperator();
+      const castExpression = ctx.castExpression();
+      if (unaryOperator !== undefined && castExpression === undefined) {
+        throw new BrokenInvariantError(
+          'Encountered a UnaryExpression with a UnaryOperator but no CastExpression.'
+        );
+      }
+      if (unaryOperator === undefined && castExpression !== undefined) {
+        throw new BrokenInvariantError(
+          'Encountered a UnaryExpression with a CastExpression but no UnaryOperator.'
+        );
+      }
+      if (unaryOperator !== undefined && castExpression !== undefined) {
+        expression = {
+          type: 'UnaryExpression',
+          operator: this.visitUnaryOperator(unaryOperator),
+          operand: this.visitCastExpression(castExpression)
+        };
+      }
+    }
 
-    throw new UnreachableCaseError();
+    if (expression === undefined) {
+      const typeName = ctx.typeName();
+      if (typeName !== undefined) {
+        expression = this.visitTypeName(typeName);
+      }
+    }
+
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with no child nodes.'
+      );
+    }
+
+    if (expression === undefined) {
+      throw new UnreachableCaseError();
+    }
+
+    for (let i = children.length - 1; i >= 0; i--) {
+      const token = children[i].toStringTree();
+      if (token === '_Alignof') {
+        throw new UnsupportedKeywordError('_Alignof');
+      }
+      if (token === '++' || token === '--') {
+        expression = {
+          type: 'UpdateExpression',
+          operator: token,
+          operand: expression,
+          isPrefix: true
+        };
+      } else if (token === 'sizeof') {
+        expression = {
+          type: 'UnaryExpression',
+          operator: token,
+          operand: expression
+        };
+      }
+    }
+
+    return expression;
   }
 
-  visitUnaryOperator(ctx: UnaryOperatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitUnaryOperator(ctx: UnaryOperatorContext): UnaryOperator {
+    const addressOfOperator = ctx.And();
+    if (addressOfOperator !== undefined) {
+      return '&';
+    }
+
+    const indirectionOperator = ctx.Star();
+    if (indirectionOperator !== undefined) {
+      return '*';
+    }
+
+    const unaryPlusOperator = ctx.Plus();
+    if (unaryPlusOperator !== undefined) {
+      return '+';
+    }
+
+    const negationOperator = ctx.Minus();
+    if (negationOperator !== undefined) {
+      return '-';
+    }
+
+    const bitwiseNotOperator = ctx.Tilde();
+    if (bitwiseNotOperator !== undefined) {
+      return '~';
+    }
+
+    const logicalNotOperator = ctx.Not();
+    if (logicalNotOperator !== undefined) {
+      return '!';
+    }
+
+    throw new UnreachableCaseError();
   }
 }

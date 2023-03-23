@@ -145,6 +145,7 @@ export type Expression =
   | MemberExpression
   | SequenceExpression
   | StringLiteral
+  | UnaryExpression
   | UpdateExpression;
 
 export interface BaseExpression extends BaseNode {}
@@ -193,6 +194,14 @@ export interface UpdateExpression extends BaseExpression {
 }
 
 export type UpdateOperator = '++' | '--';
+
+export interface UnaryExpression extends BaseExpression {
+  type: 'UnaryExpression';
+  operator: UnaryOperator;
+  operand: Expression;
+}
+
+export type UnaryOperator = '&' | '*' | '+' | '-' | '~' | '!' | 'sizeof';
 
 export interface BinaryExpression extends BaseExpression {
   type: 'BinaryExpression';
