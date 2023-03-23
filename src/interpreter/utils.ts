@@ -22,11 +22,12 @@ import {
   TypeErrorSide,
   UnsupportedBinaryOperatorError
 } from './errors';
-import { type Memory } from '../memory/memory';
+import { type OldMemory } from '../memory/oldMemory';
 import { FALSE_VALUE } from '../utils/constants';
 import { type TypeofResult } from './types/utils';
+import { type Memory } from '../memory/memory';
 
-const allocateUninitializedVariable = (memory: Memory): number => {
+const allocateUninitializedVariable = (memory: OldMemory | Memory): number => {
   const valueWhenUninitialized = 0;
   return memory.stackAllocate(valueWhenUninitialized);
 };
@@ -77,7 +78,7 @@ export const getFunctionDeclarationName = (
 
 export const allocateStackAddresses = (
   names: DeclarationName[],
-  memory: Memory
+  memory: OldMemory | Memory
 ): DeclarationNameWithAddress[] => {
   const nameAddressMapping: DeclarationNameWithAddress[] = names.map(
     (name) => ({

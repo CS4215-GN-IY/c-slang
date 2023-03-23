@@ -1,17 +1,18 @@
-/**
- * Contains function instructions, as encoding it to the virtual memory text section is too difficult.
- */
-import { type Closure } from '../interpreter/types/interpreter';
+import { type Instr } from '../interpreter/types/vmInstruction';
 
 export class TextMemory {
-  private readonly functionInstructions: Closure[] = [];
+  private readonly instructions: Instr[] = [];
 
-  public allocate(functionInstruction: Closure): number {
-    this.functionInstructions.push(functionInstruction);
-    return this.functionInstructions.length - 1;
+  public allocate(instruction: Instr): number {
+    this.instructions.push(instruction);
+    return this.instructions.length - 1;
   }
 
-  public get(idx: number): Closure {
-    return this.functionInstructions[idx];
+  public get(address: number): Instr {
+    return this.instructions[address];
+  }
+
+  public getNextFreeAddress(): number {
+    return this.instructions.length;
   }
 }

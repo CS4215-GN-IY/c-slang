@@ -84,7 +84,7 @@ import {
   getEntryFromSymbolTable
 } from './symbolTable';
 import { isEmptyStatement } from '../ast/typeGuards';
-import { Memory } from '../memory/memory';
+import { OldMemory } from '../memory/oldMemory';
 import { isNotUndefined } from '../utils/typeGuards';
 
 /**
@@ -121,7 +121,7 @@ export const interpret = (ast: Program): Value => {
   agenda.push(ast);
   const stash = new Stack<Value>();
   const environment = constructInitialSymbolTable();
-  const memory = new Memory(1000, 1000, 1000);
+  const memory = new OldMemory(1000, 1000, 1000);
   const state: ExplicitControlEvaluatorState = {
     agenda,
     stash,

@@ -6,13 +6,13 @@ import {
   type Node
 } from '../../ast/types';
 import { type Instr } from './instruction';
-import { type Memory } from '../../memory/memory';
+import { type OldMemory } from '../../memory/oldMemory';
 
 export interface ExplicitControlEvaluatorState {
   agenda: Stack<AgendaItem>;
   stash: Stack<Value>;
   symbolTable: SymbolTable;
-  memory: Memory;
+  memory: OldMemory;
 }
 
 export interface SymbolTable {

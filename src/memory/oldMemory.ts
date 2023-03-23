@@ -1,19 +1,19 @@
 import { VirtualMemory } from './virtualMemory';
+import { OldTextMemory } from './oldTextMemory';
 import {
+  type Closure,
   type DeclarationNameWithAddress,
   type DeclarationNameWithValue
 } from '../interpreter/types/interpreter';
-import { TextMemory } from './textMemory';
-import { type Instr } from '../interpreter/types/vmInstruction';
 
-export class Memory {
+export class OldMemory {
   private readonly virtualMemory;
-  readonly textMemory;
+  private readonly textMemory;
 
   constructor(dataSize: number, stackSize: number, heapSize: number) {
     // Instructions are stored in a separate text memory as encoding is too difficult.
     this.virtualMemory = new VirtualMemory(0, dataSize, stackSize, heapSize);
-    this.textMemory = new TextMemory();
+    this.textMemory = new OldTextMemory();
   }
 
   public get(address: number): number {
@@ -34,15 +34,11 @@ export class Memory {
     return this.virtualMemory.stackFunctionCallAllocate(paramsWithValues);
   }
 
-  public textAllocate(instruction: Instr): number {
-    return this.textMemory.allocate(instruction);
+  public textAllocate(functionInstruction: Closure): number {
+    return this.textMemory.allocate(functionInstruction);
   }
 
-  public textGet(address: number): Instr {
-    return this.textMemory.get(address);
-  }
-
-  public textGetNextFreeAddress(): number {
-    return this.textMemory.getNextFreeAddress();
+  public textGet(idx: number): Closure {
+    return this.textMemory.get(idx);
   }
 }
