@@ -306,13 +306,42 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitConditionalExpression(ctx: ConditionalExpressionContext): Expression {
     const logicalOrExpression = ctx.logicalOrExpression();
-    if (logicalOrExpression !== undefined) {
-      return this.visitLogicalOrExpression(logicalOrExpression);
+    if (logicalOrExpression === undefined) {
+      throw new UnreachableCaseError();
+    }
+    let expression = this.visitLogicalOrExpression(logicalOrExpression);
+
+    const consequentExpression = ctx.expression();
+    const alternateExpression = ctx.conditionalExpression();
+    if (
+      consequentExpression !== undefined &&
+      alternateExpression === undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered a ConditionalExpression with an Expression but not ConditionalExpression.'
+      );
+    }
+    if (
+      consequentExpression === undefined &&
+      alternateExpression !== undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered a ConditionalExpression with a ConditionalExpression but not Expression.'
+      );
+    }
+    if (
+      consequentExpression !== undefined &&
+      alternateExpression !== undefined
+    ) {
+      expression = {
+        type: 'ConditionalExpression',
+        predicate: expression,
+        consequent: this.visitExpression(consequentExpression),
+        alternate: this.visitConditionalExpression(alternateExpression)
+      };
     }
 
-    // TODO: Deal with conditionals.
-
-    throw new UnreachableCaseError();
+    return expression;
   }
 
   visitConstantExpression(ctx: ConstantExpressionContext): BaseNode {
@@ -1177,7 +1206,7 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       return {
         type: 'IfStatement',
-        test: this.visitExpression(expression),
+        predicate: this.visitExpression(expression),
         consequent: this.visitStatement(firstStatement),
         alternate:
           secondStatement !== undefined

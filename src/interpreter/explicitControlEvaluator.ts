@@ -34,7 +34,8 @@ import {
   type UpdateExpression,
   type VariableDeclaration,
   type WhileStatement,
-  type UnaryExpression
+  type UnaryExpression,
+  type ConditionalExpression
 } from '../ast/types';
 import {
   allocateStackAddresses,
@@ -207,6 +208,10 @@ const evaluators: AgendaItemEvaluatorMapping = {
       state.agenda.push(command.arguments[i]);
     }
   },
+  ConditionalExpression: (
+    command: ConditionalExpression,
+    state: ExplicitControlEvaluatorState
+  ) => {},
   Constant: (command: Constant, state: ExplicitControlEvaluatorState) => {
     state.stash.push(command.value);
   },

@@ -69,7 +69,7 @@ export type SelectionStatement = IfStatement | SwitchStatement;
 
 export interface IfStatement extends BaseStatement {
   type: 'IfStatement';
-  test: SequenceExpression;
+  predicate: SequenceExpression;
   consequent: Statement;
   alternate?: Statement;
 }
@@ -139,6 +139,7 @@ export type Expression =
   | AssignmentExpression
   | BinaryExpression
   | CallExpression
+  | ConditionalExpression
   | Constant
   | Identifier
   | LogicalExpression
@@ -236,6 +237,13 @@ export interface LogicalExpression extends BaseExpression {
 }
 
 export type LogicalOperator = '&&' | '||';
+
+export interface ConditionalExpression extends BaseExpression {
+  type: 'ConditionalExpression';
+  predicate: Expression;
+  consequent: Expression;
+  alternate: Expression;
+}
 
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression';
