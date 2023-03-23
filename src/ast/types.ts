@@ -248,8 +248,7 @@ export interface ConditionalExpression extends BaseExpression {
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression';
   operator: AssignmentOperator;
-  // TODO: Not the final type.
-  left: string;
+  left: Expression;
   right: Expression;
 }
 

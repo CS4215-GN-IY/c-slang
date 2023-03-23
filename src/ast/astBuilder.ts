@@ -17,7 +17,8 @@ import {
   type Statement,
   type VariableDeclaration,
   type VariableDeclarator,
-  type UnaryOperator
+  type UnaryOperator,
+  type AssignmentOperator
 } from './types';
 import {
   type ErrorNode,
@@ -236,14 +237,90 @@ export class ASTBuilder implements CVisitor<any> {
       return this.visitConditionalExpression(conditionalExpression);
     }
 
-    // TODO: Deal with assignments.
-    // TODO: Deal with number sequence.
-
-    throw new UnreachableCaseError();
+    const unaryExpression = ctx.unaryExpression();
+    const assignmentOperator = ctx.assignmentOperator();
+    const assignmentExpression = ctx.assignmentExpression();
+    if (
+      unaryExpression === undefined &&
+      assignmentOperator === undefined &&
+      assignmentExpression === undefined
+    ) {
+      throw new UnreachableCaseError();
+    }
+    if (
+      unaryExpression === undefined ||
+      assignmentOperator === undefined ||
+      assignmentExpression === undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered an AssignmentExpression where at least one of UnaryExpression, AssignmentOperator, and AssignmentExpression is undefined.'
+      );
+    }
+    return {
+      type: 'AssignmentExpression',
+      operator: this.visitAssignmentOperator(assignmentOperator),
+      left: this.visitUnaryExpression(unaryExpression),
+      right: this.visitAssignmentExpression(assignmentExpression)
+    };
   }
 
-  visitAssignmentOperator(ctx: AssignmentOperatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitAssignmentOperator(ctx: AssignmentOperatorContext): AssignmentOperator {
+    const assignmentOperator = ctx.Assign();
+    if (assignmentOperator !== undefined) {
+      return '=';
+    }
+
+    const multiplicationAssignmentOperator = ctx.StarAssign();
+    if (multiplicationAssignmentOperator !== undefined) {
+      return '*=';
+    }
+
+    const divisionAssignmentOperator = ctx.DivAssign();
+    if (divisionAssignmentOperator !== undefined) {
+      return '/=';
+    }
+
+    const remainderAssignmentOperator = ctx.ModAssign();
+    if (remainderAssignmentOperator !== undefined) {
+      return '%=';
+    }
+
+    const additionAssignmentOperator = ctx.PlusAssign();
+    if (additionAssignmentOperator !== undefined) {
+      return '+=';
+    }
+
+    const subtractionAssignmentOperator = ctx.MinusAssign();
+    if (subtractionAssignmentOperator !== undefined) {
+      return '-=';
+    }
+
+    const leftShiftAssignmentOperator = ctx.LeftShiftAssign();
+    if (leftShiftAssignmentOperator !== undefined) {
+      return '<<=';
+    }
+
+    const rightShiftAssignmentOperator = ctx.RightShiftAssign();
+    if (rightShiftAssignmentOperator !== undefined) {
+      return '>>=';
+    }
+
+    const bitwiseAndAssignmentOperator = ctx.AndAssign();
+    if (bitwiseAndAssignmentOperator !== undefined) {
+      return '&=';
+    }
+
+    const bitwiseXorAssignmentOperator = ctx.XorAssign();
+    if (bitwiseXorAssignmentOperator !== undefined) {
+      return '^=';
+    }
+
+    const bitwiseOrAssignmentOperator = ctx.OrAssign();
+    if (bitwiseOrAssignmentOperator !== undefined) {
+      return '|=';
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitAtomicTypeSpecifier(ctx: AtomicTypeSpecifierContext): BaseNode {
