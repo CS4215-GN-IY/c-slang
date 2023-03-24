@@ -20,10 +20,6 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      # Necessary for the action to work until the following issue is fixed:
-      # https://github.com/EPMatt/reviewdog-action-tsc/issues/157
-      - name: Downgrade npm to v8
-        run: npm install -g npm@8
       - name: Typecheck
         uses: EPMatt/reviewdog-action-tsc@v1
         with:
