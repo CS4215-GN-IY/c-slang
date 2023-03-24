@@ -386,39 +386,30 @@ export class ASTBuilder implements CVisitor<any> {
     if (logicalOrExpression === undefined) {
       throw new UnreachableCaseError();
     }
-    let expression = this.visitLogicalOrExpression(logicalOrExpression);
+    let returnedExpression = this.visitLogicalOrExpression(logicalOrExpression);
 
-    const consequentExpression = ctx.expression();
-    const alternateExpression = ctx.conditionalExpression();
-    if (
-      consequentExpression !== undefined &&
-      alternateExpression === undefined
-    ) {
+    const expression = ctx.expression();
+    const conditionalExpression = ctx.conditionalExpression();
+    if (expression !== undefined && conditionalExpression === undefined) {
       throw new BrokenInvariantError(
         'Encountered a ConditionalExpression with an Expression but not ConditionalExpression.'
       );
     }
-    if (
-      consequentExpression === undefined &&
-      alternateExpression !== undefined
-    ) {
+    if (expression === undefined && conditionalExpression !== undefined) {
       throw new BrokenInvariantError(
         'Encountered a ConditionalExpression with a ConditionalExpression but not Expression.'
       );
     }
-    if (
-      consequentExpression !== undefined &&
-      alternateExpression !== undefined
-    ) {
-      expression = {
+    if (expression !== undefined && conditionalExpression !== undefined) {
+      returnedExpression = {
         type: 'ConditionalExpression',
-        predicate: expression,
-        consequent: this.visitExpression(consequentExpression),
-        alternate: this.visitConditionalExpression(alternateExpression)
+        predicate: returnedExpression,
+        consequent: this.visitExpression(expression),
+        alternate: this.visitConditionalExpression(conditionalExpression)
       };
     }
 
-    return expression;
+    return returnedExpression;
   }
 
   visitConstantExpression(ctx: ConstantExpressionContext): BaseNode {
