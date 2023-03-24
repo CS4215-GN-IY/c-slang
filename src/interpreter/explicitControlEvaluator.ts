@@ -72,10 +72,7 @@ import {
   constructMainCallExpression,
   constructTrueConstant
 } from '../ast/constructors';
-import {
-  InvalidFunctionApplicationError,
-  InvalidFunctionIdentifierError
-} from './errors';
+import { InvalidCallError, InvalidFunctionIdentifierError } from './errors';
 import {
   addEntriesToSymbolTable,
   constructInitialSymbolTable,
@@ -385,9 +382,7 @@ const evaluators: AgendaItemEvaluatorMapping = {
     state.agenda.push(constructResetInstr());
     if (command.argument !== undefined) {
       if (command.argument.expressions.length > 1) {
-        throw new InvalidFunctionApplicationError(
-          'Encountered more than 1 return value'
-        );
+        throw new InvalidCallError('Encountered more than 1 return value');
       }
       state.agenda.push(command.argument.expressions[0]);
     }

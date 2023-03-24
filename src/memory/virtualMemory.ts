@@ -84,6 +84,37 @@ export class VirtualMemory {
     return this.rsp;
   }
 
+  public stackGetByOffset(offset: number): number {
+    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
+    return this.get(address);
+  }
+
+  public stackFunctionCallSetup(args: number[]): number[] {
+    this.stackAllocate(this.rbp);
+    this.stackAllocate(this.rsp);
+    this.rbp = this.rsp + PageTable.ENTRY_SIZE;
+
+    this.rsp += args.length > 0 ? (args.length - 1) * PageTable.ENTRY_SIZE : 0;
+    const addresses: number[] = [];
+    for (let i = 0; i < args.length; i++) {
+      const address = this.rbp + i * PageTable.ENTRY_SIZE;
+      this.setFree(address, args[i]);
+      addresses.push(address);
+    }
+    return addresses;
+  }
+
+  public stackFunctionCallTeardown(): void {
+    let fp = this.rsp;
+    // Get saved rsp and subtract space taken to store rbp
+    this.rsp = this.get(this.rbp - PageTable.ENTRY_SIZE) - PageTable.ENTRY_SIZE;
+    this.rbp = this.get(this.rbp - 2 * PageTable.ENTRY_SIZE);
+    while (fp > this.rbp) {
+      this.free(fp);
+      fp -= PageTable.ENTRY_SIZE;
+    }
+  }
+
   // Sets up stack for function call and returns address of parameters
   public stackFunctionCallAllocate(
     paramsWithValues: DeclarationNameWithValue[]

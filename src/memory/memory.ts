@@ -1,8 +1,4 @@
 import { VirtualMemory } from './virtualMemory';
-import {
-  type DeclarationNameWithAddress,
-  type DeclarationNameWithValue
-} from '../interpreter/types/interpreter';
 import { TextMemory } from './textMemory';
 import { type Instr } from '../interpreter/types/vmInstruction';
 
@@ -24,14 +20,20 @@ export class Memory {
     this.virtualMemory.set(address, data);
   }
 
+  public stackGetByOffset(offset: number): number {
+    return this.virtualMemory.stackGetByOffset(offset);
+  }
+
   public stackAllocate(data: number): number {
     return this.virtualMemory.stackAllocate(data);
   }
 
-  public stackFunctionCallAllocate(
-    paramsWithValues: DeclarationNameWithValue[]
-  ): DeclarationNameWithAddress[] {
-    return this.virtualMemory.stackFunctionCallAllocate(paramsWithValues);
+  public stackFunctionCallAllocate(args: number[]): number[] {
+    return this.virtualMemory.stackFunctionCallSetup(args);
+  }
+
+  public stackFunctionCallTeardown(): void {
+    this.virtualMemory.stackFunctionCallTeardown();
   }
 
   public textAllocate(instruction: Instr): number {

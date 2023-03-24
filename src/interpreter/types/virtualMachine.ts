@@ -9,13 +9,32 @@ export type CompilerMapping = {
 };
 
 export interface CompilerState {
-  symbolTable: SymbolTableEntry[][];
   memory: Memory;
+  symbolTable: SymbolTable;
 }
 
-export interface SymbolTableEntry {
+export type SymbolTable = SymbolTableEntry[][];
+
+interface BaseSymbolTableEntry {
   name: string;
-  nameType: 'Function' | 'Variable';
+  nameType: string;
+  // Represents the offset of the variable within a stack frame.
+  // Store this for easy access, because calculation can be difficult
+  // when there are blocks inside functions.
+  offset: number;
+}
+
+export type SymbolTableEntry =
+  | FunctionSymbolTableEntry
+  | VariableSymbolTableEntry;
+
+export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
+  nameType: 'Function';
+  numOfParams: number;
+}
+
+export interface VariableSymbolTableEntry extends BaseSymbolTableEntry {
+  nameType: 'Variable';
 }
 
 export interface SymbolTableEntryPosition {

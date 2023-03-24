@@ -6,7 +6,7 @@ export class UnsupportedBinaryOperatorError extends InterpreterError {
   }
 }
 
-export class InvalidFunctionApplicationError extends InterpreterError {}
+export class InvalidCallError extends InterpreterError {}
 
 export class InvalidFunctionIdentifierError extends InterpreterError {
   constructor() {
@@ -16,15 +16,20 @@ export class InvalidFunctionIdentifierError extends InterpreterError {
 
 export class RedeclaredNameError extends InterpreterError {}
 
-export enum TypeErrorSide {
+export enum TypeErrorContext {
+  ADDRESS = ' for an address',
   NA = '',
   LHS = ' on left hand side of operation',
   RHS = ' on right hand side of operation'
 }
 
 export class TypeError extends InterpreterError {
-  constructor(expectedType: string, actualType: string, side: TypeErrorSide) {
-    super(`Expected ${expectedType}${side}, got ${actualType}`);
+  constructor(
+    expectedType: string,
+    actualType: string,
+    context: TypeErrorContext
+  ) {
+    super(`Expected ${expectedType}${context}, got ${actualType}`);
   }
 }
 

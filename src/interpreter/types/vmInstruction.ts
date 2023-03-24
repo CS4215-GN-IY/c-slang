@@ -7,18 +7,23 @@ interface BaseInstr {
 
 export type Instr =
   | AssignInstr
+  | CallInstr
   | DoneInstr
   | ExitFunctionInstr
   | GotoInstr
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
-  | SetupBlockInstr
-  | TeardownBlockInstr;
+  | TeardownInstr;
 
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
   symbolTableEntryPosition: SymbolTableEntryPosition;
+}
+
+export interface CallInstr extends BaseInstr {
+  type: 'Call';
+  numOfArgs: number;
 }
 
 export interface DoneInstr extends BaseInstr {
@@ -26,7 +31,7 @@ export interface DoneInstr extends BaseInstr {
 }
 
 export interface ExitFunctionInstr extends BaseInstr {
-  type: 'ExitFunctionInstr';
+  type: 'ExitFunction';
 }
 
 export interface GotoInstr extends BaseInstr {
@@ -46,15 +51,10 @@ export interface LoadFunctionInstr extends BaseInstr {
 
 export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
-  symbol: string;
-  address: number;
+  symbolTableEntryPosition: SymbolTableEntryPosition;
 }
 
-export interface SetupBlockInstr extends BaseInstr {
-  type: 'SetupBlock';
-  numOfVariables: number;
-}
-
-export interface TeardownBlockInstr extends BaseInstr {
-  type: 'TeardownBlock';
+export interface TeardownInstr extends BaseInstr {
+  type: 'Teardown';
+  returnAddressOffset: number;
 }

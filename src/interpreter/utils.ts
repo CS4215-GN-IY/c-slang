@@ -17,9 +17,9 @@ import {
 import { type Value } from './types/evaluationResults';
 import { isConstant, isVariableDeclaration } from '../ast/typeGuards';
 import {
-  InvalidFunctionApplicationError,
+  InvalidCallError,
   TypeError,
-  TypeErrorSide,
+  TypeErrorContext,
   UnsupportedBinaryOperatorError
 } from './errors';
 import { type OldMemory } from '../memory/oldMemory';
@@ -133,7 +133,7 @@ export const setParamArgs = (
   args: Value[]
 ): DeclarationNameWithValue[] => {
   if (params.length !== args.length) {
-    throw new InvalidFunctionApplicationError(
+    throw new InvalidCallError(
       `Function takes in ${params.length} arguments but ${args.length} arguments were passed in`
     );
   }
@@ -150,9 +150,7 @@ export const setParamArgs = (
       continue;
     }
     // TODO: Add support for character and address later
-    throw new InvalidFunctionApplicationError(
-      `Encountered an unhandled argument.`
-    );
+    throw new InvalidCallError(`Encountered an unhandled argument.`);
   }
   return nameValueMappings;
 };
@@ -172,10 +170,10 @@ export const typeCheckBinaryOperation = (
     case '/':
     case '%':
       if (!isNumber(left)) {
-        throw new TypeError('number', typeOf(left), TypeErrorSide.LHS);
+        throw new TypeError('number', typeOf(left), TypeErrorContext.LHS);
       }
       if (!isNumber(right)) {
-        throw new TypeError('number', typeOf(right), TypeErrorSide.RHS);
+        throw new TypeError('number', typeOf(right), TypeErrorContext.RHS);
       }
       break;
     case '+':
@@ -187,14 +185,14 @@ export const typeCheckBinaryOperation = (
         throw new TypeError(
           'string or number',
           typeOf(left),
-          TypeErrorSide.LHS
+          TypeErrorContext.LHS
         );
       }
       if (isNumber(left) && !isNumber(right)) {
-        throw new TypeError('number', typeOf(right), TypeErrorSide.RHS);
+        throw new TypeError('number', typeOf(right), TypeErrorContext.RHS);
       }
       if (isString(left) && !isString(right)) {
-        throw new TypeError('string', typeOf(right), TypeErrorSide.RHS);
+        throw new TypeError('string', typeOf(right), TypeErrorContext.RHS);
       }
       break;
     default:
@@ -238,7 +236,7 @@ export function evaluateBinaryExpression(
 
 export const typeCheckNumber = (val: Value): void => {
   if (!isNumber(val)) {
-    throw new TypeError('number', typeOf(val), TypeErrorSide.NA);
+    throw new TypeError('number', typeOf(val), TypeErrorContext.NA);
   }
 };
 

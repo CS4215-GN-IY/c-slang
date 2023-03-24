@@ -1,4 +1,6 @@
 import {
+  type FunctionSymbolTableEntry,
+  type SymbolTable,
   type SymbolTableEntry,
   type SymbolTableEntryPosition
 } from './types/virtualMachine';
@@ -12,15 +14,21 @@ import { getIdentifierName } from './utils';
 import { isVariableDeclaration } from '../ast/typeGuards';
 import { UndeclaredNameError } from './errors';
 
+export const isFunctionSymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is FunctionSymbolTableEntry => {
+  return entry.nameType === 'Function';
+};
+
 export const extendSymbolTable = (
-  symbolTable: SymbolTableEntry[][],
+  symbolTable: SymbolTable,
   entries: SymbolTableEntry[]
-): SymbolTableEntry[][] => {
+): SymbolTable => {
   return [...symbolTable, entries];
 };
 
 export const getSymbolTableEntryPosition = (
-  symbolTable: SymbolTableEntry[][],
+  symbolTable: SymbolTable,
   name: string
 ): SymbolTableEntryPosition => {
   let frameIdx = symbolTable.length - 1;
@@ -39,54 +47,99 @@ export const getSymbolTableEntryPosition = (
   throw new UndeclaredNameError();
 };
 
-export const getProgramSymbolTableEntries = (
-  program: Program
+export const getNextSymbolTableOffset = (symbolTable: SymbolTable): number => {
+  if (symbolTable.length === 0) {
+    return 0;
+  }
+  const lastFrame = symbolTable[symbolTable.length - 1];
+  if (lastFrame.length === 0) {
+    return 0;
+  }
+  return lastFrame[lastFrame.length - 1].offset + 1;
+};
+
+export const getSymbolTableEntry = (
+  symbolTable: SymbolTable,
+  position: SymbolTableEntryPosition
+): SymbolTableEntry => {
+  return symbolTable[position.frameIdx][position.entryIdx];
+};
+
+export const constructProgramSymbolTableEntries = (
+  program: Program,
+  startingOffset: number
 ): SymbolTableEntry[] => {
+  let offset = startingOffset;
   const allNames: SymbolTableEntry[] = [];
   program.body.forEach((declaration) => {
     switch (declaration.type) {
       case 'FunctionDeclaration': {
-        const name = getFunctionDeclarationSymbolTableEntry(declaration);
+        const name = constructFunctionDeclarationSymbolTableEntry(
+          declaration,
+          offset
+        );
         allNames.push(name);
         break;
       }
       case 'VariableDeclaration': {
-        const names = getVariableDeclarationSymbolTableEntries(declaration);
+        const names = constructVariableDeclarationSymbolTableEntries(
+          declaration,
+          offset
+        );
         allNames.push(...names);
         break;
       }
     }
+    offset += 1;
   });
   return allNames;
 };
 
-export const getBlockSymbolTableEntries = (
-  block: BlockStatement
+export const constructBlockSymbolTableEntries = (
+  block: BlockStatement,
+  startingOffset: number
 ): SymbolTableEntry[] => {
+  let offset = startingOffset;
   const allNames: SymbolTableEntry[] = [];
   block.items.forEach((blockItem) => {
     if (isVariableDeclaration(blockItem)) {
-      const names = getVariableDeclarationSymbolTableEntries(blockItem);
+      const names = constructVariableDeclarationSymbolTableEntries(
+        blockItem,
+        offset
+      );
       allNames.push(...names);
     }
+    offset += 1;
   });
   return allNames;
 };
 
-const getFunctionDeclarationSymbolTableEntry = (
-  functionDeclaration: FunctionDeclaration
+const constructFunctionDeclarationSymbolTableEntry = (
+  functionDeclaration: FunctionDeclaration,
+  offset: number
 ): SymbolTableEntry => {
   return {
     name: getIdentifierName(functionDeclaration.id),
-    nameType: 'Function'
+    nameType: 'Function',
+    offset,
+    // TODO: Update this when function declaration parameters are supported.
+    numOfParams: 0
   };
 };
 
-const getVariableDeclarationSymbolTableEntries = (
-  variableDeclaration: VariableDeclaration
+const constructVariableDeclarationSymbolTableEntries = (
+  variableDeclaration: VariableDeclaration,
+  startingOffset: number
 ): SymbolTableEntry[] => {
-  return variableDeclaration.declarations.map((declarator) => ({
-    name: getIdentifierName(declarator.id),
-    nameType: 'Variable'
-  }));
+  let offset = startingOffset;
+  const allNames: SymbolTableEntry[] = [];
+  variableDeclaration.declarations.forEach((declarator) => {
+    allNames.push({
+      name: getIdentifierName(declarator.id),
+      nameType: 'Variable',
+      offset
+    });
+    offset += 1;
+  });
+  return allNames;
 };

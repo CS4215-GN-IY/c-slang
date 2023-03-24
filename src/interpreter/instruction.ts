@@ -16,7 +16,7 @@ import {
 } from '../ast/types';
 import { type SymbolTable } from './types/interpreter';
 import { isIdentifier } from '../ast/typeGuards';
-import { InvalidFunctionApplicationError } from './errors';
+import { InvalidCallError } from './errors';
 
 export const constructBinaryOperationInstr = (
   symbol: BinaryOperator
@@ -56,7 +56,7 @@ export const constructFunctionApplicationInstr = (
 ): FunctionApplicationInstr => {
   const callee = srcNode.callee;
   if (!isIdentifier(callee)) {
-    throw new InvalidFunctionApplicationError('Cannot call non-identifier.');
+    throw new InvalidCallError('Cannot call non-identifier.');
   }
   return {
     type: 'FunctionApplication',

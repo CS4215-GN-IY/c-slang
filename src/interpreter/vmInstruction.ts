@@ -1,12 +1,13 @@
 import {
   type AssignInstr,
+  type CallInstr,
   type DoneInstr,
-  type ExitFunctionInstr,
+  type TeardownInstr,
   type GotoInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
-  type SetupBlockInstr,
-  type TeardownBlockInstr
+  type LoadSymbolInstr,
+  type ExitFunctionInstr
 } from './types/vmInstruction';
 import { type SymbolTableEntryPosition } from './types/virtualMachine';
 import { type Value } from './types/evaluationResults';
@@ -20,12 +21,17 @@ export const constructAssignInstr = (
   symbolTableEntryPosition: position
 });
 
+export const constructCallInstr = (numOfArgs: number): CallInstr => ({
+  type: 'Call',
+  numOfArgs
+});
+
 export const constructDoneInstr = (): DoneInstr => ({
   type: 'Done'
 });
 
 export const constructExitFunctionInstr = (): ExitFunctionInstr => ({
-  type: 'ExitFunctionInstr'
+  type: 'ExitFunction'
 });
 
 export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
@@ -47,13 +53,16 @@ export const constructLoadFunctionInstr = (
   functionInstrAddress
 });
 
-export const constructSetupBlockInstr = (
-  numOfVariables: number
-): SetupBlockInstr => ({
-  type: 'SetupBlock',
-  numOfVariables
+export const constructLoadSymbolInstr = (
+  symbolTableEntryPosition: SymbolTableEntryPosition
+): LoadSymbolInstr => ({
+  type: 'LoadSymbol',
+  symbolTableEntryPosition
 });
 
-export const constructTeardownBlockInstr = (): TeardownBlockInstr => ({
-  type: 'TeardownBlock'
+export const constructTeardownInstr = (
+  returnAddressOffset: number
+): TeardownInstr => ({
+  type: 'Teardown',
+  returnAddressOffset
 });
