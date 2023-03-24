@@ -1531,33 +1531,38 @@ export class ASTBuilder implements CVisitor<any> {
       expression = this.visitPostfixExpression(postfixExpression);
     }
 
-    if (expression === undefined) {
-      const unaryOperator = ctx.unaryOperator();
-      const castExpression = ctx.castExpression();
-      if (unaryOperator !== undefined && castExpression === undefined) {
-        throw new BrokenInvariantError(
-          'Encountered a UnaryExpression with a UnaryOperator but no CastExpression.'
-        );
-      }
-      if (unaryOperator === undefined && castExpression !== undefined) {
-        throw new BrokenInvariantError(
-          'Encountered a UnaryExpression with a CastExpression but no UnaryOperator.'
-        );
-      }
-      if (unaryOperator !== undefined && castExpression !== undefined) {
-        expression = {
-          type: 'UnaryExpression',
-          operator: this.visitUnaryOperator(unaryOperator),
-          operand: this.visitCastExpression(castExpression)
-        };
-      }
+    const unaryOperator = ctx.unaryOperator();
+    const castExpression = ctx.castExpression();
+    if (
+      expression !== undefined &&
+      (unaryOperator !== undefined || castExpression !== undefined)
+    ) {
+      throw new BrokenInvariantError('Encountered an invalid UnaryExpression.');
+    }
+    if (unaryOperator !== undefined && castExpression === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with a UnaryOperator but no CastExpression.'
+      );
+    }
+    if (unaryOperator === undefined && castExpression !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with a CastExpression but no UnaryOperator.'
+      );
+    }
+    if (unaryOperator !== undefined && castExpression !== undefined) {
+      expression = {
+        type: 'UnaryExpression',
+        operator: this.visitUnaryOperator(unaryOperator),
+        operand: this.visitCastExpression(castExpression)
+      };
     }
 
-    if (expression === undefined) {
-      const typeName = ctx.typeName();
-      if (typeName !== undefined) {
-        expression = this.visitTypeName(typeName);
-      }
+    const typeName = ctx.typeName();
+    if (expression !== undefined && typeName !== undefined) {
+      throw new BrokenInvariantError('Encountered an invalid UnaryExpression.');
+    }
+    if (typeName !== undefined) {
+      expression = this.visitTypeName(typeName);
     }
 
     const children = ctx.children;
