@@ -5,11 +5,7 @@ import { type Instr } from './instructions';
 export type CompilerMapping = {
   [NodeType in Node['type']]: (
     node: Extract<Node, { type: NodeType }>,
-    state: CompilerState
+    instructions: Instr[],
+    symbolTable: SymbolTable
   ) => void;
 };
-
-export interface CompilerState {
-  instructions: Instr[];
-  symbolTable: SymbolTable;
-}

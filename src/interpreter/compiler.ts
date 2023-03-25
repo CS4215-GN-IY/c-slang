@@ -1,4 +1,4 @@
-import { type CompilerMapping, type CompilerState } from './types/compiler';
+import { type CompilerMapping } from './types/compiler';
 import {
   type ArrayAccessExpression,
   type AssignmentExpression,
@@ -77,57 +77,68 @@ export const compileProgram = (ast: Program): Instr[] => {
     tail: null,
     parent: null
   };
-  const state: CompilerState = {
-    symbolTable,
-    instructions: []
-  };
-  compile(ast, state);
-  const mainCallExpression = constructMainCallExpression();
-  compile(mainCallExpression, state);
-  const doneInstr = constructDoneInstr();
-  state.instructions.push(doneInstr);
-  return state.instructions;
+  const instructions: Instr[] = [];
+  compile(ast, instructions, symbolTable);
+  return instructions;
 };
 
-const compile = (node: Node, state: CompilerState): void => {
+const compile = (
+  node: Node,
+  instructions: Instr[],
+  symbolTable: SymbolTable
+): void => {
   // The typecast allows for mapping to a specific evaluator instr type from their union type.
   // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
-  compilers[node.type](node as any, state);
+  compilers[node.type](node as any, instructions, symbolTable);
 };
 
 const compilers: CompilerMapping = {
   ArrayAccessExpression: (
     node: ArrayAccessExpression,
-    state: CompilerState
+    instructions: Instr[],
+    symbolTable: SymbolTable
   ) => {},
   AssignmentExpression: (
     node: AssignmentExpression,
-    state: CompilerState
+    instructions: Instr[],
+    symbolTable: SymbolTable
   ) => {},
-  BinaryExpression: (node: BinaryExpression, state: CompilerState) => {
-    compile(node.left, state);
-    compile(node.right, state);
+  BinaryExpression: (
+    node: BinaryExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
+    compile(node.left, instructions, symbolTable);
+    compile(node.right, instructions, symbolTable);
     const binaryOperationInstr = constructBinaryOperationInstr(node.operator);
-    state.instructions.push(binaryOperationInstr);
+    instructions.push(binaryOperationInstr);
   },
-  BlockStatement: (node: BlockStatement, state: CompilerState) => {
-    const blockSymbolTable = addBlockSymbolTableEntries(
-      node,
-      state.symbolTable
-    );
+  BlockStatement: (
+    node: BlockStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
+    const blockSymbolTable = addBlockSymbolTableEntries(node, symbolTable);
     node.items.forEach((item) => {
-      state.symbolTable = blockSymbolTable;
-      compile(item, state);
+      compile(item, instructions, blockSymbolTable);
     });
   },
-  BreakStatement: (node: BreakStatement, state: CompilerState) => {},
-  CallExpression: (node: CallExpression, state: CompilerState) => {
+  BreakStatement: (
+    node: BreakStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  CallExpression: (
+    node: CallExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     if (!isIdentifier(node.callee)) {
       throw new InvalidCallError('Cannot call non-identifier.');
     }
     const functionEntry = getFunctionSymbolTableEntry(
       node.callee.name,
-      state.symbolTable
+      symbolTable
     );
     if (functionEntry.numOfParams !== node.arguments.length) {
       throw new InvalidCallError(
@@ -135,80 +146,132 @@ const compilers: CompilerMapping = {
       );
     }
 
-    compile(node.callee, state);
+    compile(node.callee, instructions, symbolTable);
     node.arguments.forEach((arg) => {
-      compile(arg, state);
+      compile(arg, instructions, symbolTable);
     });
     const callInstr = constructCallInstr(
       node.arguments.length,
       functionEntry.numOfVariables
     );
-    state.instructions.push(callInstr);
+    instructions.push(callInstr);
   },
   ConditionalExpression: (
     node: ConditionalExpression,
-    state: CompilerState
+    instructions: Instr[],
+    symbolTable: SymbolTable
   ) => {
-    compile(node.predicate, state);
+    compile(node.predicate, instructions, symbolTable);
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
-    state.instructions.push(jumpOnFalseInstr);
-    compile(node.consequent, state);
+    instructions.push(jumpOnFalseInstr);
+    compile(node.consequent, instructions, symbolTable);
     const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    state.instructions.push(gotoInstr);
-    jumpOnFalseInstr.instrAddress = state.instructions.length;
-    compile(node.alternate, state);
-    gotoInstr.instrAddress = state.instructions.length;
+    instructions.push(gotoInstr);
+    jumpOnFalseInstr.instrAddress = instructions.length;
+    compile(node.alternate, instructions, symbolTable);
+    gotoInstr.instrAddress = instructions.length;
   },
-  Constant: (node: Constant, state: CompilerState) => {
+  Constant: (
+    node: Constant,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     const loadConstantInstr = constructLoadConstantInstr(node.value);
-    state.instructions.push(loadConstantInstr);
+    instructions.push(loadConstantInstr);
   },
-  ContinueStatement: (node: ContinueStatement, state: CompilerState) => {},
-  DefaultStatement: (node: DefaultStatement, state: CompilerState) => {},
-  DoWhileStatement: (node: DoWhileStatement, state: CompilerState) => {},
-  EmptyStatement: (node: EmptyStatement, state: CompilerState) => {},
-  ExpressionStatement: (node: ExpressionStatement, state: CompilerState) => {},
-  ForStatement: (node: ForStatement, state: CompilerState) => {},
-  FunctionDeclaration: (node: FunctionDeclaration, state: CompilerState) => {
+  ContinueStatement: (
+    node: ContinueStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  DefaultStatement: (
+    node: DefaultStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  DoWhileStatement: (
+    node: DoWhileStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  EmptyStatement: (
+    node: EmptyStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  ExpressionStatement: (
+    node: ExpressionStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  ForStatement: (
+    node: ForStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  FunctionDeclaration: (
+    node: FunctionDeclaration,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     const loadFunctionInstr = constructLoadFunctionInstr(PLACEHOLDER_ADDRESS);
-    state.instructions.push(loadFunctionInstr);
+    instructions.push(loadFunctionInstr);
     const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    state.instructions.push(gotoInstr);
+    instructions.push(gotoInstr);
 
-    loadFunctionInstr.functionInstrAddress = state.instructions.length;
+    loadFunctionInstr.functionInstrAddress = instructions.length;
 
     // TODO: Replace param declarations when parameter list is supported
     const functionSymbolTable = addFunctionSymbolTableEntries(
       [],
       node,
-      state.symbolTable
+      symbolTable
     );
     if (!isEmptyStatement(node.body)) {
       node.body.items.forEach((item) => {
-        state.symbolTable = functionSymbolTable;
-        compile(item, state);
+        compile(item, instructions, functionSymbolTable);
       });
     }
     const teardownInstr = constructTeardownInstr();
-    state.instructions.push(teardownInstr);
+    instructions.push(teardownInstr);
 
-    gotoInstr.instrAddress = state.instructions.length;
+    gotoInstr.instrAddress = instructions.length;
 
     const assignInstr = constructAssignInstr(
-      getSymbolTableEntry(node.id.name, state.symbolTable)
+      getSymbolTableEntry(node.id.name, symbolTable)
     );
-    state.instructions.push(assignInstr);
+    instructions.push(assignInstr);
   },
-  GotoStatement: (node: GotoStatement, state: CompilerState) => {},
-  Identifier: (node: Identifier, state: CompilerState) => {
+  GotoStatement: (
+    node: GotoStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  Identifier: (
+    node: Identifier,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     const loadSymbolInstr = constructLoadSymbolInstr(
-      getSymbolTableEntry(node.name, state.symbolTable)
+      getSymbolTableEntry(node.name, symbolTable)
     );
-    state.instructions.push(loadSymbolInstr);
+    instructions.push(loadSymbolInstr);
   },
-  IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
-  IfStatement: (node: IfStatement, state: CompilerState) => {},
-  LogicalExpression: (node: LogicalExpression, state: CompilerState) => {
+  IdentifierStatement: (
+    node: IdentifierStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  IfStatement: (
+    node: IfStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  LogicalExpression: (
+    node: LogicalExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     let conditionalExpression;
     if (node.operator === '&&') {
       conditionalExpression = constructConditionalExpression(
@@ -230,59 +293,95 @@ const compilers: CompilerMapping = {
         UnsupportedOperatorErrorType.LOGICAL
       );
     }
-    compile(conditionalExpression, state);
+    compile(conditionalExpression, instructions, symbolTable);
   },
-  MemberExpression: (node: MemberExpression, state: CompilerState) => {},
-  Program: (node: Program, state: CompilerState) => {
-    const programSymbolTable = addProgramSymbolTableEntries(
-      node,
-      state.symbolTable
-    );
+  MemberExpression: (
+    node: MemberExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  Program: (node: Program, instructions: Instr[], symbolTable: SymbolTable) => {
+    const programSymbolTable = addProgramSymbolTableEntries(node, symbolTable);
     const enterProgramInstr = constructEnterProgramInstr(
       getNumOfEntriesInFrame(programSymbolTable.head)
     );
-    state.instructions.push(enterProgramInstr);
+    instructions.push(enterProgramInstr);
     node.body.forEach((item) => {
-      state.symbolTable = programSymbolTable;
-      compile(item, state);
+      compile(item, instructions, programSymbolTable);
     });
+    const mainCallExpression = constructMainCallExpression();
+    compile(mainCallExpression, instructions, programSymbolTable);
+    const doneInstr = constructDoneInstr();
+    instructions.push(doneInstr);
   },
-  ReturnStatement: (node: ReturnStatement, state: CompilerState) => {
+  ReturnStatement: (
+    node: ReturnStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     // TODO: Check if return with no argument works correctly.
     if (isNotUndefined(node.argument)) {
       if (node.argument.expressions.length > 1) {
         throw new InvalidCallError('Encountered more than 1 return value');
       }
-      compile(node.argument.expressions[0], state);
+      compile(node.argument.expressions[0], instructions, symbolTable);
     }
     // TODO: Handle tail call.
     const teardownInstr = constructTeardownInstr();
-    state.instructions.push(teardownInstr);
+    instructions.push(teardownInstr);
   },
-  SequenceExpression: (node: SequenceExpression, state: CompilerState) => {
+  SequenceExpression: (
+    node: SequenceExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     node.expressions.forEach((expression) => {
-      compile(expression, state);
+      compile(expression, instructions, symbolTable);
     });
   },
-  StringLiteral: (node: StringLiteral, state: CompilerState) => {},
-  SwitchStatement: (node: SwitchStatement, state: CompilerState) => {},
-  UnaryExpression: (node: UnaryExpression, state: CompilerState) => {},
-  UpdateExpression: (node: UpdateExpression, state: CompilerState) => {},
-  VariableDeclaration: (node: VariableDeclaration, state: CompilerState) => {
+  StringLiteral: (
+    node: StringLiteral,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  SwitchStatement: (
+    node: SwitchStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  UnaryExpression: (
+    node: UnaryExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  UpdateExpression: (
+    node: UpdateExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
+  VariableDeclaration: (
+    node: VariableDeclaration,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {
     node.declarations.forEach((declarator) => {
       const initialValue = declarator.initialValue;
       if (isNotUndefined(initialValue)) {
-        compile(initialValue, state);
+        compile(initialValue, instructions, symbolTable);
         // Declaration names should have been added to the symbol table by the parent scope.
         // Should only need to assign for declaration in last frame.
         const entry = getSymbolTableEntryInFrame(
           declarator.id.name,
-          state.symbolTable.head
+          symbolTable.head
         );
         const assignInstr = constructAssignInstr(entry);
-        state.instructions.push(assignInstr);
+        instructions.push(assignInstr);
       }
     });
   },
-  WhileStatement: (node: WhileStatement, state: CompilerState) => {}
+  WhileStatement: (
+    node: WhileStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {}
 };
