@@ -1,4 +1,9 @@
-import { type EvaluatorMapping, type EvaluatorState } from './types/evaluator';
+import {
+  type EvaluatorMapping,
+  type EvaluatorState,
+  type Result,
+  type Value
+} from './types/evaluator';
 import {
   type AssignInstr,
   type BinaryOperationInstr,
@@ -11,8 +16,7 @@ import {
   type LoadFunctionInstr,
   type LoadSymbolInstr,
   type TeardownInstr
-} from './types/vmInstruction';
-import { type Result, type Value } from './types/evaluationResults';
+} from './types/instruction';
 import {
   evaluateBinaryExpression,
   isAddress,

@@ -1,4 +1,3 @@
-import { type Value } from './types/evaluationResults';
 import { type TypeofResult } from './types/evaluatorUtils';
 import { type BinaryOperator } from '../ast/types';
 import {
@@ -8,6 +7,7 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import { FALSE_VALUE } from '../utils/constants';
+import { type Value } from './types/evaluator';
 
 export const typeOf = (v: Value): TypeofResult => typeof v;
 export const isNumber = (v: Value): v is number => typeOf(v) === 'number';

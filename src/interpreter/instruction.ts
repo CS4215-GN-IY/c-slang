@@ -11,10 +11,10 @@ import {
   type BinaryOperationInstr,
   type BinaryOperator,
   type JumpOnFalseInstr
-} from './types/vmInstruction';
-import { type Value } from './types/evaluationResults';
+} from './types/instruction';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
+import { type Value } from './types/evaluator';
 
 export const PLACEHOLDER_ADDRESS = -1;
 

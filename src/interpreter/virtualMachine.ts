@@ -49,7 +49,7 @@ import {
   constructLoadSymbolInstr,
   constructTeardownInstr,
   PLACEHOLDER_ADDRESS
-} from './vmInstruction';
+} from './instruction';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {

@@ -1,4 +1,4 @@
-import { type Instr } from '../interpreter/types/vmInstruction';
+import { type Instr } from '../interpreter/types/instruction';
 
 export class TextMemory {
   private readonly instructions: Instr[] = [];

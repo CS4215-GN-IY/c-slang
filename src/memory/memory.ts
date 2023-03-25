@@ -1,6 +1,6 @@
 import { VirtualMemory } from './virtualMemory';
 import { TextMemory } from './textMemory';
-import { type Instr } from '../interpreter/types/vmInstruction';
+import { type Instr } from '../interpreter/types/instruction';
 import { Segment } from './segment';
 import { MemoryError, MemoryErrorType } from './memoryError';
 

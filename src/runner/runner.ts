@@ -1,6 +1,6 @@
-import { type Result } from '../interpreter/types/evaluationResults';
 import { parse } from '../parser/parser';
 import { evaluate } from '../interpreter/evaluator';
+import { type Result } from '../interpreter/types/evaluator';
 
 /**
  * Runs the C code asynchronously & returns the result of evaluation.
