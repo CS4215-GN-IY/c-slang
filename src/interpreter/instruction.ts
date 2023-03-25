@@ -14,7 +14,7 @@ import {
 } from './types/instruction';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
-import { type Value } from './types/evaluator';
+import { type Value } from './types/virtualMachine';
 
 export const PLACEHOLDER_ADDRESS = -1;
 

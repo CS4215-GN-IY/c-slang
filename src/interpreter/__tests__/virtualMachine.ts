@@ -1,6 +1,6 @@
 import { parse } from '../../parser/parser';
-import { compileProgram } from '../virtualMachine';
-import { interpret } from '../evaluator';
+import { compileProgram } from '../compiler';
+import { interpret } from '../virtualMachine';
 import { FALSE_VALUE } from '../../utils/constants';
 
 describe('compile and run', () => {

@@ -1,4 +1,4 @@
-import { type TypeofResult } from './types/evaluatorUtils';
+import { type TypeofResult } from './types/virtualMachineUtils';
 import { type BinaryOperator } from '../ast/types';
 import {
   TypeError,
@@ -7,7 +7,7 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import { FALSE_VALUE } from '../utils/constants';
-import { type Value } from './types/evaluator';
+import { type Value } from './types/virtualMachine';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';

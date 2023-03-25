@@ -1,5 +1,5 @@
 import { type Segment } from '../../memory/segment';
-import { type Value } from './evaluator';
+import { type Value } from './virtualMachine';
 
 interface BaseInstr {
   type: string;
