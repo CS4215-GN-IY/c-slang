@@ -136,7 +136,9 @@ const compilers: CompilerMapping = {
     }
 
     compile(node.callee, state);
-    node.arguments.forEach((arg) => { compile(arg, state); });
+    node.arguments.forEach((arg) => {
+      compile(arg, state);
+    });
     const callInstr = constructCallInstr(
       node.arguments.length,
       functionEntry.numOfVariables

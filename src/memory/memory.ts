@@ -6,7 +6,7 @@ import { MemoryError, MemoryErrorType } from './memoryError';
 
 export class Memory {
   private readonly virtualMemory;
-  readonly textMemory;
+  private readonly textMemory;
 
   constructor(
     instructions: Instr[],
