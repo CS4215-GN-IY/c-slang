@@ -17,8 +17,9 @@ export class InvalidFunctionIdentifierError extends InterpreterError {
 export class RedeclaredNameError extends InterpreterError {}
 
 export enum TypeErrorContext {
-  ADDRESS = ' for an address',
   NA = '',
+  ADDRESS = ' for an address',
+  PREDICATE = ' for a predicate',
   LHS = ' on left hand side of operation',
   RHS = ' on right hand side of operation'
 }

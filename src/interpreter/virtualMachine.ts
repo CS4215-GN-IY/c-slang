@@ -9,6 +9,7 @@ import {
   type BlockStatement,
   type BreakStatement,
   type CallExpression,
+  type ConditionalExpression,
   type Constant,
   type ContinueStatement,
   type DefaultStatement,
@@ -29,6 +30,7 @@ import {
   type SequenceExpression,
   type StringLiteral,
   type SwitchStatement,
+  type UnaryExpression,
   type UpdateExpression,
   type VariableDeclaration,
   type WhileStatement
@@ -45,12 +47,18 @@ import {
   PLACEHOLDER_ADDRESS,
   constructLoadSymbolInstr,
   constructEnterProgramInstr,
-  constructBinaryOperationInstr
+  constructBinaryOperationInstr,
+  constructJumpOnFalseInstr
 } from './vmInstruction';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import { InvalidCallError } from './errors';
-import { constructMainCallExpression } from '../ast/constructors';
+import {
+  constructConditionalExpression,
+  constructFalseConstant,
+  constructMainCallExpression,
+  constructTrueConstant
+} from '../ast/constructors';
 import { type SymbolTable } from './types/symbolTable';
 import {
   addBlockSymbolTableEntries,
@@ -135,6 +143,20 @@ const compilers: CompilerMapping = {
     );
     state.memory.textAllocate(callInstr);
   },
+  ConditionalExpression: (
+    node: ConditionalExpression,
+    state: CompilerState
+  ) => {
+    compile(node.predicate, state);
+    const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+    state.memory.textAllocate(jumpOnFalseInstr);
+    compile(node.consequent, state);
+    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
+    state.memory.textAllocate(gotoInstr);
+    jumpOnFalseInstr.instrAddress = state.memory.textGetNextFreeAddress();
+    compile(node.alternate, state);
+    gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
+  },
   Constant: (node: Constant, state: CompilerState) => {
     const loadConstantInstr = constructLoadConstantInstr(node.value);
     state.memory.textAllocate(loadConstantInstr);
@@ -185,7 +207,21 @@ const compilers: CompilerMapping = {
   },
   IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
   IfStatement: (node: IfStatement, state: CompilerState) => {},
-  LogicalExpression: (node: LogicalExpression, state: CompilerState) => {},
+  LogicalExpression: (node: LogicalExpression, state: CompilerState) => {
+    const conditionalExpression =
+      node.operator === '&&'
+        ? constructConditionalExpression(
+            node.left,
+            node.right,
+            constructFalseConstant()
+          )
+        : constructConditionalExpression(
+            node.left,
+            constructTrueConstant(),
+            node.right
+          );
+    compile(conditionalExpression, state);
+  },
   MemberExpression: (node: MemberExpression, state: CompilerState) => {},
   Program: (node: Program, state: CompilerState) => {
     const programSymbolTable = addProgramSymbolTableEntries(
@@ -213,9 +249,12 @@ const compilers: CompilerMapping = {
     const teardownInstr = constructTeardownInstr();
     state.memory.textAllocate(teardownInstr);
   },
-  SequenceExpression: (node: SequenceExpression, state: CompilerState) => {},
+  SequenceExpression: (node: SequenceExpression, state: CompilerState) => {
+    node.expressions.forEach((expression) => { compile(expression, state); });
+  },
   StringLiteral: (node: StringLiteral, state: CompilerState) => {},
   SwitchStatement: (node: SwitchStatement, state: CompilerState) => {},
+  UnaryExpression: (node: UnaryExpression, state: CompilerState) => {},
   UpdateExpression: (node: UpdateExpression, state: CompilerState) => {},
   VariableDeclaration: (node: VariableDeclaration, state: CompilerState) => {},
   WhileStatement: (node: WhileStatement, state: CompilerState) => {}

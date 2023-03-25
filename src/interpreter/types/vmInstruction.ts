@@ -12,6 +12,7 @@ export type Instr =
   | DoneInstr
   | EnterProgramInstr
   | GotoInstr
+  | JumpOnFalseInstr
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
@@ -45,6 +46,11 @@ export interface EnterProgramInstr extends BaseInstr {
 
 export interface GotoInstr extends BaseInstr {
   type: 'Goto';
+  instrAddress: number;
+}
+
+export interface JumpOnFalseInstr extends BaseInstr {
+  type: 'JumpOnFalse';
   instrAddress: number;
 }
 

@@ -1,8 +1,10 @@
 import { type TerminalNode } from 'antlr4ts/tree';
 import {
   type CallExpression,
+  type ConditionalExpression,
   type Constant,
   type EmptyStatement,
+  type Expression,
   type Identifier,
   type StringLiteral
 } from './types';
@@ -20,6 +22,19 @@ export const constructConstant = (constant: TerminalNode): Constant => {
   return {
     type: 'Constant',
     value
+  };
+};
+
+export const constructConditionalExpression = (
+  predicate: Expression,
+  consequent: Expression,
+  alternate: Expression
+): ConditionalExpression => {
+  return {
+    type: 'ConditionalExpression',
+    predicate,
+    consequent,
+    alternate
   };
 };
 

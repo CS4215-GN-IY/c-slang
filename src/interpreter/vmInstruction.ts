@@ -9,7 +9,8 @@ import {
   type LoadSymbolInstr,
   type EnterProgramInstr,
   type BinaryOperationInstr,
-  type BinaryOperator
+  type BinaryOperator,
+  type JumpOnFalseInstr
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
 import { type SymbolTableEntry } from './types/symbolTable';
@@ -52,6 +53,13 @@ export const constructEnterProgramInstr = (
 
 export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
   type: 'Goto',
+  instrAddress
+});
+
+export const constructJumpOnFalseInstr = (
+  instrAddress: number
+): JumpOnFalseInstr => ({
+  type: 'JumpOnFalse',
   instrAddress
 });
 

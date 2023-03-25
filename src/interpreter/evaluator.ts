@@ -6,17 +6,22 @@ import {
   type DoneInstr,
   type EnterProgramInstr,
   type GotoInstr,
+  type JumpOnFalseInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
   type TeardownInstr
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
-import { isAddress, typeOf } from './evaluatorUtils';
+import { isAddress, isNumber, typeOf } from './evaluatorUtils';
 import { TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
-import { evaluateBinaryExpression, typeCheckBinaryOperation } from './utils';
+import {
+  evaluateBinaryExpression,
+  isTrue,
+  typeCheckBinaryOperation,
+} from './utils';
 
 export const interpret = (compilation: CompilerState): Value => {
   const stash = new Stack<Value>();
@@ -71,6 +76,21 @@ const evaluators: EvaluatorMapping = {
   },
   Goto: (command: GotoInstr, state: EvaluatorState) => {
     state.memory.moveToInstr(command.instrAddress);
+  },
+  JumpOnFalse: (command: JumpOnFalseInstr, state: EvaluatorState) => {
+    const predicate = state.stash.pop();
+    if (!isNumber(predicate)) {
+      throw new TypeError(
+        'number',
+        typeOf(predicate),
+        TypeErrorContext.PREDICATE
+      );
+    }
+    if (isTrue(predicate)) {
+      state.memory.moveToNextInstr();
+    } else {
+      state.memory.moveToInstr(command.instrAddress);
+    }
   },
   LoadConstant: (command: LoadConstantInstr, state: EvaluatorState) => {
     state.stash.push(command.value);
