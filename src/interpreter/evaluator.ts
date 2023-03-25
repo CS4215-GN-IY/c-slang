@@ -11,6 +11,7 @@ import {
   type DoneInstr,
   type EnterProgramInstr,
   type GotoInstr,
+  type Instr,
   type JumpOnFalseInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
@@ -24,10 +25,10 @@ import {
   isTrue,
   typeCheckBinaryOperation
 } from './evaluatorUtils';
-import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
 import { type Program } from '../ast/types';
 import { compileProgram } from './virtualMachine';
+import { Memory } from '../memory/memory';
 
 /**
  * Evaluates the abstract syntax tree using a virtual machine evaluator &
@@ -42,8 +43,8 @@ export const evaluate = async (ast: Program): Promise<Result> => {
       _reject: (reason?: any) => void
     ) => {
       try {
-        const compilation = compileProgram(ast);
-        const value = interpret(compilation);
+        const instructions = compileProgram(ast);
+        const value = interpret(instructions);
         resolve({ status: 'finished', value });
       } catch (err) {
         resolve({ status: 'error' });
@@ -52,10 +53,11 @@ export const evaluate = async (ast: Program): Promise<Result> => {
   );
 };
 
-export const interpret = (compilation: CompilerState): Value => {
+export const interpret = (instructions: Instr[]): Value => {
+  const memory = new Memory(instructions, 1000, 1000, 1000);
   const stash = new Stack<Value>();
   const state: EvaluatorState = {
-    memory: compilation.memory,
+    memory,
     stash
   };
   while (!state.memory.isAtDoneInstr()) {

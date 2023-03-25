@@ -35,7 +35,6 @@ import {
   type VariableDeclaration,
   type WhileStatement
 } from '../ast/types';
-import { Memory } from '../memory/memory';
 import {
   constructAssignInstr,
   constructBinaryOperationInstr,
@@ -73,24 +72,24 @@ import {
   getSymbolTableEntry,
   getSymbolTableEntryInFrame
 } from './symbolTable';
+import { type Instr } from './types/instruction';
 
-export const compileProgram = (ast: Program): CompilerState => {
+export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
     head: {},
     tail: null,
     parent: null
   };
-  const memory = new Memory(1000, 1000, 1000);
   const state: CompilerState = {
     symbolTable,
-    memory
+    instructions: []
   };
   compile(ast, state);
   const mainCallExpression = constructMainCallExpression();
   compile(mainCallExpression, state);
   const doneInstr = constructDoneInstr();
-  state.memory.textAllocate(doneInstr);
-  return state;
+  state.instructions.push(doneInstr);
+  return state.instructions;
 };
 
 const compile = (node: Node, state: CompilerState): void => {
@@ -112,7 +111,7 @@ const compilers: CompilerMapping = {
     compile(node.left, state);
     compile(node.right, state);
     const binaryOperationInstr = constructBinaryOperationInstr(node.operator);
-    state.memory.textAllocate(binaryOperationInstr);
+    state.instructions.push(binaryOperationInstr);
   },
   BlockStatement: (node: BlockStatement, state: CompilerState) => {
     const blockSymbolTable = addBlockSymbolTableEntries(
@@ -149,7 +148,7 @@ const compilers: CompilerMapping = {
       node.arguments.length,
       functionEntry.numOfVariables
     );
-    state.memory.textAllocate(callInstr);
+    state.instructions.push(callInstr);
   },
   ConditionalExpression: (
     node: ConditionalExpression,
@@ -157,17 +156,17 @@ const compilers: CompilerMapping = {
   ) => {
     compile(node.predicate, state);
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
-    state.memory.textAllocate(jumpOnFalseInstr);
+    state.instructions.push(jumpOnFalseInstr);
     compile(node.consequent, state);
     const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    state.memory.textAllocate(gotoInstr);
-    jumpOnFalseInstr.instrAddress = state.memory.textGetNextFreeAddress();
+    state.instructions.push(gotoInstr);
+    jumpOnFalseInstr.instrAddress = state.instructions.length;
     compile(node.alternate, state);
-    gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
+    gotoInstr.instrAddress = state.instructions.length;
   },
   Constant: (node: Constant, state: CompilerState) => {
     const loadConstantInstr = constructLoadConstantInstr(node.value);
-    state.memory.textAllocate(loadConstantInstr);
+    state.instructions.push(loadConstantInstr);
   },
   ContinueStatement: (node: ContinueStatement, state: CompilerState) => {},
   DefaultStatement: (node: DefaultStatement, state: CompilerState) => {},
@@ -177,12 +176,11 @@ const compilers: CompilerMapping = {
   ForStatement: (node: ForStatement, state: CompilerState) => {},
   FunctionDeclaration: (node: FunctionDeclaration, state: CompilerState) => {
     const loadFunctionInstr = constructLoadFunctionInstr(PLACEHOLDER_ADDRESS);
-    state.memory.textAllocate(loadFunctionInstr);
+    state.instructions.push(loadFunctionInstr);
     const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    state.memory.textAllocate(gotoInstr);
+    state.instructions.push(gotoInstr);
 
-    loadFunctionInstr.functionInstrAddress =
-      state.memory.textGetNextFreeAddress();
+    loadFunctionInstr.functionInstrAddress = state.instructions.length;
 
     // TODO: Replace param declarations when parameter list is supported
     const functionSymbolTable = addFunctionSymbolTableEntries(
@@ -197,21 +195,21 @@ const compilers: CompilerMapping = {
       });
     }
     const teardownInstr = constructTeardownInstr();
-    state.memory.textAllocate(teardownInstr);
+    state.instructions.push(teardownInstr);
 
-    gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
+    gotoInstr.instrAddress = state.instructions.length;
 
     const assignInstr = constructAssignInstr(
       getSymbolTableEntry(node.id.name, state.symbolTable)
     );
-    state.memory.textAllocate(assignInstr);
+    state.instructions.push(assignInstr);
   },
   GotoStatement: (node: GotoStatement, state: CompilerState) => {},
   Identifier: (node: Identifier, state: CompilerState) => {
     const loadSymbolInstr = constructLoadSymbolInstr(
       getSymbolTableEntry(node.name, state.symbolTable)
     );
-    state.memory.textAllocate(loadSymbolInstr);
+    state.instructions.push(loadSymbolInstr);
   },
   IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
   IfStatement: (node: IfStatement, state: CompilerState) => {},
@@ -248,7 +246,7 @@ const compilers: CompilerMapping = {
     const enterProgramInstr = constructEnterProgramInstr(
       getNumOfEntriesInFrame(programSymbolTable.head)
     );
-    state.memory.textAllocate(enterProgramInstr);
+    state.instructions.push(enterProgramInstr);
     node.body.forEach((item) => {
       state.symbolTable = programSymbolTable;
       compile(item, state);
@@ -264,7 +262,7 @@ const compilers: CompilerMapping = {
     }
     // TODO: Handle tail call.
     const teardownInstr = constructTeardownInstr();
-    state.memory.textAllocate(teardownInstr);
+    state.instructions.push(teardownInstr);
   },
   SequenceExpression: (node: SequenceExpression, state: CompilerState) => {
     node.expressions.forEach((expression) => {
@@ -287,7 +285,7 @@ const compilers: CompilerMapping = {
           state.symbolTable.head
         );
         const assignInstr = constructAssignInstr(entry);
-        state.memory.textAllocate(assignInstr);
+        state.instructions.push(assignInstr);
       }
     });
   },

@@ -1,6 +1,6 @@
-import { type Memory } from '../../memory/memory';
 import { type Node } from '../../ast/types';
 import { type SymbolTable } from './symbolTable';
+import { type Instr } from './instruction';
 
 export type CompilerMapping = {
   [NodeType in Node['type']]: (
@@ -10,6 +10,6 @@ export type CompilerMapping = {
 };
 
 export interface CompilerState {
-  memory: Memory;
+  instructions: Instr[];
   symbolTable: SymbolTable;
 }
