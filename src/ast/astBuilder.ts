@@ -16,7 +16,9 @@ import {
   type SelectionStatement,
   type Statement,
   type VariableDeclaration,
-  type VariableDeclarator
+  type VariableDeclarator,
+  type UnaryOperator,
+  type AssignmentOperator
 } from './types';
 import {
   type ErrorNode,
@@ -235,14 +237,90 @@ export class ASTBuilder implements CVisitor<any> {
       return this.visitConditionalExpression(conditionalExpression);
     }
 
-    // TODO: Deal with assignments.
-    // TODO: Deal with number sequence.
-
-    throw new UnreachableCaseError();
+    const unaryExpression = ctx.unaryExpression();
+    const assignmentOperator = ctx.assignmentOperator();
+    const assignmentExpression = ctx.assignmentExpression();
+    if (
+      unaryExpression === undefined &&
+      assignmentOperator === undefined &&
+      assignmentExpression === undefined
+    ) {
+      throw new UnreachableCaseError();
+    }
+    if (
+      unaryExpression === undefined ||
+      assignmentOperator === undefined ||
+      assignmentExpression === undefined
+    ) {
+      throw new BrokenInvariantError(
+        'Encountered an AssignmentExpression where at least one of UnaryExpression, AssignmentOperator, and AssignmentExpression is undefined.'
+      );
+    }
+    return {
+      type: 'AssignmentExpression',
+      operator: this.visitAssignmentOperator(assignmentOperator),
+      left: this.visitUnaryExpression(unaryExpression),
+      right: this.visitAssignmentExpression(assignmentExpression)
+    };
   }
 
-  visitAssignmentOperator(ctx: AssignmentOperatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitAssignmentOperator(ctx: AssignmentOperatorContext): AssignmentOperator {
+    const assignmentOperator = ctx.Assign();
+    if (assignmentOperator !== undefined) {
+      return '=';
+    }
+
+    const multiplicationAssignmentOperator = ctx.StarAssign();
+    if (multiplicationAssignmentOperator !== undefined) {
+      return '*=';
+    }
+
+    const divisionAssignmentOperator = ctx.DivAssign();
+    if (divisionAssignmentOperator !== undefined) {
+      return '/=';
+    }
+
+    const remainderAssignmentOperator = ctx.ModAssign();
+    if (remainderAssignmentOperator !== undefined) {
+      return '%=';
+    }
+
+    const additionAssignmentOperator = ctx.PlusAssign();
+    if (additionAssignmentOperator !== undefined) {
+      return '+=';
+    }
+
+    const subtractionAssignmentOperator = ctx.MinusAssign();
+    if (subtractionAssignmentOperator !== undefined) {
+      return '-=';
+    }
+
+    const leftShiftAssignmentOperator = ctx.LeftShiftAssign();
+    if (leftShiftAssignmentOperator !== undefined) {
+      return '<<=';
+    }
+
+    const rightShiftAssignmentOperator = ctx.RightShiftAssign();
+    if (rightShiftAssignmentOperator !== undefined) {
+      return '>>=';
+    }
+
+    const bitwiseAndAssignmentOperator = ctx.AndAssign();
+    if (bitwiseAndAssignmentOperator !== undefined) {
+      return '&=';
+    }
+
+    const bitwiseXorAssignmentOperator = ctx.XorAssign();
+    if (bitwiseXorAssignmentOperator !== undefined) {
+      return '^=';
+    }
+
+    const bitwiseOrAssignmentOperator = ctx.OrAssign();
+    if (bitwiseOrAssignmentOperator !== undefined) {
+      return '|=';
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitAtomicTypeSpecifier(ctx: AtomicTypeSpecifierContext): BaseNode {
@@ -305,13 +383,33 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitConditionalExpression(ctx: ConditionalExpressionContext): Expression {
     const logicalOrExpression = ctx.logicalOrExpression();
-    if (logicalOrExpression !== undefined) {
-      return this.visitLogicalOrExpression(logicalOrExpression);
+    if (logicalOrExpression === undefined) {
+      throw new UnreachableCaseError();
+    }
+    let returnedExpression = this.visitLogicalOrExpression(logicalOrExpression);
+
+    const expression = ctx.expression();
+    const conditionalExpression = ctx.conditionalExpression();
+    if (expression !== undefined && conditionalExpression === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ConditionalExpression with an Expression but not ConditionalExpression.'
+      );
+    }
+    if (expression === undefined && conditionalExpression !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ConditionalExpression with a ConditionalExpression but not Expression.'
+      );
+    }
+    if (expression !== undefined && conditionalExpression !== undefined) {
+      returnedExpression = {
+        type: 'ConditionalExpression',
+        predicate: returnedExpression,
+        consequent: this.visitExpression(expression),
+        alternate: this.visitConditionalExpression(conditionalExpression)
+      };
     }
 
-    // TODO: Deal with conditionals.
-
-    throw new UnreachableCaseError();
+    return returnedExpression;
   }
 
   visitConstantExpression(ctx: ConstantExpressionContext): BaseNode {
@@ -1176,7 +1274,7 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       return {
         type: 'IfStatement',
-        test: this.visitExpression(expression),
+        predicate: this.visitExpression(expression),
         consequent: this.visitStatement(firstStatement),
         alternate:
           secondStatement !== undefined
@@ -1314,7 +1412,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitTypeName(ctx: TypeNameContext): BaseNode {
+  visitTypeName(ctx: TypeNameContext): Expression {
     throw new Error('Method not implemented.');
   }
 
@@ -1417,17 +1515,113 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitUnaryExpression(ctx: UnaryExpressionContext): Expression {
+    let expression: Expression | undefined;
+
     const postfixExpression = ctx.postfixExpression();
     if (postfixExpression !== undefined) {
-      return this.visitPostfixExpression(postfixExpression);
+      expression = this.visitPostfixExpression(postfixExpression);
     }
 
-    // TODO: Deal with everything else.
+    const unaryOperator = ctx.unaryOperator();
+    const castExpression = ctx.castExpression();
+    if (
+      expression !== undefined &&
+      (unaryOperator !== undefined || castExpression !== undefined)
+    ) {
+      throw new BrokenInvariantError('Encountered an invalid UnaryExpression.');
+    }
+    if (unaryOperator !== undefined && castExpression === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with a UnaryOperator but no CastExpression.'
+      );
+    }
+    if (unaryOperator === undefined && castExpression !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with a CastExpression but no UnaryOperator.'
+      );
+    }
+    if (unaryOperator !== undefined && castExpression !== undefined) {
+      expression = {
+        type: 'UnaryExpression',
+        operator: this.visitUnaryOperator(unaryOperator),
+        operand: this.visitCastExpression(castExpression)
+      };
+    }
 
-    throw new UnreachableCaseError();
+    const typeName = ctx.typeName();
+    if (expression !== undefined && typeName !== undefined) {
+      throw new BrokenInvariantError('Encountered an invalid UnaryExpression.');
+    }
+    if (typeName !== undefined) {
+      expression = this.visitTypeName(typeName);
+    }
+
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a UnaryExpression with no child nodes.'
+      );
+    }
+
+    if (expression === undefined) {
+      throw new UnreachableCaseError();
+    }
+
+    for (let i = children.length - 1; i >= 0; i--) {
+      const token = children[i].toStringTree();
+      if (token === '_Alignof') {
+        throw new UnsupportedKeywordError('_Alignof');
+      }
+      if (token === '++' || token === '--') {
+        expression = {
+          type: 'UpdateExpression',
+          operator: token,
+          operand: expression,
+          isPrefix: true
+        };
+      } else if (token === 'sizeof') {
+        expression = {
+          type: 'UnaryExpression',
+          operator: token,
+          operand: expression
+        };
+      }
+    }
+
+    return expression;
   }
 
-  visitUnaryOperator(ctx: UnaryOperatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitUnaryOperator(ctx: UnaryOperatorContext): UnaryOperator {
+    const addressOfOperator = ctx.And();
+    if (addressOfOperator !== undefined) {
+      return '&';
+    }
+
+    const indirectionOperator = ctx.Star();
+    if (indirectionOperator !== undefined) {
+      return '*';
+    }
+
+    const unaryPlusOperator = ctx.Plus();
+    if (unaryPlusOperator !== undefined) {
+      return '+';
+    }
+
+    const negationOperator = ctx.Minus();
+    if (negationOperator !== undefined) {
+      return '-';
+    }
+
+    const bitwiseNotOperator = ctx.Tilde();
+    if (bitwiseNotOperator !== undefined) {
+      return '~';
+    }
+
+    const logicalNotOperator = ctx.Not();
+    if (logicalNotOperator !== undefined) {
+      return '!';
+    }
+
+    throw new UnreachableCaseError();
   }
 }
