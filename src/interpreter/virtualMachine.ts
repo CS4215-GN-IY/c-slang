@@ -70,7 +70,8 @@ import {
   addProgramSymbolTableEntries,
   getFunctionSymbolTableEntry,
   getNumOfEntriesInFrame,
-  getSymbolTableEntry
+  getSymbolTableEntry,
+  getSymbolTableEntryInFrame
 } from './symbolTable';
 
 export const compileProgram = (ast: Program): CompilerState => {
@@ -87,11 +88,14 @@ export const compileProgram = (ast: Program): CompilerState => {
   compile(ast, state);
   const mainCallExpression = constructMainCallExpression();
   compile(mainCallExpression, state);
-  state.memory.textAllocate(constructDoneInstr());
+  const doneInstr = constructDoneInstr();
+  state.memory.textAllocate(doneInstr);
   return state;
 };
 
 const compile = (node: Node, state: CompilerState): void => {
+  // The typecast allows for mapping to a specific evaluator instr type from their union type.
+  // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
   compilers[node.type](node as any, state);
 };
 
@@ -258,7 +262,7 @@ const compilers: CompilerMapping = {
       }
       compile(node.argument.expressions[0], state);
     }
-    // TODO: Check tail call.
+    // TODO: Handle tail call.
     const teardownInstr = constructTeardownInstr();
     state.memory.textAllocate(teardownInstr);
   },
@@ -272,18 +276,18 @@ const compilers: CompilerMapping = {
   UnaryExpression: (node: UnaryExpression, state: CompilerState) => {},
   UpdateExpression: (node: UpdateExpression, state: CompilerState) => {},
   VariableDeclaration: (node: VariableDeclaration, state: CompilerState) => {
-    // Declaration names should have been added to the symbol table by the parent scope.
-    // Only need to handle assignment.
     node.declarations.forEach((declarator) => {
       const initialValue = declarator.initialValue;
       if (isNotUndefined(initialValue)) {
         compile(initialValue, state);
-        const entry = getSymbolTableEntry(
+        // Declaration names should have been added to the symbol table by the parent scope.
+        // Should only need to assign for declaration in last frame.
+        const entry = getSymbolTableEntryInFrame(
           declarator.id.name,
-          state.symbolTable
+          state.symbolTable.head
         );
-        const assignmentInstr = constructAssignInstr(entry);
-        state.memory.textAllocate(assignmentInstr);
+        const assignInstr = constructAssignInstr(entry);
+        state.memory.textAllocate(assignInstr);
       }
     });
   },

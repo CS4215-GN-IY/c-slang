@@ -18,14 +18,12 @@ import {
   type TeardownInstr
 } from './types/instruction';
 import {
+  convertToAddress,
+  convertToPredicate,
   evaluateBinaryExpression,
-  isAddress,
-  isNumber,
   isTrue,
-  typeCheckBinaryOperation,
-  typeOf
+  typeCheckBinaryOperation
 } from './evaluatorUtils';
-import { TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
 import { type Program } from '../ast/types';
@@ -71,7 +69,8 @@ export const interpret = (compilation: CompilerState): Value => {
 
 const evaluators: EvaluatorMapping = {
   Assign: (instr: AssignInstr, state: EvaluatorState) => {
-    // TODO: Add conversion method to convert stash value to number.
+    // TODO: Add conversion method to convert various stash values to their respective number.
+    // Do this when types are supported.
     state.memory.setByOffset(instr.scope, instr.offset, state.stash.pop());
     state.memory.moveToNextInstr();
   },
@@ -88,15 +87,7 @@ const evaluators: EvaluatorMapping = {
     for (let i = 0; i < instr.numOfArgs; i++) {
       args.push(state.stash.pop());
     }
-    const functionInstrAddress = state.stash.pop();
-    if (!isAddress(functionInstrAddress)) {
-      throw new TypeError(
-        'number',
-        typeOf(functionInstrAddress),
-        TypeErrorContext.ADDRESS
-      );
-    }
-
+    const functionInstrAddress = convertToAddress(state.stash.pop());
     state.memory.stackFunctionCallAllocate(args, instr.numOfVars);
     state.memory.moveToInstr(functionInstrAddress);
   },
@@ -109,14 +100,7 @@ const evaluators: EvaluatorMapping = {
     state.memory.moveToInstr(instr.instrAddress);
   },
   JumpOnFalse: (instr: JumpOnFalseInstr, state: EvaluatorState) => {
-    const predicate = state.stash.pop();
-    if (!isNumber(predicate)) {
-      throw new TypeError(
-        'number',
-        typeOf(predicate),
-        TypeErrorContext.PREDICATE
-      );
-    }
+    const predicate = convertToPredicate(state.stash.pop());
     if (isTrue(predicate)) {
       state.memory.moveToNextInstr();
     } else {

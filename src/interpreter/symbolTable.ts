@@ -65,9 +65,9 @@ export const addFunctionSymbolTableEntries = (
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame: SymbolTableFrame = {};
-  // Param offset starts from below the rbp, add 1 to leave a space for return address.
-  let offset = -1;
-  paramDeclarations.reverse().forEach((declaration) => {
+  // Params offset from below the rbp, start from -2 to leave a space for return address.
+  let offset = -2;
+  paramDeclarations.forEach((declaration) => {
     const entries = constructVariableDeclarationSymbolTableEntries(
       declaration,
       'Function',
@@ -164,6 +164,16 @@ export const getSymbolTableEntry = (
     currentTable = currentTable.tail;
   }
 
+  throw new UndeclaredNameError(`Encountered an undeclared name: ${name}`);
+};
+
+export const getSymbolTableEntryInFrame = (
+  name: string,
+  frame: SymbolTableFrame
+): SymbolTableEntry => {
+  if (name in frame) {
+    return frame[name];
+  }
   throw new UndeclaredNameError(`Encountered an undeclared name: ${name}`);
 };
 

@@ -9,12 +9,28 @@ import {
 import { FALSE_VALUE } from '../utils/constants';
 import { type Value } from './types/evaluator';
 
-export const typeOf = (v: Value): TypeofResult => typeof v;
-export const isNumber = (v: Value): v is number => typeOf(v) === 'number';
-export const isAddress = (address: Value): address is number =>
-  isNumber(address);
+const typeOf = (v: Value): TypeofResult => typeof v;
+const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 export const isTrue = (num: number): boolean => num !== FALSE_VALUE;
+
+export const convertToAddress = (address: Value): number => {
+  return convertToNumber(address, TypeErrorContext.ADDRESS);
+};
+
+export const convertToPredicate = (value: Value): number => {
+  return convertToNumber(value, TypeErrorContext.PREDICATE);
+};
+
+export const convertToNumber = (
+  number: Value,
+  typeErrorContext: TypeErrorContext
+): number => {
+  if (!isNumber(number)) {
+    throw new TypeError('number', typeOf(number), typeErrorContext);
+  }
+  return number;
+};
 
 export const typeCheckBinaryOperation = (
   operator: BinaryOperator,

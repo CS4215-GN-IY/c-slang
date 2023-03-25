@@ -8,6 +8,7 @@ export class RedeclaredNameError extends InterpreterError {}
 
 export enum TypeErrorContext {
   ADDRESS = ' for an address',
+  BINARY = ' on both sides',
   LHS = ' on left hand side of operation',
   NA = '',
   NAME = ' for a name',
