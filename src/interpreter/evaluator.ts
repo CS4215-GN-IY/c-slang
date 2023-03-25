@@ -52,7 +52,7 @@ const evaluators: EvaluatorMapping = {
       );
     }
 
-    state.memory.stackFunctionCallAllocate(args, 0);
+    state.memory.stackFunctionCallAllocate(args, command.numOfVars);
     state.memory.moveToInstr(functionInstrAddress);
   },
   Done: (command: DoneInstr, state: EvaluatorState) => {},
@@ -77,6 +77,8 @@ const evaluators: EvaluatorMapping = {
     state.memory.moveToNextInstr();
   },
   Teardown: (command: TeardownInstr, state: EvaluatorState) => {
+    const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
+    state.memory.moveToInstr(returnAddress);
   }
 };

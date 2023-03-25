@@ -55,15 +55,16 @@ import {
   addBlockSymbolTableEntries,
   addFunctionSymbolTableEntries,
   addProgramSymbolTableEntries,
+  getFunctionSymbolTableEntry,
   getNumOfEntriesInFrame,
-  getSymbolTableEntry,
-  isFunctionSymbolTableEntry
+  getSymbolTableEntry
 } from './symbolTable';
 
 export const compileProgram = (ast: Program): CompilerState => {
   const symbolTable: SymbolTable = {
     head: {},
-    tail: null
+    tail: null,
+    parent: null
   };
   const memory = new Memory(1000, 1000, 1000);
   const state: CompilerState = {
@@ -106,16 +107,13 @@ const compilers: CompilerMapping = {
     if (!isIdentifier(node.callee)) {
       throw new InvalidCallError('Cannot call non-identifier.');
     }
-    const functionNameEntry = getSymbolTableEntry(
+    const functionEntry = getFunctionSymbolTableEntry(
       node.callee.name,
       state.symbolTable
     );
-    if (!isFunctionSymbolTableEntry(functionNameEntry)) {
-      throw new InvalidCallError('Cannot call a non-function.');
-    }
-    if (functionNameEntry.numOfParams !== node.arguments.length) {
+    if (functionEntry.numOfParams !== node.arguments.length) {
       throw new InvalidCallError(
-        `Function takes in ${functionNameEntry.numOfParams} arguments but ${node.arguments.length} arguments were passed in.`
+        `Function takes in ${functionEntry.numOfParams} arguments but ${node.arguments.length} arguments were passed in.`
       );
     }
 
@@ -125,7 +123,10 @@ const compilers: CompilerMapping = {
     for (let i = node.arguments.length - 1; i >= 0; i--) {
       compile(node.arguments[i], state);
     }
-    const callInstr = constructCallInstr(node.arguments.length);
+    const callInstr = constructCallInstr(
+      node.arguments.length,
+      functionEntry.numOfVariables
+    );
     state.memory.textAllocate(callInstr);
   },
   Constant: (node: Constant, state: CompilerState) => {
@@ -150,7 +151,7 @@ const compilers: CompilerMapping = {
     // TODO: Replace param declarations when parameter list is supported
     const functionSymbolTable = addFunctionSymbolTableEntries(
       [],
-      node.body,
+      node,
       state.symbolTable
     );
     if (!isEmptyStatement(node.body)) {

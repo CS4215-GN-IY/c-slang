@@ -55,10 +55,12 @@ export class Memory {
     this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
   }
 
+  public getReturnAddress(): number {
+    return this.virtualMemory.getReturnAddress();
+  }
+
   public stackFunctionCallTeardown(): void {
-    const returnAddress = this.virtualMemory.getReturnAddress();
     this.virtualMemory.stackFunctionCallTeardown();
-    this.textMemory.moveToInstr(returnAddress);
   }
 
   public textAllocate(instruction: Instr): number {

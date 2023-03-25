@@ -1,6 +1,7 @@
 export interface SymbolTable {
   head: SymbolTableFrame;
   tail: SymbolTable | null;
+  parent: FunctionSymbolTableEntry | null;
 }
 
 export type SymbolTableFrame = Record<string, SymbolTableEntry>;
@@ -19,6 +20,7 @@ export interface BaseSymbolTableEntry {
 export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
   nameType: 'Function';
   numOfParams: number;
+  numOfVariables: number;
 }
 
 interface VariableSymbolTableEntry extends BaseSymbolTableEntry {

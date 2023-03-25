@@ -1,5 +1,4 @@
 import {
-  type BlockOrEmptyStatement,
   type BlockStatement,
   type FunctionDeclaration,
   type Program,
@@ -14,20 +13,22 @@ import {
 } from './types/symbolTable';
 import { getIdentifierName } from './utils';
 import {
+  InvalidCallError,
   RedeclaredNameError,
   UndeclaredNameError,
   UnhandledDeclarationError,
-  UnhandledScopeError
+  InvalidScopeError
 } from './errors';
 import { isEmptyStatement, isVariableDeclaration } from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
+import { isNotNull } from '../utils/typeGuards';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame = symbolTable.head;
-  let offset = findLastOffset(frame) + 1;
+  let offset = getNumOfEntriesInFrame(frame);
   program.body.forEach((declaration) => {
     switch (declaration.type) {
       case 'FunctionDeclaration': {
@@ -60,19 +61,29 @@ export const addProgramSymbolTableEntries = (
 
 export const addFunctionSymbolTableEntries = (
   paramDeclarations: VariableDeclaration[],
-  body: BlockOrEmptyStatement,
+  node: FunctionDeclaration,
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame: SymbolTableFrame = {};
-  let offset = 0;
-  const bodyDeclarations = !isEmptyStatement(body)
-    ? body.items.filter((item): item is VariableDeclaration =>
+  // Param offset starts from below the rbp, add 1 to leave a space for return address.
+  let offset = -1;
+  paramDeclarations.reverse().forEach((declaration) => {
+    const entries = constructVariableDeclarationSymbolTableEntries(
+      declaration,
+      'Function',
+      offset
+    );
+    addToFrame(frame, ...entries);
+    offset -= entries.length;
+  });
+
+  offset = 0;
+  const bodyDeclarations = !isEmptyStatement(node.body)
+    ? node.body.items.filter((item): item is VariableDeclaration =>
         isVariableDeclaration(item)
       )
     : [];
-  // TODO: Fix this, param declarations offsets should be negative as params are below rbp.
-  const declarations = [...paramDeclarations, ...bodyDeclarations];
-  declarations.forEach((declaration) => {
+  bodyDeclarations.forEach((declaration) => {
     const entries = constructVariableDeclarationSymbolTableEntries(
       declaration,
       'Function',
@@ -81,9 +92,14 @@ export const addFunctionSymbolTableEntries = (
     addToFrame(frame, ...entries);
     offset += entries.length;
   });
+
+  const functionEntry = getFunctionSymbolTableEntry(node.id.name, symbolTable);
+  functionEntry.numOfVariables += offset;
+
   return {
     head: frame,
-    tail: symbolTable
+    tail: symbolTable,
+    parent: functionEntry
   };
 };
 
@@ -92,7 +108,10 @@ export const addBlockSymbolTableEntries = (
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame: SymbolTableFrame = {};
-  let offset = findLastOffset(symbolTable.head) + 1;
+  if (!isNotNull(symbolTable.parent)) {
+    throw new InvalidScopeError('Block is not inside a function.');
+  }
+  let offset = symbolTable.parent.numOfVariables;
   const declarations = block.items.filter((item): item is VariableDeclaration =>
     isVariableDeclaration(item)
   );
@@ -105,10 +124,26 @@ export const addBlockSymbolTableEntries = (
     addToFrame(frame, ...entries);
     offset += entries.length;
   });
+
+  symbolTable.parent.numOfVariables +=
+    offset - symbolTable.parent.numOfVariables;
+
   return {
     head: frame,
-    tail: symbolTable
+    tail: symbolTable,
+    parent: symbolTable.parent
   };
+};
+
+export const getFunctionSymbolTableEntry = (
+  name: string,
+  symbolTable: SymbolTable
+): FunctionSymbolTableEntry => {
+  const functionEntry = getSymbolTableEntry(name, symbolTable);
+  if (!isFunctionSymbolTableEntry(functionEntry)) {
+    throw new InvalidCallError('Cannot call a non-function.');
+  }
+  return functionEntry;
 };
 
 export const getSymbolTableEntry = (
@@ -137,7 +172,7 @@ export const getSegmentScope = (scope: SymbolTableEntryScope): Segment => {
     case 'Global':
       return Segment.DATA;
     default:
-      throw new UnhandledScopeError('Encountered an invalid scope.');
+      throw new InvalidScopeError('Encountered an invalid scope.');
   }
 };
 
@@ -163,15 +198,6 @@ const addToFrame = (
   });
 };
 
-// TODO: Make this more efficient. This is low priority.
-const findLastOffset = (frame: SymbolTableFrame): number => {
-  let lastOffset = -1;
-  Object.values(frame).forEach((entry) => {
-    lastOffset = Math.max(entry.offset, lastOffset);
-  });
-  return lastOffset;
-};
-
 const constructFunctionDeclarationSymbolTableEntry = (
   functionDeclaration: FunctionDeclaration,
   scope: SymbolTableEntryScope,
@@ -183,7 +209,8 @@ const constructFunctionDeclarationSymbolTableEntry = (
     offset,
     scope,
     // TODO: Update this when function declaration parameters are supported.
-    numOfParams: 0
+    numOfParams: 0,
+    numOfVariables: 0
   };
 };
 

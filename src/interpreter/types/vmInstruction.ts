@@ -25,6 +25,7 @@ export interface AssignInstr extends BaseInstr {
 export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
+  numOfVars: number;
 }
 
 export interface DoneInstr extends BaseInstr {

@@ -1,6 +1,6 @@
 import { type Memory } from '../../memory/memory';
 import { type Node } from '../../ast/types';
-import { type SymbolTable } from '../symbolTable';
+import { type SymbolTable } from './symbolTable';
 
 export type CompilerMapping = {
   [NodeType in Node['type']]: (

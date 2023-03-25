@@ -37,4 +37,4 @@ export class UndeclaredNameError extends InterpreterError {}
 
 export class UnhandledDeclarationError extends InterpreterError {}
 
-export class UnhandledScopeError extends InterpreterError {}
+export class InvalidScopeError extends InterpreterError {}

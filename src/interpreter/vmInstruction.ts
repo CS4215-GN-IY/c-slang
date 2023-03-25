@@ -21,9 +21,13 @@ export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   offset: entry.offset
 });
 
-export const constructCallInstr = (numOfArgs: number): CallInstr => ({
+export const constructCallInstr = (
+  numOfArgs: number,
+  numOfVars: number
+): CallInstr => ({
   type: 'Call',
-  numOfArgs
+  numOfArgs,
+  numOfVars
 });
 
 export const constructDoneInstr = (): DoneInstr => ({
