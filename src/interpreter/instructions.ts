@@ -11,7 +11,7 @@ import {
   type BinaryOperationInstr,
   type BinaryOperator,
   type JumpOnFalseInstr
-} from './types/instruction';
+} from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
 import { type Value } from './types/virtualMachine';

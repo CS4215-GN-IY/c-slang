@@ -78,11 +78,9 @@ export const addFunctionSymbolTableEntries = (
   });
 
   offset = 0;
-  const bodyDeclarations = !isEmptyStatement(node.body)
-    ? node.body.items.filter((item): item is VariableDeclaration =>
-        isVariableDeclaration(item)
-      )
-    : [];
+  const bodyDeclarations = isEmptyStatement(node.body)
+    ? []
+    : node.body.items.filter(isVariableDeclaration);
   bodyDeclarations.forEach((declaration) => {
     const entries = constructVariableDeclarationSymbolTableEntries(
       declaration,
@@ -125,8 +123,7 @@ export const addBlockSymbolTableEntries = (
     offset += entries.length;
   });
 
-  symbolTable.parent.numOfVariables +=
-    offset - symbolTable.parent.numOfVariables;
+  symbolTable.parent.numOfVariables = offset;
 
   return {
     head: frame,

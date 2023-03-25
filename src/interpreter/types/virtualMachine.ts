@@ -1,4 +1,4 @@
-import { type Instr } from './instruction';
+import { type Instr } from './instructions';
 import { type Memory } from '../../memory/memory';
 import { type Stack } from '../../utils/stack';
 

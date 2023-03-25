@@ -45,7 +45,7 @@ import {
   constructLoadSymbolInstr,
   constructTeardownInstr,
   PLACEHOLDER_ADDRESS
-} from './instruction';
+} from './instructions';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
@@ -69,7 +69,7 @@ import {
   getSymbolTableEntry,
   getSymbolTableEntryInFrame
 } from './symbolTable';
-import { type Instr } from './types/instruction';
+import { type Instr } from './types/instructions';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
@@ -136,11 +136,7 @@ const compilers: CompilerMapping = {
     }
 
     compile(node.callee, state);
-    // Compile in reverse order so that last argument is lower in the stash,
-    // and the first argument is higher.
-    for (let i = node.arguments.length - 1; i >= 0; i--) {
-      compile(node.arguments[i], state);
-    }
+    node.arguments.forEach((arg) => { compile(arg, state); });
     const callInstr = constructCallInstr(
       node.arguments.length,
       functionEntry.numOfVariables

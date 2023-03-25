@@ -17,7 +17,7 @@ import {
   type LoadFunctionInstr,
   type LoadSymbolInstr,
   type TeardownInstr
-} from './types/instruction';
+} from './types/instructions';
 import {
   convertToAddress,
   convertToPredicate,

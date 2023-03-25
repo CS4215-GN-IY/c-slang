@@ -11,8 +11,10 @@ export type SymbolTableEntry =
 export type SymbolTableEntryScope = 'Block' | 'Function' | 'Global';
 
 export interface BaseSymbolTableEntry {
-  name: string;
+  // The nameType property allows us to
+  // make use of TypeScript's discriminated unions.
   nameType: string;
+  name: string;
   offset: number;
   scope: SymbolTableEntryScope;
 }
