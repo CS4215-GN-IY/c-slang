@@ -44,7 +44,7 @@ import {
   constructLoadFunctionInstr,
   PLACEHOLDER_ADDRESS,
   constructLoadSymbolInstr,
-  constructExitFunctionInstr
+  constructEnterProgramInstr
 } from './vmInstruction';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
@@ -55,6 +55,7 @@ import {
   addBlockSymbolTableEntries,
   addFunctionSymbolTableEntries,
   addProgramSymbolTableEntries,
+  getNumOfEntriesInFrame,
   getSymbolTableEntry,
   isFunctionSymbolTableEntry
 } from './symbolTable';
@@ -126,8 +127,6 @@ const compilers: CompilerMapping = {
     }
     const callInstr = constructCallInstr(node.arguments.length);
     state.memory.textAllocate(callInstr);
-    const teardownInstr = constructTeardownInstr(node.arguments.length);
-    state.memory.textAllocate(teardownInstr);
   },
   Constant: (node: Constant, state: CompilerState) => {
     const loadConstantInstr = constructLoadConstantInstr(node.value);
@@ -160,7 +159,7 @@ const compilers: CompilerMapping = {
         compile(item, state);
       });
     }
-    state.memory.textAllocate(constructExitFunctionInstr());
+    state.memory.textAllocate(constructTeardownInstr());
 
     gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
 
@@ -186,6 +185,10 @@ const compilers: CompilerMapping = {
       node,
       state.symbolTable
     );
+    const enterProgramInstr = constructEnterProgramInstr(
+      getNumOfEntriesInFrame(programSymbolTable.head)
+    );
+    state.memory.textAllocate(enterProgramInstr);
     node.body.forEach((item) => {
       state.symbolTable = programSymbolTable;
       compile(item, state);
@@ -200,7 +203,8 @@ const compilers: CompilerMapping = {
       compile(node.argument.expressions[0], state);
     }
     // TODO: Check tail call.
-    state.memory.textAllocate(constructExitFunctionInstr());
+    const teardownInstr = constructTeardownInstr();
+    state.memory.textAllocate(teardownInstr);
   },
   SequenceExpression: (node: SequenceExpression, state: CompilerState) => {},
   StringLiteral: (node: StringLiteral, state: CompilerState) => {},

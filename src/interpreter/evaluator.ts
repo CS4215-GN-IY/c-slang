@@ -3,7 +3,7 @@ import {
   type AssignInstr,
   type CallInstr,
   type DoneInstr,
-  type ExitFunctionInstr,
+  type EnterProgramInstr,
   type GotoInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
@@ -12,7 +12,7 @@ import {
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
 import { isAddress, typeOf } from './evaluatorUtils';
-import { UnhandledScopeError, TypeError, TypeErrorContext } from './errors';
+import { TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
 
@@ -20,12 +20,10 @@ export const interpret = (compilation: CompilerState): Value => {
   const stash = new Stack<Value>();
   const state: EvaluatorState = {
     memory: compilation.memory,
-    pc: 0,
-    stash,
-    symbolTable: compilation.symbolTable
+    stash
   };
-  while (state.memory.textGet(state.pc).type !== 'Done') {
-    const instr = state.memory.textGet(state.pc);
+  while (!state.memory.isAtDoneInstr()) {
+    const instr = state.memory.getCurrentInstr();
     // The typecast allows for mapping to a specific evaluator command type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     evaluators[instr.type](instr as any, state);
@@ -35,8 +33,9 @@ export const interpret = (compilation: CompilerState): Value => {
 
 const evaluators: EvaluatorMapping = {
   Assign: (command: AssignInstr, state: EvaluatorState) => {
-    state.memory.stackAllocate(state.stash.pop());
-    state.pc += 1;
+    // TODO: Add conversion method to convert stash value to number.
+    state.memory.setByOffset(command.scope, command.offset, state.stash.pop());
+    state.memory.moveToNextInstr();
   },
   Call: (command: CallInstr, state: EvaluatorState) => {
     // First item popped from the stash should be the arg for the first param and so on.
@@ -53,49 +52,31 @@ const evaluators: EvaluatorMapping = {
       );
     }
 
-    // Setup stack for function and write parameters to the stack
-    const paramAddresses = state.memory.stackFunctionCallAllocate(args);
-    // Push in reverse order as param addresses should be assigned from first to last.
-    for (let i = paramAddresses.length - 1; i >= 0; i--) {
-      state.stash.push(paramAddresses[i]);
-    }
-    // Push return address to stack,
-    // Call is always followed by Teardown instruction, so add 2 to pc to go past both.
-    state.memory.stackAllocate(state.pc + 2);
-    // Jump to function
-    state.pc = functionInstrAddress;
+    state.memory.stackFunctionCallAllocate(args, 0);
+    state.memory.moveToInstr(functionInstrAddress);
   },
   Done: (command: DoneInstr, state: EvaluatorState) => {},
-  ExitFunction: (command: ExitFunctionInstr, state: EvaluatorState) => {
-    while (state.memory.textGet(state.pc).type !== 'Teardown') {
-      state.pc += 1;
-    }
+  EnterProgram: (command: EnterProgramInstr, state: EvaluatorState) => {
+    state.memory.dataAllocate(command.numOfDeclarations);
+    state.memory.moveToNextInstr();
   },
   Goto: (command: GotoInstr, state: EvaluatorState) => {
-    state.pc = command.instrAddress;
+    state.memory.moveToInstr(command.instrAddress);
   },
   LoadConstant: (command: LoadConstantInstr, state: EvaluatorState) => {
     state.stash.push(command.value);
-    state.pc += 1;
+    state.memory.moveToNextInstr();
   },
   LoadFunction: (command: LoadFunctionInstr, state: EvaluatorState) => {
     state.stash.push(command.functionInstrAddress);
-    state.pc += 1;
+    state.memory.moveToNextInstr();
   },
   LoadSymbol: (command: LoadSymbolInstr, state: EvaluatorState) => {
-    // TODO: Replace with getting from the correct segment after other segmens are supported.
-    if (command.scope !== 'Stack') {
-      throw new UnhandledScopeError();
-    }
-    const value = state.memory.stackGetByOffset(command.offset);
+    const value = state.memory.getByOffset(command.scope, command.offset);
     state.stash.push(value);
-    state.pc += 1;
+    state.memory.moveToNextInstr();
   },
   Teardown: (command: TeardownInstr, state: EvaluatorState) => {
-    const returnAddress = state.memory.stackGetByOffset(
-      command.returnAddressOffset
-    );
-    state.pc = returnAddress;
     state.memory.stackFunctionCallTeardown();
   }
 };

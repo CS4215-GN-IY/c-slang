@@ -3,10 +3,6 @@ import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 import { MemoryError, MemoryErrorType } from './memoryError';
-import {
-  type DeclarationNameWithAddress,
-  type DeclarationNameWithValue
-} from '../interpreter/types/interpreter';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -21,6 +17,7 @@ export class VirtualMemory {
   >();
 
   private rbp: number;
+  private readonly rdx: number;
   private rsp: number;
 
   /**
@@ -74,14 +71,28 @@ export class VirtualMemory {
         heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
       )
     );
+    this.rdx = dataBaseAddress;
     this.rbp = stackBaseAddress;
-    this.rsp = stackBaseAddress - PageTable.ENTRY_SIZE;
+    this.rsp = this.rbp;
   }
 
-  public stackAllocate(data: number): number {
-    this.rsp += PageTable.ENTRY_SIZE;
-    this.setFree(this.rsp, data);
-    return this.rsp;
+  public dataAllocate(numOfEntries: number): void {
+    const placeholderData = 0;
+    let address = this.rdx;
+    for (let i = 0; i < numOfEntries; i++) {
+      this.setFree(address, placeholderData);
+      address += PageTable.ENTRY_SIZE;
+    }
+  }
+
+  public dataGetByOffset(offset: number): number {
+    const address = this.rdx + offset * PageTable.ENTRY_SIZE;
+    return this.get(address);
+  }
+
+  public dataSetByOffset(offset: number, data: number): void {
+    const address = this.rdx + offset * PageTable.ENTRY_SIZE;
+    this.set(address, data);
   }
 
   public stackGetByOffset(offset: number): number {
@@ -89,52 +100,64 @@ export class VirtualMemory {
     return this.get(address);
   }
 
-  public stackFunctionCallSetup(args: number[]): number[] {
-    this.stackAllocate(this.rbp);
-    this.stackAllocate(this.rsp);
-    this.rbp = this.rsp + PageTable.ENTRY_SIZE;
+  public stackSetByOffset(offset: number, data: number): void {
+    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
+    this.set(address, data);
+  }
 
-    this.rsp += args.length > 0 ? (args.length - 1) * PageTable.ENTRY_SIZE : 0;
-    const addresses: number[] = [];
-    for (let i = 0; i < args.length; i++) {
-      const address = this.rbp + i * PageTable.ENTRY_SIZE;
-      this.setFree(address, args[i]);
-      addresses.push(address);
+  public stackAllocate(data: number): void {
+    this.setFree(this.rsp, data);
+    this.rsp += PageTable.ENTRY_SIZE;
+  }
+
+  public stackFunctionCallSetup(
+    args: number[],
+    numOfVars: number,
+    returnAddress: number
+  ): void {
+    /*
+    Structure of frame is as such:
+                   <- rsp
+    -------------
+    Local vars     <- rbp
+    -------------
+    Return address
+    -------------
+    Saved rsp
+    -------------
+    Saved rbp
+    -------------
+    Params/Args   <- prev rsp which is stored as Saved rsp
+    -------------
+     */
+    const savedRsp = this.rsp;
+    args.forEach((arg) => {
+      this.stackAllocate(arg);
+    });
+    this.stackAllocate(this.rbp);
+    this.stackAllocate(savedRsp);
+    this.stackAllocate(returnAddress);
+    this.rbp = this.rsp;
+    const placeholderData = 0;
+    for (let i = 0; i < numOfVars; i++) {
+      this.stackAllocate(placeholderData);
     }
-    return addresses;
+  }
+
+  public getReturnAddress(): number {
+    return this.get(this.rbp - PageTable.ENTRY_SIZE);
   }
 
   public stackFunctionCallTeardown(): void {
+    const savedRbp = this.get(this.rbp - 3 * PageTable.ENTRY_SIZE);
+    const savedRsp = this.get(this.rsp - 2 * PageTable.ENTRY_SIZE);
     let fp = this.rsp;
-    // Get saved rsp and subtract space taken to store rbp
-    this.rsp = this.get(this.rbp - PageTable.ENTRY_SIZE) - PageTable.ENTRY_SIZE;
-    this.rbp = this.get(this.rbp - 2 * PageTable.ENTRY_SIZE);
-    while (fp > this.rbp) {
-      this.free(fp);
+    while (fp > savedRsp) {
       fp -= PageTable.ENTRY_SIZE;
+      this.free(fp);
     }
-  }
-
-  // Sets up stack for function call and returns address of parameters
-  public stackFunctionCallAllocate(
-    paramsWithValues: DeclarationNameWithValue[]
-  ): DeclarationNameWithAddress[] {
-    this.stackAllocate(this.rbp);
-    this.stackAllocate(this.rsp);
-    this.rbp = this.rsp;
-
-    const paramWithAddresses: DeclarationNameWithAddress[] = [];
-    this.rsp += paramsWithValues.length * PageTable.ENTRY_SIZE;
-    for (let i = 0; i < paramsWithValues.length; i++) {
-      const address = this.rbp + i * PageTable.ENTRY_SIZE;
-      this.setFree(address, paramsWithValues[i].value);
-      paramWithAddresses.push({
-        name: paramsWithValues[i].name,
-        nameType: paramsWithValues[i].nameType,
-        address
-      });
-    }
-    return paramWithAddresses;
+    this.rsp = savedRsp;
+    this.rbp = savedRbp;
   }
 
   /**

@@ -7,17 +7,17 @@ import {
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
-  type ExitFunctionInstr
+  type EnterProgramInstr
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
 import { type SymbolTableEntry } from './types/symbolTable';
-import { convertToNameScope } from './symbolTable';
+import { getSegmentScope } from './symbolTable';
 
 export const PLACEHOLDER_ADDRESS = -1;
 
 export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   type: 'Assign',
-  scope: convertToNameScope(entry.scope),
+  scope: getSegmentScope(entry.scope),
   offset: entry.offset
 });
 
@@ -30,8 +30,11 @@ export const constructDoneInstr = (): DoneInstr => ({
   type: 'Done'
 });
 
-export const constructExitFunctionInstr = (): ExitFunctionInstr => ({
-  type: 'ExitFunction'
+export const constructEnterProgramInstr = (
+  numOfDeclarations: number
+): EnterProgramInstr => ({
+  type: 'EnterProgram',
+  numOfDeclarations
 });
 
 export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
@@ -57,13 +60,10 @@ export const constructLoadSymbolInstr = (
   entry: SymbolTableEntry
 ): LoadSymbolInstr => ({
   type: 'LoadSymbol',
-  scope: convertToNameScope(entry.scope),
+  scope: getSegmentScope(entry.scope),
   offset: entry.offset
 });
 
-export const constructTeardownInstr = (
-  returnAddressOffset: number
-): TeardownInstr => ({
-  type: 'Teardown',
-  returnAddressOffset
+export const constructTeardownInstr = (): TeardownInstr => ({
+  type: 'Teardown'
 });

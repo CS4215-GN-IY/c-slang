@@ -25,7 +25,8 @@ export class OldMemory {
   }
 
   public stackAllocate(data: number): number {
-    return this.virtualMemory.stackAllocate(data);
+    // TODO: Temp returning this so program can compile, will be removing this file
+    return 0;
   }
 
   public stackFunctionCallAllocate(

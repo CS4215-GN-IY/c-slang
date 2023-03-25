@@ -25,9 +25,8 @@ import {
 import { type OldMemory } from '../memory/oldMemory';
 import { FALSE_VALUE } from '../utils/constants';
 import { type TypeofResult } from './types/utils';
-import { type Memory } from '../memory/memory';
 
-const allocateUninitializedVariable = (memory: OldMemory | Memory): number => {
+const allocateUninitializedVariable = (memory: OldMemory): number => {
   const valueWhenUninitialized = 0;
   return memory.stackAllocate(valueWhenUninitialized);
 };
@@ -78,7 +77,7 @@ export const getFunctionDeclarationName = (
 
 export const allocateStackAddresses = (
   names: DeclarationName[],
-  memory: OldMemory | Memory
+  memory: OldMemory
 ): DeclarationNameWithAddress[] => {
   const nameAddressMapping: DeclarationNameWithAddress[] = names.map(
     (name) => ({

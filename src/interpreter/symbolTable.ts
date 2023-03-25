@@ -14,13 +14,13 @@ import {
 } from './types/symbolTable';
 import { getIdentifierName } from './utils';
 import {
-  UnhandledScopeError,
   RedeclaredNameError,
   UndeclaredNameError,
-  UnhandledDeclarationError
+  UnhandledDeclarationError,
+  UnhandledScopeError
 } from './errors';
 import { isEmptyStatement, isVariableDeclaration } from '../ast/typeGuards';
-import { type NameScope } from './types/vmInstruction';
+import { Segment } from '../memory/segment';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -70,6 +70,7 @@ export const addFunctionSymbolTableEntries = (
         isVariableDeclaration(item)
       )
     : [];
+  // TODO: Fix this, param declarations offsets should be negative as params are below rbp.
   const declarations = [...paramDeclarations, ...bodyDeclarations];
   declarations.forEach((declaration) => {
     const entries = constructVariableDeclarationSymbolTableEntries(
@@ -127,15 +128,14 @@ export const getSymbolTableEntry = (
   throw new UndeclaredNameError(`Encountered an undeclared name: ${name}`);
 };
 
-export const convertToNameScope = (scope: SymbolTableEntryScope): NameScope => {
+export const getSegmentScope = (scope: SymbolTableEntryScope): Segment => {
   switch (scope) {
     case 'Block':
-      return 'Stack';
+      return Segment.STACK;
     case 'Function':
-      return 'Stack';
+      return Segment.STACK;
     case 'Global':
-      // TODO: Replace with data scope when allocation to data segment is supported
-      return 'Stack';
+      return Segment.DATA;
     default:
       throw new UnhandledScopeError('Encountered an invalid scope.');
   }
@@ -145,6 +145,10 @@ export const isFunctionSymbolTableEntry = (
   entry: SymbolTableEntry
 ): entry is FunctionSymbolTableEntry => {
   return entry.nameType === 'Function';
+};
+
+export const getNumOfEntriesInFrame = (frame: SymbolTableFrame): number => {
+  return Object.keys(frame).length;
 };
 
 const addToFrame = (

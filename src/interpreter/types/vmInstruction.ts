@@ -1,7 +1,5 @@
 import { type Value } from './evaluationResults';
-
-// TODO: Add data scope when allocation to data segment is supported
-export type NameScope = 'Stack';
+import { type Segment } from '../../memory/segment';
 
 interface BaseInstr {
   type: string;
@@ -11,7 +9,7 @@ export type Instr =
   | AssignInstr
   | CallInstr
   | DoneInstr
-  | ExitFunctionInstr
+  | EnterProgramInstr
   | GotoInstr
   | LoadConstantInstr
   | LoadFunctionInstr
@@ -20,7 +18,7 @@ export type Instr =
 
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
-  scope: NameScope;
+  scope: Segment;
   offset: number;
 }
 
@@ -33,8 +31,9 @@ export interface DoneInstr extends BaseInstr {
   type: 'Done';
 }
 
-export interface ExitFunctionInstr extends BaseInstr {
-  type: 'ExitFunction';
+export interface EnterProgramInstr extends BaseInstr {
+  type: 'EnterProgram';
+  numOfDeclarations: number;
 }
 
 export interface GotoInstr extends BaseInstr {
@@ -54,11 +53,10 @@ export interface LoadFunctionInstr extends BaseInstr {
 
 export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
-  scope: NameScope;
+  scope: Segment;
   offset: number;
 }
 
 export interface TeardownInstr extends BaseInstr {
   type: 'Teardown';
-  returnAddressOffset: number;
 }

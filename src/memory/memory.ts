@@ -1,6 +1,8 @@
 import { VirtualMemory } from './virtualMemory';
 import { TextMemory } from './textMemory';
 import { type Instr } from '../interpreter/types/vmInstruction';
+import { Segment } from './segment';
+import { MemoryError, MemoryErrorType } from './memoryError';
 
 export class Memory {
   private readonly virtualMemory;
@@ -20,20 +22,43 @@ export class Memory {
     this.virtualMemory.set(address, data);
   }
 
-  public stackGetByOffset(offset: number): number {
-    return this.virtualMemory.stackGetByOffset(offset);
+  public dataAllocate(numOfEntries: number): void {
+    this.virtualMemory.dataAllocate(numOfEntries);
   }
 
-  public stackAllocate(data: number): number {
-    return this.virtualMemory.stackAllocate(data);
+  public getByOffset(segment: Segment, offset: number): number {
+    switch (segment) {
+      case Segment.DATA:
+        return this.virtualMemory.dataGetByOffset(offset);
+      case Segment.STACK:
+        return this.virtualMemory.stackGetByOffset(offset);
+      default:
+        throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
+    }
   }
 
-  public stackFunctionCallAllocate(args: number[]): number[] {
-    return this.virtualMemory.stackFunctionCallSetup(args);
+  public setByOffset(segment: Segment, offset: number, data: number): void {
+    switch (segment) {
+      case Segment.DATA:
+        this.virtualMemory.dataSetByOffset(offset, data);
+        break;
+      case Segment.STACK:
+        this.virtualMemory.stackSetByOffset(offset, data);
+        break;
+      default:
+        throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
+    }
+  }
+
+  public stackFunctionCallAllocate(args: number[], numOfVars: number): void {
+    const returnAddress = this.textMemory.getNextInstrAddress();
+    this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
   }
 
   public stackFunctionCallTeardown(): void {
+    const returnAddress = this.virtualMemory.getReturnAddress();
     this.virtualMemory.stackFunctionCallTeardown();
+    this.textMemory.moveToInstr(returnAddress);
   }
 
   public textAllocate(instruction: Instr): number {
@@ -46,5 +71,21 @@ export class Memory {
 
   public textGetNextFreeAddress(): number {
     return this.textMemory.getNextFreeAddress();
+  }
+
+  public getCurrentInstr(): Instr {
+    return this.textMemory.getCurrentInstr();
+  }
+
+  public moveToNextInstr(): void {
+    this.textMemory.moveToNextInstr();
+  }
+
+  public moveToInstr(instrAddress: number): void {
+    this.textMemory.moveToInstr(instrAddress);
+  }
+
+  public isAtDoneInstr(): boolean {
+    return this.textMemory.isDone();
   }
 }
