@@ -206,7 +206,7 @@ export function evaluateBinaryExpression(
 ): Value {
   switch (operator) {
     case '+':
-      // Separate typeguards are required due to typescript rules: https://typescript-eslint.io/rules/restrict-plus-operands/
+      // Separate type guards are required due to typescript rules: https://typescript-eslint.io/rules/restrict-plus-operands/
       return isNumber(left) && isNumber(right)
         ? left + right
         : isString(left) && isString(right)

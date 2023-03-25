@@ -1,6 +1,7 @@
 import { type EvaluatorMapping, type EvaluatorState } from './types/evaluator';
 import {
   type AssignInstr,
+  type BinaryOperationInstr,
   type CallInstr,
   type DoneInstr,
   type EnterProgramInstr,
@@ -15,6 +16,7 @@ import { isAddress, typeOf } from './evaluatorUtils';
 import { TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
+import { evaluateBinaryExpression, typeCheckBinaryOperation } from './utils';
 
 export const interpret = (compilation: CompilerState): Value => {
   const stash = new Stack<Value>();
@@ -35,6 +37,13 @@ const evaluators: EvaluatorMapping = {
   Assign: (command: AssignInstr, state: EvaluatorState) => {
     // TODO: Add conversion method to convert stash value to number.
     state.memory.setByOffset(command.scope, command.offset, state.stash.pop());
+    state.memory.moveToNextInstr();
+  },
+  BinaryOperation: (command: BinaryOperationInstr, state: EvaluatorState) => {
+    const right = state.stash.pop();
+    const left = state.stash.pop();
+    typeCheckBinaryOperation(command.operator, left, right);
+    state.stash.push(evaluateBinaryExpression(command.operator, left, right));
     state.memory.moveToNextInstr();
   },
   Call: (command: CallInstr, state: EvaluatorState) => {

@@ -7,6 +7,7 @@ interface BaseInstr {
 
 export type Instr =
   | AssignInstr
+  | BinaryOperationInstr
   | CallInstr
   | DoneInstr
   | EnterProgramInstr
@@ -20,6 +21,11 @@ export interface AssignInstr extends BaseInstr {
   type: 'Assign';
   scope: Segment;
   offset: number;
+}
+
+export interface BinaryOperationInstr extends BaseInstr {
+  type: 'BinaryOperation';
+  operator: BinaryOperator;
 }
 
 export interface CallInstr extends BaseInstr {
@@ -61,3 +67,21 @@ export interface LoadSymbolInstr extends BaseInstr {
 export interface TeardownInstr extends BaseInstr {
   type: 'Teardown';
 }
+
+export type BinaryOperator =
+  | '*'
+  | '/'
+  | '%'
+  | '+'
+  | '-'
+  | '<<'
+  | '>>'
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | '=='
+  | '!='
+  | '&'
+  | '^'
+  | '|';

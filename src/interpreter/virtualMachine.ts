@@ -44,7 +44,8 @@ import {
   constructLoadFunctionInstr,
   PLACEHOLDER_ADDRESS,
   constructLoadSymbolInstr,
-  constructEnterProgramInstr
+  constructEnterProgramInstr,
+  constructBinaryOperationInstr
 } from './vmInstruction';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
@@ -91,7 +92,12 @@ const compilers: CompilerMapping = {
     node: AssignmentExpression,
     state: CompilerState
   ) => {},
-  BinaryExpression: (node: BinaryExpression, state: CompilerState) => {},
+  BinaryExpression: (node: BinaryExpression, state: CompilerState) => {
+    compile(node.left, state);
+    compile(node.right, state);
+    const binaryOperationInstr = constructBinaryOperationInstr(node.operator);
+    state.memory.textAllocate(binaryOperationInstr);
+  },
   BlockStatement: (node: BlockStatement, state: CompilerState) => {
     const blockSymbolTable = addBlockSymbolTableEntries(
       node,
@@ -160,7 +166,8 @@ const compilers: CompilerMapping = {
         compile(item, state);
       });
     }
-    state.memory.textAllocate(constructTeardownInstr());
+    const teardownInstr = constructTeardownInstr();
+    state.memory.textAllocate(teardownInstr);
 
     gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
 
@@ -171,11 +178,10 @@ const compilers: CompilerMapping = {
   },
   GotoStatement: (node: GotoStatement, state: CompilerState) => {},
   Identifier: (node: Identifier, state: CompilerState) => {
-    state.memory.textAllocate(
-      constructLoadSymbolInstr(
-        getSymbolTableEntry(node.name, state.symbolTable)
-      )
+    const loadSymbolInstr = constructLoadSymbolInstr(
+      getSymbolTableEntry(node.name, state.symbolTable)
     );
+    state.memory.textAllocate(loadSymbolInstr);
   },
   IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
   IfStatement: (node: IfStatement, state: CompilerState) => {},

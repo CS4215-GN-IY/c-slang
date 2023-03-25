@@ -7,7 +7,9 @@ import {
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
-  type EnterProgramInstr
+  type EnterProgramInstr,
+  type BinaryOperationInstr,
+  type BinaryOperator
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
 import { type SymbolTableEntry } from './types/symbolTable';
@@ -19,6 +21,13 @@ export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   type: 'Assign',
   scope: getSegmentScope(entry.scope),
   offset: entry.offset
+});
+
+export const constructBinaryOperationInstr = (
+  operator: BinaryOperator
+): BinaryOperationInstr => ({
+  type: 'BinaryOperation',
+  operator
 });
 
 export const constructCallInstr = (
