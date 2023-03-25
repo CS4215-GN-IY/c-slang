@@ -250,12 +250,29 @@ const compilers: CompilerMapping = {
     state.memory.textAllocate(teardownInstr);
   },
   SequenceExpression: (node: SequenceExpression, state: CompilerState) => {
-    node.expressions.forEach((expression) => { compile(expression, state); });
+    node.expressions.forEach((expression) => {
+      compile(expression, state);
+    });
   },
   StringLiteral: (node: StringLiteral, state: CompilerState) => {},
   SwitchStatement: (node: SwitchStatement, state: CompilerState) => {},
   UnaryExpression: (node: UnaryExpression, state: CompilerState) => {},
   UpdateExpression: (node: UpdateExpression, state: CompilerState) => {},
-  VariableDeclaration: (node: VariableDeclaration, state: CompilerState) => {},
+  VariableDeclaration: (node: VariableDeclaration, state: CompilerState) => {
+    // Declaration names should have been added to the symbol table by the parent scope.
+    // Only need to handle assignment.
+    node.declarations.forEach((declarator) => {
+      const initialValue = declarator.initialValue;
+      if (isNotUndefined(initialValue)) {
+        compile(initialValue, state);
+        const entry = getSymbolTableEntry(
+          declarator.id.name,
+          state.symbolTable
+        );
+        const assignmentInstr = constructAssignInstr(entry);
+        state.memory.textAllocate(assignmentInstr);
+      }
+    });
+  },
   WhileStatement: (node: WhileStatement, state: CompilerState) => {}
 };

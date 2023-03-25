@@ -20,7 +20,7 @@ import { Stack } from '../utils/stack';
 import {
   evaluateBinaryExpression,
   isTrue,
-  typeCheckBinaryOperation,
+  typeCheckBinaryOperation
 } from './utils';
 
 export const interpret = (compilation: CompilerState): Value => {

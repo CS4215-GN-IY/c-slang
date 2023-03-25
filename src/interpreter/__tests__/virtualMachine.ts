@@ -102,4 +102,13 @@ describe('compile and run', () => {
     const falseVal = FALSE_VALUE;
     expect(result).toEqual(falseVal);
   });
+
+  test('handles variable declarations and identifiers', () => {
+    const code = 'int main() { int a; int b = 5; return b; }';
+    const ast = parse(code);
+    const compilation = compileProgram(ast);
+    const result = interpret(compilation);
+    const expectedResult = 5;
+    expect(result).toEqual(expectedResult);
+  });
 });

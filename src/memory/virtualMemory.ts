@@ -150,7 +150,7 @@ export class VirtualMemory {
 
   public stackFunctionCallTeardown(): void {
     const savedRbp = this.get(this.rbp - 3 * PageTable.ENTRY_SIZE);
-    const savedRsp = this.get(this.rsp - 2 * PageTable.ENTRY_SIZE);
+    const savedRsp = this.get(this.rbp - 2 * PageTable.ENTRY_SIZE);
     let fp = this.rsp;
     while (fp > savedRsp) {
       fp -= PageTable.ENTRY_SIZE;
