@@ -1,5 +1,7 @@
-import { type SymbolTableEntryPosition } from './virtualMachine';
 import { type Value } from './evaluationResults';
+
+// TODO: Add data scope when allocation to data segment is supported
+export type NameScope = 'Stack';
 
 interface BaseInstr {
   type: string;
@@ -18,7 +20,8 @@ export type Instr =
 
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
-  symbolTableEntryPosition: SymbolTableEntryPosition;
+  scope: NameScope;
+  offset: number;
 }
 
 export interface CallInstr extends BaseInstr {
@@ -51,7 +54,8 @@ export interface LoadFunctionInstr extends BaseInstr {
 
 export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
-  symbolTableEntryPosition: SymbolTableEntryPosition;
+  scope: NameScope;
+  offset: number;
 }
 
 export interface TeardownInstr extends BaseInstr {

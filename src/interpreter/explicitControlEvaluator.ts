@@ -79,7 +79,7 @@ import {
   extendSymbolTable,
   extendSymbolTableWithEntries,
   getEntryFromSymbolTable
-} from './symbolTable';
+} from './oldSymbolTable';
 import { isEmptyStatement } from '../ast/typeGuards';
 import { OldMemory } from '../memory/oldMemory';
 import { isNotUndefined } from '../utils/typeGuards';

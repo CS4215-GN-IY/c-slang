@@ -2,7 +2,7 @@ import { parse } from '../../parser/parser';
 import { compileProgram } from '../virtualMachine';
 import { interpret } from '../evaluator';
 
-describe('compile', () => {
+describe('compile and run', () => {
   test('program', () => {
     const code = 'int main() { return 2; }';
     const ast = parse(code);

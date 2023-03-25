@@ -12,8 +12,7 @@ import {
 } from './types/vmInstruction';
 import { type Value } from './types/evaluationResults';
 import { isAddress, typeOf } from './evaluatorUtils';
-import { TypeError, TypeErrorContext } from './errors';
-import { getSymbolTableEntry } from './vmUtils';
+import { UnhandledScopeError, TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
 
@@ -84,11 +83,11 @@ const evaluators: EvaluatorMapping = {
     state.pc += 1;
   },
   LoadSymbol: (command: LoadSymbolInstr, state: EvaluatorState) => {
-    const symbolTableEntry = getSymbolTableEntry(
-      state.symbolTable,
-      command.symbolTableEntryPosition
-    );
-    const value = state.memory.stackGetByOffset(symbolTableEntry.offset);
+    // TODO: Replace with getting from the correct segment after other segmens are supported.
+    if (command.scope !== 'Stack') {
+      throw new UnhandledScopeError();
+    }
+    const value = state.memory.stackGetByOffset(command.offset);
     state.stash.push(value);
     state.pc += 1;
   },

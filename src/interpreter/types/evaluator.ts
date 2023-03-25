@@ -1,8 +1,8 @@
-import { type SymbolTableEntry } from './virtualMachine';
 import { type Instr } from './vmInstruction';
 import { type Memory } from '../../memory/memory';
 import { type Stack } from '../../utils/stack';
 import { type Value } from './evaluationResults';
+import { type SymbolTableEntry } from './symbolTable';
 
 export type EvaluatorMapping = {
   [InstrType in Instr['type']]: (

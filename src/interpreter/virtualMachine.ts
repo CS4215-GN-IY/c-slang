@@ -1,8 +1,6 @@
 import {
   type CompilerMapping,
-  type CompilerState,
-  type SymbolTable,
-  type SymbolTableEntry
+  type CompilerState
 } from './types/virtualMachine';
 import {
   type ArrayAccessExpression,
@@ -48,23 +46,24 @@ import {
   constructLoadSymbolInstr,
   constructExitFunctionInstr
 } from './vmInstruction';
-import {
-  extendSymbolTable,
-  constructBlockSymbolTableEntries,
-  getNextSymbolTableOffset,
-  constructProgramSymbolTableEntries,
-  getSymbolTableEntryPosition,
-  getSymbolTableEntry,
-  isFunctionSymbolTableEntry
-} from './vmUtils';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import { InvalidCallError } from './errors';
 import { constructMainCallExpression } from '../ast/constructors';
+import { type SymbolTable } from './types/symbolTable';
+import {
+  addBlockSymbolTableEntries,
+  addFunctionSymbolTableEntries,
+  addProgramSymbolTableEntries,
+  getSymbolTableEntry,
+  isFunctionSymbolTableEntry
+} from './symbolTable';
 
 export const compileProgram = (ast: Program): CompilerState => {
-  // TODO: Fix symbol table. It cannot just be an array.
-  const symbolTable: SymbolTable = [];
+  const symbolTable: SymbolTable = {
+    head: {},
+    tail: null
+  };
   const memory = new Memory(1000, 1000, 1000);
   const state: CompilerState = {
     symbolTable,
@@ -92,15 +91,12 @@ const compilers: CompilerMapping = {
   ) => {},
   BinaryExpression: (node: BinaryExpression, state: CompilerState) => {},
   BlockStatement: (node: BlockStatement, state: CompilerState) => {
-    const symbolTableEntries = constructBlockSymbolTableEntries(
+    const blockSymbolTable = addBlockSymbolTableEntries(
       node,
-      getNextSymbolTableOffset(state.symbolTable)
-    );
-    state.symbolTable = extendSymbolTable(
-      state.symbolTable,
-      symbolTableEntries
+      state.symbolTable
     );
     node.items.forEach((item) => {
+      state.symbolTable = blockSymbolTable;
       compile(item, state);
     });
   },
@@ -109,13 +105,9 @@ const compilers: CompilerMapping = {
     if (!isIdentifier(node.callee)) {
       throw new InvalidCallError('Cannot call non-identifier.');
     }
-    const functionNameEntryPosition = getSymbolTableEntryPosition(
-      state.symbolTable,
-      node.callee.name
-    );
     const functionNameEntry = getSymbolTableEntry(
-      state.symbolTable,
-      functionNameEntryPosition
+      node.callee.name,
+      state.symbolTable
     );
     if (!isFunctionSymbolTableEntry(functionNameEntry)) {
       throw new InvalidCallError('Cannot call a non-function.');
@@ -156,22 +148,15 @@ const compilers: CompilerMapping = {
     loadFunctionInstr.functionInstrAddress =
       state.memory.textGetNextFreeAddress();
 
-    // TODO: Implement when parameter list is supported
-    const paramSymbolTableEntries: SymbolTableEntry[] = [];
-    // Add 1 to leave a space for return address
-    const blockVariablesStartingOffset = paramSymbolTableEntries.length + 1;
-    const blockSymbolTableEntries = isEmptyStatement(node.body)
-      ? []
-      : constructBlockSymbolTableEntries(
-          node.body,
-          blockVariablesStartingOffset
-        );
-    state.symbolTable = extendSymbolTable(state.symbolTable, [
-      ...paramSymbolTableEntries,
-      ...blockSymbolTableEntries
-    ]);
+    // TODO: Replace param declarations when parameter list is supported
+    const functionSymbolTable = addFunctionSymbolTableEntries(
+      [],
+      node.body,
+      state.symbolTable
+    );
     if (!isEmptyStatement(node.body)) {
       node.body.items.forEach((item) => {
+        state.symbolTable = functionSymbolTable;
         compile(item, state);
       });
     }
@@ -180,18 +165,16 @@ const compilers: CompilerMapping = {
     gotoInstr.instrAddress = state.memory.textGetNextFreeAddress();
 
     const assignInstr = constructAssignInstr(
-      getSymbolTableEntryPosition(state.symbolTable, node.id.name)
+      getSymbolTableEntry(node.id.name, state.symbolTable)
     );
     state.memory.textAllocate(assignInstr);
   },
   GotoStatement: (node: GotoStatement, state: CompilerState) => {},
   Identifier: (node: Identifier, state: CompilerState) => {
-    const symbolTableEntryPosition = getSymbolTableEntryPosition(
-      state.symbolTable,
-      node.name
-    );
     state.memory.textAllocate(
-      constructLoadSymbolInstr(symbolTableEntryPosition)
+      constructLoadSymbolInstr(
+        getSymbolTableEntry(node.name, state.symbolTable)
+      )
     );
   },
   IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
@@ -199,18 +182,12 @@ const compilers: CompilerMapping = {
   LogicalExpression: (node: LogicalExpression, state: CompilerState) => {},
   MemberExpression: (node: MemberExpression, state: CompilerState) => {},
   Program: (node: Program, state: CompilerState) => {
-    // TODO: Decide whether to use offsets or not.
-    // If offsets are used, must place things in appropriate section
-    // e.g. program-level variables are in the data section.
-    const symbolTableEntries = constructProgramSymbolTableEntries(
+    const programSymbolTable = addProgramSymbolTableEntries(
       node,
-      getNextSymbolTableOffset(state.symbolTable)
-    );
-    state.symbolTable = extendSymbolTable(
-      state.symbolTable,
-      symbolTableEntries
+      state.symbolTable
     );
     node.body.forEach((item) => {
+      state.symbolTable = programSymbolTable;
       compile(item, state);
     });
   },

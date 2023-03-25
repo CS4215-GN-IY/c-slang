@@ -9,16 +9,16 @@ import {
   type LoadSymbolInstr,
   type ExitFunctionInstr
 } from './types/vmInstruction';
-import { type SymbolTableEntryPosition } from './types/virtualMachine';
 import { type Value } from './types/evaluationResults';
+import { type SymbolTableEntry } from './types/symbolTable';
+import { convertToNameScope } from './symbolTable';
 
 export const PLACEHOLDER_ADDRESS = -1;
 
-export const constructAssignInstr = (
-  position: SymbolTableEntryPosition
-): AssignInstr => ({
+export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   type: 'Assign',
-  symbolTableEntryPosition: position
+  scope: convertToNameScope(entry.scope),
+  offset: entry.offset
 });
 
 export const constructCallInstr = (numOfArgs: number): CallInstr => ({
@@ -54,10 +54,11 @@ export const constructLoadFunctionInstr = (
 });
 
 export const constructLoadSymbolInstr = (
-  symbolTableEntryPosition: SymbolTableEntryPosition
+  entry: SymbolTableEntry
 ): LoadSymbolInstr => ({
   type: 'LoadSymbol',
-  symbolTableEntryPosition
+  scope: convertToNameScope(entry.scope),
+  offset: entry.offset
 });
 
 export const constructTeardownInstr = (
