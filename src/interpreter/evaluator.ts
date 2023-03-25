@@ -12,16 +12,43 @@ import {
   type LoadSymbolInstr,
   type TeardownInstr
 } from './types/vmInstruction';
-import { type Value } from './types/evaluationResults';
-import { isAddress, isNumber, typeOf } from './evaluatorUtils';
+import { type Result, type Value } from './types/evaluationResults';
+import {
+  evaluateBinaryExpression,
+  isAddress,
+  isNumber,
+  isTrue,
+  typeCheckBinaryOperation,
+  typeOf
+} from './evaluatorUtils';
 import { TypeError, TypeErrorContext } from './errors';
 import { type CompilerState } from './types/virtualMachine';
 import { Stack } from '../utils/stack';
-import {
-  evaluateBinaryExpression,
-  isTrue,
-  typeCheckBinaryOperation
-} from './utils';
+import { type Program } from '../ast/types';
+import { compileProgram } from './virtualMachine';
+
+/**
+ * Evaluates the abstract syntax tree using a virtual machine evaluator &
+ * returns the result of evaluation asynchronously.
+ *
+ * @param ast The abstract syntax tree to evaluate.
+ */
+export const evaluate = async (ast: Program): Promise<Result> => {
+  return await new Promise(
+    (
+      resolve: (value: Result | PromiseLike<Result>) => void,
+      _reject: (reason?: any) => void
+    ) => {
+      try {
+        const compilation = compileProgram(ast);
+        const value = interpret(compilation);
+        resolve({ status: 'finished', value });
+      } catch (err) {
+        resolve({ status: 'error' });
+      }
+    }
+  );
+};
 
 export const interpret = (compilation: CompilerState): Value => {
   const stash = new Stack<Value>();

@@ -11,7 +11,6 @@ import {
   type SymbolTableEntryScope,
   type SymbolTableFrame
 } from './types/symbolTable';
-import { getIdentifierName } from './utils';
 import {
   InvalidCallError,
   RedeclaredNameError,
@@ -204,7 +203,7 @@ const constructFunctionDeclarationSymbolTableEntry = (
   offset: number
 ): SymbolTableEntry => {
   return {
-    name: getIdentifierName(functionDeclaration.id),
+    name: functionDeclaration.id.name,
     nameType: 'Function',
     offset,
     scope,
@@ -223,7 +222,7 @@ const constructVariableDeclarationSymbolTableEntries = (
   const allNames: SymbolTableEntry[] = [];
   variableDeclaration.declarations.forEach((declarator) => {
     allNames.push({
-      name: getIdentifierName(declarator.id),
+      name: declarator.id.name,
       nameType: 'Variable',
       offset,
       scope
