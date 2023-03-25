@@ -38,21 +38,25 @@ import {
 import { Memory } from '../memory/memory';
 import {
   constructAssignInstr,
+  constructBinaryOperationInstr,
   constructCallInstr,
   constructDoneInstr,
-  constructTeardownInstr,
+  constructEnterProgramInstr,
   constructGotoInstr,
+  constructJumpOnFalseInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
-  PLACEHOLDER_ADDRESS,
   constructLoadSymbolInstr,
-  constructEnterProgramInstr,
-  constructBinaryOperationInstr,
-  constructJumpOnFalseInstr
+  constructTeardownInstr,
+  PLACEHOLDER_ADDRESS
 } from './vmInstruction';
 import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
-import { InvalidCallError } from './errors';
+import {
+  InvalidCallError,
+  UnsupportedOperatorError,
+  UnsupportedOperatorErrorType
+} from './errors';
 import {
   constructConditionalExpression,
   constructFalseConstant,
@@ -208,18 +212,27 @@ const compilers: CompilerMapping = {
   IdentifierStatement: (node: IdentifierStatement, state: CompilerState) => {},
   IfStatement: (node: IfStatement, state: CompilerState) => {},
   LogicalExpression: (node: LogicalExpression, state: CompilerState) => {
-    const conditionalExpression =
-      node.operator === '&&'
-        ? constructConditionalExpression(
-            node.left,
-            node.right,
-            constructFalseConstant()
-          )
-        : constructConditionalExpression(
-            node.left,
-            constructTrueConstant(),
-            node.right
-          );
+    let conditionalExpression;
+    if (node.operator === '&&') {
+      conditionalExpression = constructConditionalExpression(
+        node.left,
+        node.right,
+        constructFalseConstant()
+      );
+    }
+    if (node.operator === '||') {
+      conditionalExpression = constructConditionalExpression(
+        node.left,
+        constructTrueConstant(),
+        node.right
+      );
+    }
+    if (conditionalExpression === undefined) {
+      throw new UnsupportedOperatorError(
+        node.operator,
+        UnsupportedOperatorErrorType.LOGICAL
+      );
+    }
     compile(conditionalExpression, state);
   },
   MemberExpression: (node: MemberExpression, state: CompilerState) => {},

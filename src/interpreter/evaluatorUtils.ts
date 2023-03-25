@@ -4,7 +4,8 @@ import { type BinaryOperator } from '../ast/types';
 import {
   TypeError,
   TypeErrorContext,
-  UnsupportedBinaryOperatorError
+  UnsupportedOperatorError,
+  UnsupportedOperatorErrorType
 } from './errors';
 import { FALSE_VALUE } from '../utils/constants';
 
@@ -52,7 +53,10 @@ export const typeCheckBinaryOperation = (
       }
       break;
     default:
-      throw new UnsupportedBinaryOperatorError(operator);
+      throw new UnsupportedOperatorError(
+        operator,
+        UnsupportedOperatorErrorType.BINARY
+      );
   }
 };
 
@@ -86,6 +90,9 @@ export function evaluateBinaryExpression(
     case '>=':
       return left >= right;
     default:
-      throw new UnsupportedBinaryOperatorError(operator);
+      throw new UnsupportedOperatorError(
+        operator,
+        UnsupportedOperatorErrorType.BINARY
+      );
   }
 }

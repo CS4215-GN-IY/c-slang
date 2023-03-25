@@ -12,11 +12,12 @@ import {
   type SymbolTableFrame
 } from './types/symbolTable';
 import {
-  InvalidCallError,
+  InvalidScopeError,
   RedeclaredNameError,
+  TypeError,
+  TypeErrorContext,
   UndeclaredNameError,
-  UnhandledDeclarationError,
-  InvalidScopeError
+  UnsupportedDeclarationError
 } from './errors';
 import { isEmptyStatement, isVariableDeclaration } from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
@@ -51,7 +52,7 @@ export const addProgramSymbolTableEntries = (
         break;
       }
       default: {
-        throw new UnhandledDeclarationError();
+        throw new UnsupportedDeclarationError();
       }
     }
   });
@@ -140,7 +141,11 @@ export const getFunctionSymbolTableEntry = (
 ): FunctionSymbolTableEntry => {
   const functionEntry = getSymbolTableEntry(name, symbolTable);
   if (!isFunctionSymbolTableEntry(functionEntry)) {
-    throw new InvalidCallError('Cannot call a non-function.');
+    throw new TypeError(
+      'function',
+      functionEntry.nameType,
+      TypeErrorContext.NAME
+    );
   }
   return functionEntry;
 };
@@ -171,7 +176,7 @@ export const getSegmentScope = (scope: SymbolTableEntryScope): Segment => {
     case 'Global':
       return Segment.DATA;
     default:
-      throw new InvalidScopeError('Encountered an invalid scope.');
+      throw new InvalidScopeError('Encountered an invalid symbol table scope.');
   }
 };
 
