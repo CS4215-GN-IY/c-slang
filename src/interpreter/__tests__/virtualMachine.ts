@@ -111,4 +111,13 @@ describe('compile and run', () => {
     const expectedResult = 5;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles multiple return arguments', () => {
+    const code = 'int main() { int a; int b = 5; return 1, 2, 3; }';
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 3;
+    expect(result).toEqual(expectedResult);
+  });
 });

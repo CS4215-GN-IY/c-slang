@@ -72,6 +72,7 @@ export interface LoadSymbolInstr extends BaseInstr {
 
 export interface TeardownInstr extends BaseInstr {
   type: 'Teardown';
+  numOfReturnArgs: number;
 }
 
 export type BinaryOperator =

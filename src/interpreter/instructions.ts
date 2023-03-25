@@ -85,6 +85,9 @@ export const constructLoadSymbolInstr = (
   offset: entry.offset
 });
 
-export const constructTeardownInstr = (): TeardownInstr => ({
-  type: 'Teardown'
+export const constructTeardownInstr = (
+  numOfReturnArgs: number
+): TeardownInstr => ({
+  type: 'Teardown',
+  numOfReturnArgs
 });

@@ -232,7 +232,8 @@ const compilers: CompilerMapping = {
         compile(item, instructions, functionSymbolTable);
       });
     }
-    const teardownInstr = constructTeardownInstr();
+    // This will be executed only if the function does not encounter any return statement. So numOfReturnArgs is 0.
+    const teardownInstr = constructTeardownInstr(0);
     instructions.push(teardownInstr);
 
     gotoInstr.instrAddress = instructions.length;
@@ -320,14 +321,16 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable
   ) => {
     // TODO: Check if return with no argument works correctly.
+    let numOfReturnArgs = 0;
     if (isNotUndefined(node.argument)) {
-      if (node.argument.expressions.length > 1) {
-        throw new InvalidCallError('Encountered more than 1 return value');
-      }
-      compile(node.argument.expressions[0], instructions, symbolTable);
+      numOfReturnArgs = node.argument.expressions.length;
+      // Should evaluate arguments from left to right.
+      node.argument.expressions.forEach((arg) => {
+        compile(arg, instructions, symbolTable);
+      });
     }
     // TODO: Handle tail call.
-    const teardownInstr = constructTeardownInstr();
+    const teardownInstr = constructTeardownInstr(numOfReturnArgs);
     instructions.push(teardownInstr);
   },
   SequenceExpression: (

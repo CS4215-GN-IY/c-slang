@@ -126,6 +126,17 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.memory.moveToNextInstr();
   },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
+    // Topmost return value should be from the rightmost return argument. We only want that.
+    if (instr.numOfReturnArgs > 0) {
+      const returnValue = state.stash.pop();
+      let numOfUnusedReturnValues = instr.numOfReturnArgs - 1;
+      while (numOfUnusedReturnValues > 0) {
+        state.stash.pop();
+        numOfUnusedReturnValues -= 1;
+      }
+      state.stash.push(returnValue);
+    }
+
     const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToInstr(returnAddress);
