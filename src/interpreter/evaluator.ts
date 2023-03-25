@@ -58,7 +58,7 @@ export const interpret = (compilation: CompilerState): Value => {
   };
   while (!state.memory.isAtDoneInstr()) {
     const instr = state.memory.getCurrentInstr();
-    // The typecast allows for mapping to a specific evaluator command type from their union type.
+    // The typecast allows for mapping to a specific evaluator instr type from their union type.
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     evaluators[instr.type](instr as any, state);
   }
@@ -66,22 +66,22 @@ export const interpret = (compilation: CompilerState): Value => {
 };
 
 const evaluators: EvaluatorMapping = {
-  Assign: (command: AssignInstr, state: EvaluatorState) => {
+  Assign: (instr: AssignInstr, state: EvaluatorState) => {
     // TODO: Add conversion method to convert stash value to number.
-    state.memory.setByOffset(command.scope, command.offset, state.stash.pop());
+    state.memory.setByOffset(instr.scope, instr.offset, state.stash.pop());
     state.memory.moveToNextInstr();
   },
-  BinaryOperation: (command: BinaryOperationInstr, state: EvaluatorState) => {
+  BinaryOperation: (instr: BinaryOperationInstr, state: EvaluatorState) => {
     const right = state.stash.pop();
     const left = state.stash.pop();
-    typeCheckBinaryOperation(command.operator, left, right);
-    state.stash.push(evaluateBinaryExpression(command.operator, left, right));
+    typeCheckBinaryOperation(instr.operator, left, right);
+    state.stash.push(evaluateBinaryExpression(instr.operator, left, right));
     state.memory.moveToNextInstr();
   },
-  Call: (command: CallInstr, state: EvaluatorState) => {
+  Call: (instr: CallInstr, state: EvaluatorState) => {
     // First item popped from the stash should be the arg for the first param and so on.
     const args: Value[] = [];
-    for (let i = 0; i < command.numOfArgs; i++) {
+    for (let i = 0; i < instr.numOfArgs; i++) {
       args.push(state.stash.pop());
     }
     const functionInstrAddress = state.stash.pop();
@@ -93,18 +93,18 @@ const evaluators: EvaluatorMapping = {
       );
     }
 
-    state.memory.stackFunctionCallAllocate(args, command.numOfVars);
+    state.memory.stackFunctionCallAllocate(args, instr.numOfVars);
     state.memory.moveToInstr(functionInstrAddress);
   },
-  Done: (command: DoneInstr, state: EvaluatorState) => {},
-  EnterProgram: (command: EnterProgramInstr, state: EvaluatorState) => {
-    state.memory.dataAllocate(command.numOfDeclarations);
+  Done: (instr: DoneInstr, state: EvaluatorState) => {},
+  EnterProgram: (instr: EnterProgramInstr, state: EvaluatorState) => {
+    state.memory.dataAllocate(instr.numOfDeclarations);
     state.memory.moveToNextInstr();
   },
-  Goto: (command: GotoInstr, state: EvaluatorState) => {
-    state.memory.moveToInstr(command.instrAddress);
+  Goto: (instr: GotoInstr, state: EvaluatorState) => {
+    state.memory.moveToInstr(instr.instrAddress);
   },
-  JumpOnFalse: (command: JumpOnFalseInstr, state: EvaluatorState) => {
+  JumpOnFalse: (instr: JumpOnFalseInstr, state: EvaluatorState) => {
     const predicate = state.stash.pop();
     if (!isNumber(predicate)) {
       throw new TypeError(
@@ -116,23 +116,23 @@ const evaluators: EvaluatorMapping = {
     if (isTrue(predicate)) {
       state.memory.moveToNextInstr();
     } else {
-      state.memory.moveToInstr(command.instrAddress);
+      state.memory.moveToInstr(instr.instrAddress);
     }
   },
-  LoadConstant: (command: LoadConstantInstr, state: EvaluatorState) => {
-    state.stash.push(command.value);
+  LoadConstant: (instr: LoadConstantInstr, state: EvaluatorState) => {
+    state.stash.push(instr.value);
     state.memory.moveToNextInstr();
   },
-  LoadFunction: (command: LoadFunctionInstr, state: EvaluatorState) => {
-    state.stash.push(command.functionInstrAddress);
+  LoadFunction: (instr: LoadFunctionInstr, state: EvaluatorState) => {
+    state.stash.push(instr.functionInstrAddress);
     state.memory.moveToNextInstr();
   },
-  LoadSymbol: (command: LoadSymbolInstr, state: EvaluatorState) => {
-    const value = state.memory.getByOffset(command.scope, command.offset);
+  LoadSymbol: (instr: LoadSymbolInstr, state: EvaluatorState) => {
+    const value = state.memory.getByOffset(instr.scope, instr.offset);
     state.stash.push(value);
     state.memory.moveToNextInstr();
   },
-  Teardown: (command: TeardownInstr, state: EvaluatorState) => {
+  Teardown: (instr: TeardownInstr, state: EvaluatorState) => {
     const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToInstr(returnAddress);
