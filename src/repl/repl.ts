@@ -1,7 +1,7 @@
 import { start } from 'repl';
 import { type Context } from 'vm';
 import { run } from '../runner/runner';
-import { type Result } from '../interpreter/types/evaluationResults';
+import { type Result } from '../interpreter/types/virtualMachine';
 
 const startRepl = (): void => {
   start({

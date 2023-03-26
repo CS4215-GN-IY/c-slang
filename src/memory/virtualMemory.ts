@@ -3,10 +3,6 @@ import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
 import { MemoryError, MemoryErrorType } from './memoryError';
-import {
-  type DeclarationNameWithAddress,
-  type DeclarationNameWithValue
-} from '../interpreter/types/interpreter';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -15,10 +11,7 @@ export class VirtualMemory {
   readonly l4PageTables: PageTable[] = [];
   readonly l5PageTables: PageTable[] = [];
 
-  readonly segmentAddresses: Map<Segment, SegmentAddress> = new Map<
-    Segment,
-    SegmentAddress
-  >();
+  readonly segmentAddresses: Record<Segment, SegmentAddress>;
 
   private rbp: number;
   private rsp: number;
@@ -42,68 +35,123 @@ export class VirtualMemory {
     this.allocatePageTables(stackBaseAddress, stackSize);
     this.allocatePageTables(heapBaseAddress, heapSize);
 
-    this.segmentAddresses.set(
-      Segment.TEXT,
-      new SegmentAddress(
-        textBaseAddress,
-        textBaseAddress,
-        textBaseAddress + textSize * PageTable.ENTRY_SIZE
-      )
+    const textSegmentAddress = new SegmentAddress(
+      textBaseAddress,
+      textBaseAddress,
+      textBaseAddress + textSize * PageTable.ENTRY_SIZE
     );
-    this.segmentAddresses.set(
-      Segment.DATA,
-      new SegmentAddress(
-        dataBaseAddress,
-        dataBaseAddress,
-        dataBaseAddress + dataSize * PageTable.ENTRY_SIZE
-      )
+    const dataSegmentAddress = new SegmentAddress(
+      dataBaseAddress,
+      dataBaseAddress,
+      dataBaseAddress + dataSize * PageTable.ENTRY_SIZE
     );
-    this.segmentAddresses.set(
-      Segment.STACK,
-      new SegmentAddress(
-        stackBaseAddress,
-        stackBaseAddress,
-        stackBaseAddress + stackSize * PageTable.ENTRY_SIZE
-      )
+    const stackSegmentAddress = new SegmentAddress(
+      stackBaseAddress,
+      stackBaseAddress,
+      stackBaseAddress + stackSize * PageTable.ENTRY_SIZE
     );
-    this.segmentAddresses.set(
-      Segment.HEAP,
-      new SegmentAddress(
-        heapBaseAddress,
-        heapBaseAddress,
-        heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
-      )
+    const heapSegmentAddress = new SegmentAddress(
+      heapBaseAddress,
+      heapBaseAddress,
+      heapBaseAddress + heapSize * PageTable.ENTRY_SIZE
     );
+
+    this.segmentAddresses = {
+      [Segment.TEXT]: textSegmentAddress,
+      [Segment.DATA]: dataSegmentAddress,
+      [Segment.STACK]: stackSegmentAddress,
+      [Segment.HEAP]: heapSegmentAddress
+    };
     this.rbp = stackBaseAddress;
-    this.rsp = stackBaseAddress - PageTable.ENTRY_SIZE;
+    this.rsp = this.rbp;
   }
 
-  public stackAllocate(data: number): number {
-    this.rsp += PageTable.ENTRY_SIZE;
-    this.setFree(this.rsp, data);
-    return this.rsp;
-  }
-
-  // Sets up stack for function call and returns address of parameters
-  public stackFunctionCallAllocate(
-    paramsWithValues: DeclarationNameWithValue[]
-  ): DeclarationNameWithAddress[] {
-    this.stackAllocate(this.rbp);
-    this.stackAllocate(this.rsp);
-    this.rbp = this.rsp;
-
-    const paramWithAddresses: DeclarationNameWithAddress[] = [];
-    this.rsp += paramsWithValues.length * PageTable.ENTRY_SIZE;
-    for (let i = 0; i < paramsWithValues.length; i++) {
-      const address = this.rbp + i * PageTable.ENTRY_SIZE;
-      this.setFree(address, paramsWithValues[i].value);
-      paramWithAddresses.push({
-        name: paramsWithValues[i].name,
-        nameType: paramsWithValues[i].nameType,
-        address
-      });
+  public dataAllocate(numOfEntries: number): void {
+    const placeholderData = 0;
+    let address = this.segmentAddresses[Segment.DATA].baseAddress;
+    for (let i = 0; i < numOfEntries; i++) {
+      this.setFree(address, placeholderData);
+      address += PageTable.ENTRY_SIZE;
     }
-    return paramWithAddresses;
+  }
+
+  public dataGetByOffset(offset: number): number {
+    const address =
+      this.segmentAddresses[Segment.DATA].baseAddress +
+      offset * PageTable.ENTRY_SIZE;
+    return this.get(address);
+  }
+
+  public dataSetByOffset(offset: number, data: number): void {
+    const address =
+      this.segmentAddresses[Segment.DATA].baseAddress +
+      offset * PageTable.ENTRY_SIZE;
+    this.set(address, data);
+  }
+
+  public stackGetByOffset(offset: number): number {
+    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
+    return this.get(address);
+  }
+
+  public stackSetByOffset(offset: number, data: number): void {
+    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
+    this.set(address, data);
+  }
+
+  public stackAllocate(data: number): void {
+    this.setFree(this.rsp, data);
+    this.rsp += PageTable.ENTRY_SIZE;
+  }
+
+  public stackFunctionCallSetup(
+    args: number[],
+    numOfVars: number,
+    returnAddress: number
+  ): void {
+    /*
+    Structure of frame is as such:
+                   <- rsp
+    -------------
+    Local vars     <- rbp
+    -------------
+    Return address
+    -------------
+    Saved rsp
+    -------------
+    Saved rbp
+    -------------
+    Params/Args   <- prev rsp which is stored as Saved rsp
+    -------------
+     */
+    const savedRsp = this.rsp;
+    args.forEach((arg) => {
+      this.stackAllocate(arg);
+    });
+    this.stackAllocate(this.rbp);
+    this.stackAllocate(savedRsp);
+    this.stackAllocate(returnAddress);
+    this.rbp = this.rsp;
+    const placeholderData = 0;
+    for (let i = 0; i < numOfVars; i++) {
+      this.stackAllocate(placeholderData);
+    }
+  }
+
+  public getReturnAddress(): number {
+    return this.get(this.rbp - PageTable.ENTRY_SIZE);
+  }
+
+  public stackFunctionCallTeardown(): void {
+    const savedRbp = this.get(this.rbp - 3 * PageTable.ENTRY_SIZE);
+    const savedRsp = this.get(this.rbp - 2 * PageTable.ENTRY_SIZE);
+    let fp = this.rsp;
+    while (fp > savedRsp) {
+      fp -= PageTable.ENTRY_SIZE;
+      this.free(fp);
+    }
+    this.rsp = savedRsp;
+    this.rbp = savedRbp;
   }
 
   /**
@@ -119,7 +167,7 @@ export class VirtualMemory {
    * Allocates data to the top of the segment.
    */
   public allocate(data: number, segment: Segment): number {
-    const segmentAddress = this.segmentAddresses.get(segment);
+    const segmentAddress = this.segmentAddresses[segment];
     if (segmentAddress === undefined) {
       throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
     }
