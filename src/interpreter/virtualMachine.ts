@@ -127,6 +127,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
     // Topmost return value should be from the rightmost return argument. We only want that.
+    // TODO: Replace this if the logic is shifted to be handled in sequence expression.
     if (instr.numOfReturnArgs > 0) {
       const returnValue = state.stash.pop();
       let numOfUnusedReturnValues = instr.numOfReturnArgs - 1;
