@@ -14,6 +14,7 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -49,6 +50,7 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -92,6 +94,7 @@ describe('return statement', () => {
             type: 'Identifier',
             name: 'f'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -120,6 +123,7 @@ describe('goto statement', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
