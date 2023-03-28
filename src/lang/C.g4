@@ -289,6 +289,20 @@ directDeclarator
     |   Identifier ':' DigitSequence  // bit field
     ;
 
+functionDeclarator
+    :   pointer? functionDirectDeclarator
+    ;
+
+// Only a subset of direct declarators are used for functions:
+// https://learn.microsoft.com/en-us/cpp/c-language/c-function-definitions?view=msvc-170#syntax
+// See the following for the differences between the old-style & new-style declarators:
+// https://learn.microsoft.com/en-us/cpp/c-language/obsolete-forms-of-function-declarations-and-definitions?view=msvc-170
+functionDirectDeclarator
+    :   Identifier                                         // Function name
+    |   functionDirectDeclarator '(' parameterTypeList ')' // New-style declarator
+    |   functionDirectDeclarator '(' identifierList? ')'   // Old-style declarator
+    ;
+
 nestedParenthesesBlock
     :   (   ~('(' | ')')
         |   '(' nestedParenthesesBlock ')'
@@ -455,7 +469,7 @@ externalDeclaration
     ;
 
 functionDefinition
-    :   declarationSpecifiers? declarator declarationList? compoundStatement
+    :   declarationSpecifiers? functionDeclarator declarationList? compoundStatement
     ;
 
 declarationList
