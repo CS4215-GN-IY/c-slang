@@ -68,6 +68,6 @@ export interface AlignmentSpecifierReturnValue extends BaseReturnValue {
 export interface ForCondition extends BaseReturnValue {
   type: 'ForCondition';
   init?: VariableDeclaration | SequenceExpression;
-  test?: SequenceExpression;
+  predicate?: SequenceExpression;
   update?: SequenceExpression;
 }

@@ -675,7 +675,7 @@ export class ASTBuilder implements CVisitor<any> {
         : undefined;
 
     const firstForExpression = ctx.forExpression(0);
-    const test =
+    const predicate =
       firstForExpression !== undefined
         ? this.visitForExpression(firstForExpression)
         : undefined;
@@ -688,7 +688,7 @@ export class ASTBuilder implements CVisitor<any> {
     return {
       type: 'ForCondition',
       init,
-      test,
+      predicate,
       update
     };
   }

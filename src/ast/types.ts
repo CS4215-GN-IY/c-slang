@@ -94,7 +94,7 @@ export interface DoWhileStatement extends BaseStatement {
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
   init?: VariableDeclaration | SequenceExpression;
-  test?: SequenceExpression;
+  predicate?: SequenceExpression;
   update?: SequenceExpression;
   body: Statement;
 }

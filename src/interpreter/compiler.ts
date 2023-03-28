@@ -59,10 +59,12 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import {
+  constructAssignmentExpression,
   constructBinaryExpression,
   constructConditionalExpression,
   constructFalseConstant,
   constructMainCallExpression,
+  constructOneConstant,
   constructTrueConstant
 } from '../ast/constructors';
 import { type SymbolTable } from './types/symbolTable';
@@ -75,7 +77,7 @@ import {
   getSymbolTableEntry,
   getSymbolTableEntryInFrame
 } from './symbolTable';
-import { type Instr } from './types/instructions';
+import { type Instr, type JumpOnFalseInstr } from './types/instructions';
 import { constructAssignmentExpressionAssignInstr } from './compilerUtils';
 
 export const compileProgram = (ast: Program): Instr[] => {
@@ -232,7 +234,27 @@ const compilers: CompilerMapping = {
     node: ForStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    if (isNotUndefined(node.init)) {
+      compile(node.init, instructions, symbolTable);
+    }
+    const loopStart = instructions.length;
+    let jumpOnFalseInstr: JumpOnFalseInstr | undefined;
+    if (isNotUndefined(node.predicate)) {
+      compile(node.predicate, instructions, symbolTable);
+      jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+      instructions.push(jumpOnFalseInstr);
+    }
+    compile(node.body, instructions, symbolTable);
+    if (isNotUndefined(node.update)) {
+      compile(node.update, instructions, symbolTable);
+    }
+    const gotoInstr = constructGotoInstr(loopStart);
+    instructions.push(gotoInstr);
+    if (isNotUndefined(jumpOnFalseInstr)) {
+      jumpOnFalseInstr.instrAddress = instructions.length;
+    }
+  },
   FunctionDeclaration: (
     node: FunctionDeclaration,
     instructions: Instr[],
@@ -383,7 +405,16 @@ const compilers: CompilerMapping = {
     node: UpdateExpression,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    const assignmentOperator = node.operator === '++' ? '+=' : '-=';
+    const oneConstant = constructOneConstant();
+    const assignmentExpression = constructAssignmentExpression(
+      assignmentOperator,
+      node.operand,
+      oneConstant
+    );
+    compile(assignmentExpression, instructions, symbolTable);
+  },
   VariableDeclaration: (
     node: VariableDeclaration,
     instructions: Instr[],

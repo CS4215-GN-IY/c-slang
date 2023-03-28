@@ -1,5 +1,7 @@
 import { type TerminalNode } from 'antlr4ts/tree';
 import {
+  type AssignmentExpression,
+  type AssignmentOperator,
   type BinaryExpression,
   type BinaryOperator,
   type CallExpression,
@@ -11,6 +13,19 @@ import {
   type StringLiteral
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
+
+export const constructAssignmentExpression = (
+  operator: AssignmentOperator,
+  left: Expression,
+  right: Expression
+): AssignmentExpression => {
+  return {
+    type: 'AssignmentExpression',
+    operator,
+    left,
+    right
+  };
+};
 
 export const constructConstant = (constant: TerminalNode): Constant => {
   const constantLiteral = constant.toString().trim();
@@ -64,6 +79,13 @@ export const constructTrueConstant = (): Constant => {
   return {
     type: 'Constant',
     value: ARBITRARY_TRUE_VALUE
+  };
+};
+
+export const constructOneConstant = (): Constant => {
+  return {
+    type: 'Constant',
+    value: 1
   };
 };
 

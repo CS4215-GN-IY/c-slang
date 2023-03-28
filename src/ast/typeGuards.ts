@@ -8,6 +8,7 @@ import {
   type BinaryOperator,
   type Constant,
   type EmptyStatement,
+  type ForStatement,
   type Identifier,
   type VariableDeclaration
 } from './types';
@@ -34,6 +35,10 @@ export const isVariableDeclaration = (
 
 export const isEmptyStatement = (node: BaseNode): node is EmptyStatement => {
   return node.type === 'EmptyStatement';
+};
+
+export const isForStatement = (node: BaseNode): node is ForStatement => {
+  return node.type === 'ForStatement';
 };
 
 export const isBinaryOperator = (

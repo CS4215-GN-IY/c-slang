@@ -155,4 +155,38 @@ describe('compile and run', () => {
     const expectedResult = 1;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles for loop', () => {
+    const code = `
+        int main() {
+            int a = 0;
+            for (int i = 0; i < 2; i++) {
+                a += 3;
+            }
+            return a;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 6;
+    expect(result).toEqual(expectedResult);
+  });
+
+  test('handles return in for loop', () => {
+    const code = `
+        int main() {
+            int a = 0;
+            for (int i = 0; i < 2; i++) {
+                a += 3;
+                return a;
+            }
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 3;
+    expect(result).toEqual(expectedResult);
+  });
 });
