@@ -1255,7 +1255,7 @@ export class ASTBuilder implements CVisitor<any> {
     const expression = ctx.expression();
     const firstStatement = ctx.statement(0);
     const elseToken = ctx.Else();
-    const secondStatement = ctx.statement(1);
+    const secondStatement = (elseToken != null) ? ctx.statement(1) : undefined;
 
     if (
       ifToken !== undefined &&

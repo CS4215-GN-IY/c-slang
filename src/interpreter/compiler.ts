@@ -312,7 +312,19 @@ const compilers: CompilerMapping = {
     node: IfStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    compile(node.predicate, instructions, symbolTable);
+    const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpOnFalseInstr);
+    compile(node.consequent, instructions, symbolTable);
+    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(gotoInstr);
+    jumpOnFalseInstr.instrAddress = instructions.length;
+    if (isNotUndefined(node.alternate)) {
+      compile(node.alternate, instructions, symbolTable);
+    }
+    gotoInstr.instrAddress = instructions.length;
+  },
   LogicalExpression: (
     node: LogicalExpression,
     instructions: Instr[],
