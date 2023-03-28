@@ -299,6 +299,7 @@ functionDeclarator
 // https://learn.microsoft.com/en-us/cpp/c-language/obsolete-forms-of-function-declarations-and-definitions?view=msvc-170
 functionDirectDeclarator
     :   Identifier                                         // Function name
+    |   '(' functionDeclarator ')'
     |   functionDirectDeclarator '(' parameterTypeList ')' // New-style declarator
     |   functionDirectDeclarator '(' identifierList? ')'   // Old-style declarator
     ;
