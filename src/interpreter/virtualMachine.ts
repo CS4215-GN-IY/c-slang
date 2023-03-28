@@ -16,6 +16,7 @@ import {
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
+  type PopInstr,
   type TeardownInstr
 } from './types/instructions';
 import {
@@ -125,19 +126,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.stash.push(value);
     state.memory.moveToNextInstr();
   },
+  Pop: (instr: PopInstr, state: VirtualMachineState) => {
+    state.stash.pop();
+    state.memory.moveToNextInstr();
+  },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
-    // Topmost return value should be from the rightmost return argument. We only want that.
-    // TODO: Replace this if the logic is shifted to be handled in sequence expression.
-    if (instr.numOfReturnArgs > 0) {
-      const returnValue = state.stash.pop();
-      let numOfUnusedReturnValues = instr.numOfReturnArgs - 1;
-      while (numOfUnusedReturnValues > 0) {
-        state.stash.pop();
-        numOfUnusedReturnValues -= 1;
-      }
-      state.stash.push(returnValue);
-    }
-
     const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToInstr(returnAddress);

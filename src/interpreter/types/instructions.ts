@@ -16,6 +16,7 @@ export type Instr =
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
+  | PopInstr
   | TeardownInstr;
 
 export interface AssignInstr extends BaseInstr {
@@ -70,9 +71,12 @@ export interface LoadSymbolInstr extends BaseInstr {
   offset: number;
 }
 
+export interface PopInstr extends BaseInstr {
+  type: 'Pop';
+}
+
 export interface TeardownInstr extends BaseInstr {
   type: 'Teardown';
-  numOfReturnArgs: number;
 }
 
 export type BinaryOperator =

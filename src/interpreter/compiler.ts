@@ -43,6 +43,7 @@ import {
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
   constructLoadSymbolInstr,
+  constructPopInstr,
   constructTeardownInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
@@ -232,8 +233,7 @@ const compilers: CompilerMapping = {
         compile(item, instructions, functionSymbolTable);
       });
     }
-    // This will be executed only if the function does not encounter any return statement. So numOfReturnArgs is 0.
-    const teardownInstr = constructTeardownInstr(0);
+    const teardownInstr = constructTeardownInstr();
     instructions.push(teardownInstr);
 
     gotoInstr.instrAddress = instructions.length;
@@ -321,16 +321,11 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable
   ) => {
     // TODO: Check if return with no argument works correctly.
-    let numOfReturnArgs = 0;
     if (isNotUndefined(node.argument)) {
-      numOfReturnArgs = node.argument.expressions.length;
-      // Should evaluate arguments from left to right.
-      node.argument.expressions.forEach((arg) => {
-        compile(arg, instructions, symbolTable);
-      });
+      compile(node.argument, instructions, symbolTable);
     }
     // TODO: Handle tail call.
-    const teardownInstr = constructTeardownInstr(numOfReturnArgs);
+    const teardownInstr = constructTeardownInstr();
     instructions.push(teardownInstr);
   },
   SequenceExpression: (
@@ -340,7 +335,11 @@ const compilers: CompilerMapping = {
   ) => {
     node.expressions.forEach((expression) => {
       compile(expression, instructions, symbolTable);
+      const popInstr = constructPopInstr();
+      instructions.push(popInstr);
     });
+    // Pop everything from the virtual machine stash except the last expression.
+    instructions.pop();
   },
   StringLiteral: (
     node: StringLiteral,

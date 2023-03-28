@@ -10,7 +10,8 @@ import {
   type EnterProgramInstr,
   type BinaryOperationInstr,
   type BinaryOperator,
-  type JumpOnFalseInstr
+  type JumpOnFalseInstr,
+  type PopInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -85,9 +86,10 @@ export const constructLoadSymbolInstr = (
   offset: entry.offset
 });
 
-export const constructTeardownInstr = (
-  numOfReturnArgs: number
-): TeardownInstr => ({
-  type: 'Teardown',
-  numOfReturnArgs
+export const constructPopInstr = (): PopInstr => ({
+  type: 'Pop'
+});
+
+export const constructTeardownInstr = (): TeardownInstr => ({
+  type: 'Teardown'
 });
