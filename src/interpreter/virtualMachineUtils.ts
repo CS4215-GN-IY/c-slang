@@ -6,7 +6,7 @@ import {
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
-import { FALSE_VALUE } from '../utils/constants';
+import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 import { type Value } from './types/virtualMachine';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
@@ -20,6 +20,10 @@ export const convertToAddress = (address: Value): number => {
 
 export const convertToPredicate = (value: Value): number => {
   return convertToNumber(value, TypeErrorContext.PREDICATE);
+};
+
+export const convertBooleanToPredicate = (value: boolean): number => {
+  return value ? ARBITRARY_TRUE_VALUE : FALSE_VALUE;
 };
 
 export const convertToNumber = (
@@ -42,6 +46,11 @@ export const typeCheckBinaryOperation = (
     case '*':
     case '/':
     case '%':
+    case '<<':
+    case '>>':
+    case '&':
+    case '^':
+    case '|':
       if (!isNumber(left)) {
         throw new TypeError('number', typeOf(left), TypeErrorContext.LHS);
       }
@@ -67,6 +76,9 @@ export const typeCheckBinaryOperation = (
       if (isString(left) && !isString(right)) {
         throw new TypeError('string', typeOf(right), TypeErrorContext.RHS);
       }
+      break;
+    case '==':
+    case '!=':
       break;
     default:
       throw new UnsupportedOperatorError(
@@ -98,13 +110,23 @@ export function evaluateBinaryExpression(
     case '%':
       return left % right;
     case '<=':
-      return left <= right;
+      return convertBooleanToPredicate(left <= right);
     case '<':
-      return left < right;
+      return convertBooleanToPredicate(left < right);
     case '>':
-      return left > right;
+      return convertBooleanToPredicate(left > right);
     case '>=':
-      return left >= right;
+      return convertBooleanToPredicate(left >= right);
+    case '<<':
+      return left << right;
+    case '>>':
+      return left >> right;
+    case '&':
+      return left & right;
+    case '^':
+      return left ^ right;
+    case '|':
+      return left | right;
     default:
       throw new UnsupportedOperatorError(
         operator,

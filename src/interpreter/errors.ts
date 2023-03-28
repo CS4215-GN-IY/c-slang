@@ -28,6 +28,8 @@ export class TypeError extends InterpreterError {
 
 export class UndeclaredNameError extends InterpreterError {}
 
+export class UnsupportedAssignmentError extends InterpreterError {}
+
 export class UnsupportedDeclarationError extends InterpreterError {}
 
 export enum UnsupportedOperatorErrorType {

@@ -47,7 +47,11 @@ import {
   constructTeardownInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
-import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
+import {
+  isBinaryOperator,
+  isEmptyStatement,
+  isIdentifier
+} from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
@@ -55,6 +59,7 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import {
+  constructBinaryExpression,
   constructConditionalExpression,
   constructFalseConstant,
   constructMainCallExpression,
@@ -71,6 +76,7 @@ import {
   getSymbolTableEntryInFrame
 } from './symbolTable';
 import { type Instr } from './types/instructions';
+import { constructAssignmentExpressionAssignInstr } from './compilerUtils';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
@@ -103,7 +109,22 @@ const compilers: CompilerMapping = {
     node: AssignmentExpression,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    const binaryOperator = node.operator.slice(0, -1);
+    if (isBinaryOperator(binaryOperator)) {
+      const binaryExpression = constructBinaryExpression(
+        binaryOperator,
+        node.left,
+        node.right
+      );
+      compile(binaryExpression, instructions, symbolTable);
+    }
+    const assignInstr = constructAssignmentExpressionAssignInstr(
+      node.left,
+      symbolTable
+    );
+    instructions.push(assignInstr);
+  },
   BinaryExpression: (
     node: BinaryExpression,
     instructions: Instr[],
@@ -204,7 +225,9 @@ const compilers: CompilerMapping = {
     node: ExpressionStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    compile(node.sequence, instructions, symbolTable);
+  },
   ForStatement: (
     node: ForStatement,
     instructions: Instr[],
@@ -385,5 +408,14 @@ const compilers: CompilerMapping = {
     node: WhileStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {}
+  ) => {
+    const loopStart = instructions.length;
+    compile(node.predicate, instructions, symbolTable);
+    const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpOnFalseInstr);
+    compile(node.body, instructions, symbolTable);
+    const gotoInstr = constructGotoInstr(loopStart);
+    instructions.push(gotoInstr);
+    jumpOnFalseInstr.instrAddress = instructions.length;
+  }
 };

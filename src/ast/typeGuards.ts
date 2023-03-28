@@ -4,6 +4,8 @@ import {
 } from './astBuilderInternalTypes';
 import {
   type BaseNode,
+  BINARY_OPERATORS,
+  type BinaryOperator,
   type Constant,
   type EmptyStatement,
   type Identifier,
@@ -32,4 +34,11 @@ export const isVariableDeclaration = (
 
 export const isEmptyStatement = (node: BaseNode): node is EmptyStatement => {
   return node.type === 'EmptyStatement';
+};
+
+export const isBinaryOperator = (
+  operator: string
+): operator is BinaryOperator => {
+  // Typecast is safe as it is only used to check if the operator is a binary operator.
+  return BINARY_OPERATORS.includes(operator as BinaryOperator);
 };

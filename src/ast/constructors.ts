@@ -1,5 +1,7 @@
 import { type TerminalNode } from 'antlr4ts/tree';
 import {
+  type BinaryExpression,
+  type BinaryOperator,
   type CallExpression,
   type ConditionalExpression,
   type Constant,
@@ -22,6 +24,19 @@ export const constructConstant = (constant: TerminalNode): Constant => {
   return {
     type: 'Constant',
     value
+  };
+};
+
+export const constructBinaryExpression = (
+  operator: BinaryOperator,
+  left: Expression,
+  right: Expression
+): BinaryExpression => {
+  return {
+    type: 'BinaryExpression',
+    operator,
+    left,
+    right
   };
 };
 

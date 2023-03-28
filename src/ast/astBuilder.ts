@@ -874,7 +874,7 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       return {
         type: 'WhileStatement',
-        test: this.visitExpression(expression),
+        predicate: this.visitExpression(expression),
         body: this.visitStatement(statement)
       };
     }

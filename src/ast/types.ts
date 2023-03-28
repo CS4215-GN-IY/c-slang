@@ -101,7 +101,7 @@ export interface ForStatement extends BaseStatement {
 
 export interface WhileStatement extends BaseStatement {
   type: 'WhileStatement';
-  test: SequenceExpression;
+  predicate: SequenceExpression;
   body: Statement;
 }
 
@@ -211,23 +211,25 @@ export interface BinaryExpression extends BaseExpression {
   right: Expression;
 }
 
-export type BinaryOperator =
-  | '*'
-  | '/'
-  | '%'
-  | '+'
-  | '-'
-  | '<<'
-  | '>>'
-  | '<'
-  | '>'
-  | '<='
-  | '>='
-  | '=='
-  | '!='
-  | '&'
-  | '^'
-  | '|';
+export const BINARY_OPERATORS = [
+  '*',
+  '/',
+  '%',
+  '+',
+  '-',
+  '<<',
+  '>>',
+  '<',
+  '>',
+  '<=',
+  '>=',
+  '==',
+  '!=',
+  '&',
+  '^',
+  '|'
+] as const;
+export type BinaryOperator = (typeof BINARY_OPERATORS)[number];
 
 export interface LogicalExpression extends BaseExpression {
   type: 'LogicalExpression';
