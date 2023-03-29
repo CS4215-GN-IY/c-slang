@@ -612,4 +612,33 @@ describe('compile and run', () => {
     const expectedResult = 2;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles break statement in switch statement', () => {
+    const code = `
+        int main() {
+            int i = 2;
+            int a = 0;
+            switch(i) {
+                case 1:
+                    a += 3;
+                case 2:
+                case 3:
+                    a += 2;
+                case 4:
+                    break;
+                case 5:
+                    a += 6;
+                default:
+                    a += 1;
+                    return a;
+            }
+            return a;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 2;
+    expect(result).toEqual(expectedResult);
+  });
 });

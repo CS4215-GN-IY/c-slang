@@ -461,6 +461,8 @@ const compilers: CompilerMapping = {
     compile(node.body, instructions, symbolTable);
     const fallthroughDoneInstr = constructFallthroughDoneInstr();
     instructions.push(fallthroughDoneInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
   },
   UnaryExpression: (
     node: UnaryExpression,
