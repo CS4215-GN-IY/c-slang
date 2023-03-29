@@ -32,11 +32,20 @@ export type Statement =
 
 export interface BaseStatement extends BaseNode {}
 
-export type LabeledStatement = IdentifierStatement | DefaultStatement;
+export type LabeledStatement =
+  | IdentifierStatement
+  | CaseStatement
+  | DefaultStatement;
 
 export interface IdentifierStatement extends BaseStatement {
   type: 'IdentifierStatement';
   label: Identifier;
+  body: Statement;
+}
+
+export interface CaseStatement extends BaseStatement {
+  type: 'CaseStatement';
+  label: Expression;
   body: Statement;
 }
 

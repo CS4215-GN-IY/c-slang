@@ -6,6 +6,7 @@ import {
   type BlockStatement,
   type BreakStatement,
   type CallExpression,
+  type CaseStatement,
   type ConditionalExpression,
   type Constant,
   type ContinueStatement,
@@ -180,6 +181,11 @@ const compilers: CompilerMapping = {
     );
     instructions.push(callInstr);
   },
+  CaseStatement: (
+    node: CaseStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable
+  ) => {},
   ConditionalExpression: (
     node: ConditionalExpression,
     instructions: Instr[],

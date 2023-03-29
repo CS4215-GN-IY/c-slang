@@ -412,8 +412,8 @@ export class ASTBuilder implements CVisitor<any> {
     return returnedExpression;
   }
 
-  visitConstantExpression(ctx: ConstantExpressionContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitConstantExpression(ctx: ConstantExpressionContext): Expression {
+    return this.visitConditionalExpression(ctx.conditionalExpression());
   }
 
   visitDeclaration(ctx: DeclarationContext): VariableDeclaration {
@@ -936,6 +936,7 @@ export class ASTBuilder implements CVisitor<any> {
     const defaultToken = ctx.Default();
     const identifier = ctx.Identifier();
     const statement = ctx.statement();
+    const constantExpression = ctx.constantExpression();
 
     if (
       caseToken === undefined &&
@@ -950,7 +951,17 @@ export class ASTBuilder implements CVisitor<any> {
       };
     }
 
-    // TODO: Case statement when visitConstantExpression is implemented
+    if (
+      caseToken !== undefined &&
+      constantExpression !== undefined &&
+      statement !== undefined
+    ) {
+      return {
+        type: 'CaseStatement',
+        label: this.visitConstantExpression(constantExpression),
+        body: this.visitStatement(statement)
+      };
+    }
 
     if (defaultToken !== undefined && statement !== undefined) {
       return {
@@ -1255,7 +1266,7 @@ export class ASTBuilder implements CVisitor<any> {
     const expression = ctx.expression();
     const firstStatement = ctx.statement(0);
     const elseToken = ctx.Else();
-    const secondStatement = (elseToken != null) ? ctx.statement(1) : undefined;
+    const secondStatement = elseToken != null ? ctx.statement(1) : undefined;
 
     if (
       ifToken !== undefined &&
