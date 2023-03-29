@@ -497,7 +497,6 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
-    // TODO: Check if return with no argument works correctly.
     if (isNotUndefined(node.argument)) {
       compile(node.argument, instructions, symbolTable, labelFrame);
     }

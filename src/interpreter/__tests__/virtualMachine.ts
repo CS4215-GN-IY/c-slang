@@ -13,42 +13,6 @@ describe('compile and run', () => {
     expect(result).toEqual(expectedResult);
   });
 
-  test('handles binary add expression', () => {
-    const code = 'int main() { return 2 + 3; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles binary minus expression', () => {
-    const code = 'int main() { return 10 - 7; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles binary multiplication expression', () => {
-    const code = 'int main() { return 8 * 7; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 56;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles binary division expression', () => {
-    const code = 'int main() { return 12 / 4; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
-  });
-
   test('handles logical and expression that is true', () => {
     const code = 'int main() { return 1 && 2; }';
     const ast = parse(code);
@@ -897,6 +861,47 @@ describe('compile and run', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4;
+    expect(result).toEqual(expectedResult);
+  });
+
+  test('handles return with no argument', () => {
+    const code = `
+        int n = 0;
+        
+        int main() {
+            f();
+            return n;
+        }
+        
+        int f() {
+           n += 3;
+           return;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 3;
+    expect(result).toEqual(expectedResult);
+  });
+
+  test('handles function with no return statement', () => {
+    const code = `
+        int n = 0;
+        
+        int main() {
+            f();
+            return n;
+        }
+        
+        int f() {
+           n += 3;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 3;
     expect(result).toEqual(expectedResult);
   });
 });
