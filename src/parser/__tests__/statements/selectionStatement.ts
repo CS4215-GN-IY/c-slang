@@ -29,6 +29,7 @@ describe('selection statement', () => {
             type: 'Identifier'
           },
           type: 'FunctionDeclaration',
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -176,6 +177,7 @@ describe('selection statement', () => {
             type: 'Identifier'
           },
           type: 'FunctionDeclaration',
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
