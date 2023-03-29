@@ -283,6 +283,8 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable
   ) => {
     compile(node.sequence, instructions, symbolTable);
+    const popInstr = constructPopInstr();
+    instructions.push(popInstr);
   },
   ForStatement: (
     node: ForStatement,
@@ -448,6 +450,9 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable
   ) => {
+    if (node.expressions.length === 0) {
+      return;
+    }
     node.expressions.forEach((expression) => {
       compile(expression, instructions, symbolTable);
       const popInstr = constructPopInstr();

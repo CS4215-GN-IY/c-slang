@@ -761,4 +761,17 @@ describe('compile and run', () => {
     const expectedResult = 5;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles expression statement', () => {
+    const code = `
+        int main() {
+            1 + 2;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = undefined;
+    expect(result).toEqual(expectedResult);
+  });
 });
