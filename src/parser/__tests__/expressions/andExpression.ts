@@ -14,6 +14,7 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -57,6 +58,7 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -108,6 +110,7 @@ describe('and expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [

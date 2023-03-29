@@ -14,6 +14,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -49,6 +50,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -84,6 +86,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -119,6 +122,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -154,6 +158,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -189,6 +194,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -245,6 +251,7 @@ describe('primary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -303,7 +310,7 @@ describe('primary expression', () => {
 
   test("throws UnsupportedKeywordError for '_Generic'", () => {
     const code = `
-      int main(void) {
+      int main() {
         // Invalid program - we only want to test that the keyword '_Generic' is banned.
         _Generic((X), long double: cbrtl, default: cbrt, float: cbrtf)(X);
       }
@@ -315,7 +322,7 @@ describe('primary expression', () => {
 
   test("throws UnsupportedKeywordError for '__builtin_va_arg'", () => {
     const code = `
-      int main(void) {
+      int main() {
         // Invalid program - we only want to test that the keyword '__builtin_va_arg' is banned.
         __builtin_va_arg(a, int);
       }
@@ -327,7 +334,7 @@ describe('primary expression', () => {
 
   test("throws UnsupportedKeywordError for '__builtin_offsetof'", () => {
     const code = `
-      int main(void) {
+      int main() {
         // Invalid program - we only want to test that the keyword '__builtin_offsetof' is banned.
         __builtin_offsetof(int, a);
       }

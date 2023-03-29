@@ -14,6 +14,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -57,6 +58,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -100,6 +102,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -143,6 +146,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -186,6 +190,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -229,6 +234,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -272,6 +278,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -315,6 +322,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -358,6 +366,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -401,6 +410,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -444,6 +454,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -488,6 +499,7 @@ describe('assignment expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [

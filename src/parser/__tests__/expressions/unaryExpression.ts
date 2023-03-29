@@ -14,6 +14,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -54,6 +55,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -94,6 +96,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -133,6 +136,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -172,6 +176,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -211,6 +216,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -250,6 +256,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -289,6 +296,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -328,6 +336,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -367,6 +376,7 @@ describe('unary expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [

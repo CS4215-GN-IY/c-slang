@@ -65,7 +65,9 @@ import {
   type ForConditionContext,
   type ForDeclarationContext,
   type ForExpressionContext,
+  type FunctionDeclaratorContext,
   type FunctionDefinitionContext,
+  type FunctionDirectDeclaratorContext,
   type FunctionSpecifierContext,
   type GenericAssociationContext,
   type GenericAssocListContext,
@@ -120,6 +122,7 @@ import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
   type ForCondition,
+  type FunctionDirectDeclaratorReturnValue,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
   type VisitFunctionSpecifierReturnValue,
@@ -152,8 +155,14 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitAbstractDeclarator(ctx: AbstractDeclaratorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitAbstractDeclarator(ctx: AbstractDeclaratorContext): Identifier {
+    // TODO: Rework this to account for pointers.
+    const directAbstractDeclarator = ctx.directAbstractDeclarator();
+    if (directAbstractDeclarator !== undefined) {
+      return this.visitDirectAbstractDeclarator(directAbstractDeclarator);
+    }
+
+    throw new UnreachableCaseError();
   }
 
   visitAdditiveExpression(ctx: AdditiveExpressionContext): Expression {
@@ -492,13 +501,17 @@ export class ASTBuilder implements CVisitor<any> {
     return declarationSpecifiers.map(this.visitDeclarationSpecifier, this);
   }
 
-  visitDeclarationSpecifiers2(ctx: DeclarationSpecifiers2Context): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDeclarationSpecifiers2(
+    ctx: DeclarationSpecifiers2Context
+  ): VisitDeclarationSpecifierReturnValue[] {
+    const declarationSpecifiers = ctx.declarationSpecifier();
+    return declarationSpecifiers.map(this.visitDeclarationSpecifier, this);
   }
 
   visitDeclarator(ctx: DeclaratorContext): Identifier {
     // TODO: Rework this to account for pointers.
-    return this.visitDirectDeclarator(ctx.directDeclarator());
+    const directDeclarator = ctx.directDeclarator();
+    return this.visitDirectDeclarator(directDeclarator);
   }
 
   visitDesignation(ctx: DesignationContext): BaseNode {
@@ -515,7 +528,7 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitDirectAbstractDeclarator(
     ctx: DirectAbstractDeclaratorContext
-  ): BaseNode {
+  ): Identifier {
     throw new Error('Method not implemented.');
   }
 
@@ -738,26 +751,84 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
+  visitFunctionDeclarator(
+    ctx: FunctionDeclaratorContext
+  ): FunctionDirectDeclaratorReturnValue {
+    // TODO: Rework this to account for pointers.
+    const functionDirectDeclarator = ctx.functionDirectDeclarator();
+    return this.visitFunctionDirectDeclarator(functionDirectDeclarator);
+  }
+
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
-    const declarator = ctx.declarator();
+    const functionDeclarator = ctx.functionDeclarator();
     const compoundStatement = ctx.compoundStatement();
 
-    if (declarator === undefined) {
+    if (functionDeclarator === undefined) {
       throw new BrokenInvariantError(
-        'Encountered a FunctionDefinition without a declarator.'
+        'Encountered a FunctionDefinition without a FunctionDeclarator.'
       );
     }
 
     if (compoundStatement === undefined) {
       throw new BrokenInvariantError(
-        'Encountered a FunctionDefinition without a compound statement.'
+        'Encountered a FunctionDefinition without a CompoundStatement.'
       );
     }
 
+    const processedFunctionDeclarator =
+      this.visitFunctionDeclarator(functionDeclarator);
+
     return {
       type: 'FunctionDeclaration',
-      id: this.visitDeclarator(declarator),
+      id: processedFunctionDeclarator.functionId,
+      params: processedFunctionDeclarator.functionParams,
       body: this.visitCompoundStatement(compoundStatement)
+    };
+  }
+
+  visitFunctionDirectDeclarator(
+    ctx: FunctionDirectDeclaratorContext
+  ): FunctionDirectDeclaratorReturnValue {
+    let functionId: Identifier | undefined;
+    let functionParams: Identifier[] | undefined;
+
+    const identifier = ctx.Identifier();
+    if (identifier !== undefined) {
+      functionId = constructIdentifier(identifier);
+    }
+
+    const functionDeclarator = ctx.functionDeclarator();
+    if (functionDeclarator !== undefined) {
+      const processedFunctionDeclarator =
+        this.visitFunctionDeclarator(functionDeclarator);
+      // In the case of functions which return function pointers, the function name & params
+      // are the ones that are the most deeply embedded. Note that functions returning functions
+      // can be chained to infinity, with each function in the chain adding one level to the
+      // recursion of the parse tree.
+      functionId = processedFunctionDeclarator.functionId;
+      functionParams = processedFunctionDeclarator.functionParams;
+    }
+
+    if (functionId === undefined) {
+      throw new BrokenInvariantError(
+        'Function ID is undefined when it should be defined.'
+      );
+    }
+
+    const parameterTypeList = ctx.parameterTypeList();
+    if (parameterTypeList !== undefined) {
+      const processedParameterTypeList =
+        this.visitParameterTypeList(parameterTypeList);
+      if (functionParams === undefined) {
+        functionParams = processedParameterTypeList;
+      }
+      // TODO: Handle the case where the parameters are part of the function pointer type.
+    }
+
+    return {
+      type: 'FunctionDirectDeclarator',
+      functionId,
+      functionParams: functionParams ?? []
     };
   }
 
@@ -1057,16 +1128,56 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitParameterDeclaration(ctx: ParameterDeclarationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitParameterDeclaration(ctx: ParameterDeclarationContext): Identifier {
+    // TODO: Handle declaration specifiers.
+    const declarator = ctx.declarator();
+    if (declarator !== undefined) {
+      return this.visitDeclarator(declarator);
+    }
+
+    const abstractDeclarator = ctx.abstractDeclarator();
+    if (abstractDeclarator !== undefined) {
+      return this.visitAbstractDeclarator(abstractDeclarator);
+    }
+
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers !== undefined) {
+      const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+        declarationSpecifiers
+      );
+      const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
+        isTypedefNameReturnValue
+      );
+      if (typedefNameReturnValues.length === 1) {
+        return typedefNameReturnValues[0].typedefName;
+      }
+    }
+
+    const declarationSpecifiers2 = ctx.declarationSpecifiers2();
+    if (declarationSpecifiers2 !== undefined) {
+      const processedDeclarationSpecifiers2 = this.visitDeclarationSpecifiers2(
+        declarationSpecifiers2
+      );
+      const typedefNameReturnValues = processedDeclarationSpecifiers2.filter(
+        isTypedefNameReturnValue
+      );
+      if (typedefNameReturnValues.length === 1) {
+        return typedefNameReturnValues[0].typedefName;
+      }
+    }
+
+    throw new UnreachableCaseError();
   }
 
-  visitParameterList(ctx: ParameterListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitParameterList(ctx: ParameterListContext): Identifier[] {
+    const parameterDeclarations = ctx.parameterDeclaration();
+    return parameterDeclarations.map(this.visitParameterDeclaration, this);
   }
 
-  visitParameterTypeList(ctx: ParameterTypeListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitParameterTypeList(ctx: ParameterTypeListContext): Identifier[] {
+    // TODO: Handle variadic arguments.
+    const parameterList = ctx.parameterList();
+    return this.visitParameterList(parameterList);
   }
 
   visitPointer(ctx: PointerContext): BaseNode {
