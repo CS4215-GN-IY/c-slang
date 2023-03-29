@@ -1,94 +1,96 @@
 // Generated from ./src/lang/C.g4 by ANTLR 4.9.0-SNAPSHOT
 
-import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 
-import { PrimaryExpressionContext } from './CParser';
-import { GenericSelectionContext } from './CParser';
-import { GenericAssocListContext } from './CParser';
-import { GenericAssociationContext } from './CParser';
-import { PostfixExpressionContext } from './CParser';
-import { ArgumentExpressionListContext } from './CParser';
-import { UnaryExpressionContext } from './CParser';
-import { UnaryOperatorContext } from './CParser';
-import { CastExpressionContext } from './CParser';
-import { MultiplicativeExpressionContext } from './CParser';
-import { AdditiveExpressionContext } from './CParser';
-import { ShiftExpressionContext } from './CParser';
-import { RelationalExpressionContext } from './CParser';
-import { EqualityExpressionContext } from './CParser';
-import { AndExpressionContext } from './CParser';
-import { ExclusiveOrExpressionContext } from './CParser';
-import { InclusiveOrExpressionContext } from './CParser';
-import { LogicalAndExpressionContext } from './CParser';
-import { LogicalOrExpressionContext } from './CParser';
-import { ConditionalExpressionContext } from './CParser';
-import { AssignmentExpressionContext } from './CParser';
-import { AssignmentOperatorContext } from './CParser';
-import { ExpressionContext } from './CParser';
-import { ConstantExpressionContext } from './CParser';
-import { DeclarationContext } from './CParser';
-import { DeclarationSpecifiersContext } from './CParser';
-import { DeclarationSpecifiers2Context } from './CParser';
-import { DeclarationSpecifierContext } from './CParser';
-import { InitDeclaratorListContext } from './CParser';
-import { InitDeclaratorContext } from './CParser';
-import { StorageClassSpecifierContext } from './CParser';
-import { TypeSpecifierContext } from './CParser';
-import { StructOrUnionSpecifierContext } from './CParser';
-import { StructOrUnionContext } from './CParser';
-import { StructDeclarationListContext } from './CParser';
-import { StructDeclarationContext } from './CParser';
-import { SpecifierQualifierListContext } from './CParser';
-import { StructDeclaratorListContext } from './CParser';
-import { StructDeclaratorContext } from './CParser';
-import { EnumSpecifierContext } from './CParser';
-import { EnumeratorListContext } from './CParser';
-import { EnumeratorContext } from './CParser';
-import { EnumerationConstantContext } from './CParser';
-import { AtomicTypeSpecifierContext } from './CParser';
-import { TypeQualifierContext } from './CParser';
-import { FunctionSpecifierContext } from './CParser';
-import { AlignmentSpecifierContext } from './CParser';
-import { DeclaratorContext } from './CParser';
-import { DirectDeclaratorContext } from './CParser';
-import { FunctionDeclaratorContext } from './CParser';
-import { FunctionDirectDeclaratorContext } from './CParser';
-import { NestedParenthesesBlockContext } from './CParser';
-import { PointerContext } from './CParser';
-import { TypeQualifierListContext } from './CParser';
-import { ParameterTypeListContext } from './CParser';
-import { ParameterListContext } from './CParser';
-import { ParameterDeclarationContext } from './CParser';
-import { IdentifierListContext } from './CParser';
-import { TypeNameContext } from './CParser';
-import { AbstractDeclaratorContext } from './CParser';
-import { DirectAbstractDeclaratorContext } from './CParser';
-import { TypedefNameContext } from './CParser';
-import { InitializerContext } from './CParser';
-import { InitializerListContext } from './CParser';
-import { DesignationContext } from './CParser';
-import { DesignatorListContext } from './CParser';
-import { DesignatorContext } from './CParser';
-import { StaticAssertDeclarationContext } from './CParser';
-import { StatementContext } from './CParser';
-import { LabeledStatementContext } from './CParser';
-import { CompoundStatementContext } from './CParser';
-import { BlockItemListContext } from './CParser';
-import { BlockItemContext } from './CParser';
-import { ExpressionStatementContext } from './CParser';
-import { SelectionStatementContext } from './CParser';
-import { IterationStatementContext } from './CParser';
-import { ForConditionContext } from './CParser';
-import { ForDeclarationContext } from './CParser';
-import { ForConditionalExpressionContext } from './CParser';
-import { ForUpdateExpressionContext } from './CParser';
-import { ForExpressionContext } from './CParser';
-import { JumpStatementContext } from './CParser';
-import { CompilationUnitContext } from './CParser';
-import { TranslationUnitContext } from './CParser';
-import { ExternalDeclarationContext } from './CParser';
-import { FunctionDefinitionContext } from './CParser';
-import { DeclarationListContext } from './CParser';
+import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
+
+import { PrimaryExpressionContext } from "./CParser";
+import { GenericSelectionContext } from "./CParser";
+import { GenericAssocListContext } from "./CParser";
+import { GenericAssociationContext } from "./CParser";
+import { PostfixExpressionContext } from "./CParser";
+import { ArgumentExpressionListContext } from "./CParser";
+import { UnaryExpressionContext } from "./CParser";
+import { UnaryOperatorContext } from "./CParser";
+import { CastExpressionContext } from "./CParser";
+import { MultiplicativeExpressionContext } from "./CParser";
+import { AdditiveExpressionContext } from "./CParser";
+import { ShiftExpressionContext } from "./CParser";
+import { RelationalExpressionContext } from "./CParser";
+import { EqualityExpressionContext } from "./CParser";
+import { AndExpressionContext } from "./CParser";
+import { ExclusiveOrExpressionContext } from "./CParser";
+import { InclusiveOrExpressionContext } from "./CParser";
+import { LogicalAndExpressionContext } from "./CParser";
+import { LogicalOrExpressionContext } from "./CParser";
+import { ConditionalExpressionContext } from "./CParser";
+import { AssignmentExpressionContext } from "./CParser";
+import { AssignmentOperatorContext } from "./CParser";
+import { ExpressionContext } from "./CParser";
+import { ConstantExpressionContext } from "./CParser";
+import { DeclarationContext } from "./CParser";
+import { DeclarationSpecifiersContext } from "./CParser";
+import { DeclarationSpecifiers2Context } from "./CParser";
+import { DeclarationSpecifierContext } from "./CParser";
+import { InitDeclaratorListContext } from "./CParser";
+import { InitDeclaratorContext } from "./CParser";
+import { StorageClassSpecifierContext } from "./CParser";
+import { TypeSpecifierContext } from "./CParser";
+import { StructOrUnionSpecifierContext } from "./CParser";
+import { StructOrUnionContext } from "./CParser";
+import { StructDeclarationListContext } from "./CParser";
+import { StructDeclarationContext } from "./CParser";
+import { SpecifierQualifierListContext } from "./CParser";
+import { StructDeclaratorListContext } from "./CParser";
+import { StructDeclaratorContext } from "./CParser";
+import { EnumSpecifierContext } from "./CParser";
+import { EnumeratorListContext } from "./CParser";
+import { EnumeratorContext } from "./CParser";
+import { EnumerationConstantContext } from "./CParser";
+import { AtomicTypeSpecifierContext } from "./CParser";
+import { TypeQualifierContext } from "./CParser";
+import { FunctionSpecifierContext } from "./CParser";
+import { AlignmentSpecifierContext } from "./CParser";
+import { DeclaratorContext } from "./CParser";
+import { DirectDeclaratorContext } from "./CParser";
+import { FunctionDeclaratorContext } from "./CParser";
+import { FunctionDirectDeclaratorContext } from "./CParser";
+import { NestedParenthesesBlockContext } from "./CParser";
+import { PointerContext } from "./CParser";
+import { TypeQualifierListContext } from "./CParser";
+import { ParameterTypeListContext } from "./CParser";
+import { ParameterListContext } from "./CParser";
+import { ParameterDeclarationContext } from "./CParser";
+import { IdentifierListContext } from "./CParser";
+import { TypeNameContext } from "./CParser";
+import { AbstractDeclaratorContext } from "./CParser";
+import { DirectAbstractDeclaratorContext } from "./CParser";
+import { TypedefNameContext } from "./CParser";
+import { InitializerContext } from "./CParser";
+import { InitializerListContext } from "./CParser";
+import { DesignationContext } from "./CParser";
+import { DesignatorListContext } from "./CParser";
+import { DesignatorContext } from "./CParser";
+import { StaticAssertDeclarationContext } from "./CParser";
+import { StatementContext } from "./CParser";
+import { LabeledStatementContext } from "./CParser";
+import { CompoundStatementContext } from "./CParser";
+import { BlockItemListContext } from "./CParser";
+import { BlockItemContext } from "./CParser";
+import { ExpressionStatementContext } from "./CParser";
+import { SelectionStatementContext } from "./CParser";
+import { IterationStatementContext } from "./CParser";
+import { ForConditionContext } from "./CParser";
+import { ForDeclarationContext } from "./CParser";
+import { ForConditionalExpressionContext } from "./CParser";
+import { ForUpdateExpressionContext } from "./CParser";
+import { ForExpressionContext } from "./CParser";
+import { JumpStatementContext } from "./CParser";
+import { CompilationUnitContext } from "./CParser";
+import { TranslationUnitContext } from "./CParser";
+import { ExternalDeclarationContext } from "./CParser";
+import { FunctionDefinitionContext } from "./CParser";
+import { DeclarationListContext } from "./CParser";
+
 
 /**
  * This interface defines a complete listener for a parse tree produced by
@@ -198,9 +200,7 @@ export interface CListener extends ParseTreeListener {
    * Enter a parse tree produced by `CParser.multiplicativeExpression`.
    * @param ctx the parse tree
    */
-  enterMultiplicativeExpression?: (
-    ctx: MultiplicativeExpressionContext
-  ) => void;
+  enterMultiplicativeExpression?: (ctx: MultiplicativeExpressionContext) => void;
   /**
    * Exit a parse tree produced by `CParser.multiplicativeExpression`.
    * @param ctx the parse tree
@@ -651,9 +651,7 @@ export interface CListener extends ParseTreeListener {
    * Enter a parse tree produced by `CParser.functionDirectDeclarator`.
    * @param ctx the parse tree
    */
-  enterFunctionDirectDeclarator?: (
-    ctx: FunctionDirectDeclaratorContext
-  ) => void;
+  enterFunctionDirectDeclarator?: (ctx: FunctionDirectDeclaratorContext) => void;
   /**
    * Exit a parse tree produced by `CParser.functionDirectDeclarator`.
    * @param ctx the parse tree
@@ -763,9 +761,7 @@ export interface CListener extends ParseTreeListener {
    * Enter a parse tree produced by `CParser.directAbstractDeclarator`.
    * @param ctx the parse tree
    */
-  enterDirectAbstractDeclarator?: (
-    ctx: DirectAbstractDeclaratorContext
-  ) => void;
+  enterDirectAbstractDeclarator?: (ctx: DirectAbstractDeclaratorContext) => void;
   /**
    * Exit a parse tree produced by `CParser.directAbstractDeclarator`.
    * @param ctx the parse tree
@@ -963,9 +959,7 @@ export interface CListener extends ParseTreeListener {
    * Enter a parse tree produced by `CParser.forConditionalExpression`.
    * @param ctx the parse tree
    */
-  enterForConditionalExpression?: (
-    ctx: ForConditionalExpressionContext
-  ) => void;
+  enterForConditionalExpression?: (ctx: ForConditionalExpressionContext) => void;
   /**
    * Exit a parse tree produced by `CParser.forConditionalExpression`.
    * @param ctx the parse tree
