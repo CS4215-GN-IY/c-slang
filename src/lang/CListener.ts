@@ -82,6 +82,7 @@ import { ForConditionContext } from './CParser';
 import { ForDeclarationContext } from './CParser';
 import { ForConditionalExpressionContext } from './CParser';
 import { ForUpdateExpressionContext } from './CParser';
+import { ForExpressionContext } from './CParser';
 import { JumpStatementContext } from './CParser';
 import { CompilationUnitContext } from './CParser';
 import { TranslationUnitContext } from './CParser';
@@ -981,6 +982,17 @@ export interface CListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitForUpdateExpression?: (ctx: ForUpdateExpressionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `CParser.forExpression`.
+   * @param ctx the parse tree
+   */
+  enterForExpression?: (ctx: ForExpressionContext) => void;
+  /**
+   * Exit a parse tree produced by `CParser.forExpression`.
+   * @param ctx the parse tree
+   */
+  exitForExpression?: (ctx: ForExpressionContext) => void;
 
   /**
    * Enter a parse tree produced by `CParser.jumpStatement`.

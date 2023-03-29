@@ -444,10 +444,14 @@ forDeclaration
     ;
 
 forConditionalExpression
-    :    assignmentExpression (',' assignmentExpression)*
+    :   forExpression
     ;
 
 forUpdateExpression
+    :   forExpression
+    ;
+
+forExpression
     :   assignmentExpression (',' assignmentExpression)*
     ;
 

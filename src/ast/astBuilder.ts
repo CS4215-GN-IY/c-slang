@@ -65,6 +65,7 @@ import {
   type ForConditionalExpressionContext,
   type ForConditionContext,
   type ForDeclarationContext,
+  type ForExpressionContext,
   type ForUpdateExpressionContext,
   type FunctionDeclaratorContext,
   type FunctionDefinitionContext,
@@ -742,9 +743,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForConditionalExpression(
-    ctx: ForConditionalExpressionContext
-  ): SequenceExpression {
+  visitForExpression(ctx: ForExpressionContext): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
       type: 'SequenceExpression',
@@ -755,17 +754,16 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
+  visitForConditionalExpression(
+    ctx: ForConditionalExpressionContext
+  ): SequenceExpression {
+    return this.visitForExpression(ctx.forExpression());
+  }
+
   visitForUpdateExpression(
     ctx: ForUpdateExpressionContext
   ): SequenceExpression {
-    const assignmentExpressions = ctx.assignmentExpression();
-    return {
-      type: 'SequenceExpression',
-      expressions: assignmentExpressions.map(
-        this.visitAssignmentExpression,
-        this
-      )
-    };
+    return this.visitForExpression(ctx.forExpression());
   }
 
   visitFunctionDeclarator(
