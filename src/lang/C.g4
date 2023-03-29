@@ -436,14 +436,18 @@ iterationStatement
 //    |   For '(' declaration  expression? ';' expression? ')' statement
 
 forCondition
-	:   (forDeclaration | expression?) ';' forExpression? ';' forExpression?
+	:   (forDeclaration | expression?) ';' forConditionalExpression? ';' forUpdateExpression?
 	;
 
 forDeclaration
     :   declarationSpecifiers initDeclaratorList?
     ;
 
-forExpression
+forConditionalExpression
+    :    assignmentExpression (',' assignmentExpression)*
+    ;
+
+forUpdateExpression
     :   assignmentExpression (',' assignmentExpression)*
     ;
 

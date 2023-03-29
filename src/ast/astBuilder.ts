@@ -62,9 +62,10 @@ import {
   type ExpressionContext,
   type ExpressionStatementContext,
   type ExternalDeclarationContext,
+  type ForConditionalExpressionContext,
   type ForConditionContext,
   type ForDeclarationContext,
-  type ForExpressionContext,
+  type ForUpdateExpressionContext,
   type FunctionDeclaratorContext,
   type FunctionDefinitionContext,
   type FunctionDirectDeclaratorContext,
@@ -687,15 +688,16 @@ export class ASTBuilder implements CVisitor<any> {
         ? this.visitExpression(expression)
         : undefined;
 
-    const firstForExpression = ctx.forExpression(0);
+    const forConditionalExpression = ctx.forConditionalExpression();
     const test =
-      firstForExpression !== undefined
-        ? this.visitForExpression(firstForExpression)
+      forConditionalExpression !== undefined
+        ? this.visitForConditionalExpression(forConditionalExpression)
         : undefined;
-    const secondForExpression = ctx.forExpression(1);
+
+    const forUpdateExpression = ctx.forUpdateExpression();
     const update =
-      secondForExpression !== undefined
-        ? this.visitForExpression(secondForExpression)
+      forUpdateExpression !== undefined
+        ? this.visitForUpdateExpression(forUpdateExpression)
         : undefined;
 
     return {
@@ -740,7 +742,22 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForExpression(ctx: ForExpressionContext): SequenceExpression {
+  visitForUpdateExpression(
+    ctx: ForUpdateExpressionContext
+  ): SequenceExpression {
+    const assignmentExpressions = ctx.assignmentExpression();
+    return {
+      type: 'SequenceExpression',
+      expressions: assignmentExpressions.map(
+        this.visitAssignmentExpression,
+        this
+      )
+    };
+  }
+
+  visitForConditionalExpression(
+    ctx: ForConditionalExpressionContext
+  ): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
       type: 'SequenceExpression',
