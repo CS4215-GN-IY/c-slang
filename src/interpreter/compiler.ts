@@ -128,6 +128,8 @@ const compilers: CompilerMapping = {
         node.right
       );
       compile(binaryExpression, instructions, symbolTable);
+    } else {
+      compile(node.right, instructions, symbolTable);
     }
     const assignInstr = constructAssignmentExpressionAssignInstr(
       node.left,
