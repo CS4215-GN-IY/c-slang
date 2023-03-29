@@ -62,9 +62,11 @@ import {
   type ExpressionContext,
   type ExpressionStatementContext,
   type ExternalDeclarationContext,
+  type ForConditionalExpressionContext,
   type ForConditionContext,
   type ForDeclarationContext,
   type ForExpressionContext,
+  type ForUpdateExpressionContext,
   type FunctionDeclaratorContext,
   type FunctionDefinitionContext,
   type FunctionDirectDeclaratorContext,
@@ -687,15 +689,16 @@ export class ASTBuilder implements CVisitor<any> {
         ? this.visitExpression(expression)
         : undefined;
 
-    const firstForExpression = ctx.forExpression(0);
+    const forConditionalExpression = ctx.forConditionalExpression();
     const test =
-      firstForExpression !== undefined
-        ? this.visitForExpression(firstForExpression)
+      forConditionalExpression !== undefined
+        ? this.visitForConditionalExpression(forConditionalExpression)
         : undefined;
-    const secondForExpression = ctx.forExpression(1);
+
+    const forUpdateExpression = ctx.forUpdateExpression();
     const update =
-      secondForExpression !== undefined
-        ? this.visitForExpression(secondForExpression)
+      forUpdateExpression !== undefined
+        ? this.visitForUpdateExpression(forUpdateExpression)
         : undefined;
 
     return {
@@ -749,6 +752,18 @@ export class ASTBuilder implements CVisitor<any> {
         this
       )
     };
+  }
+
+  visitForConditionalExpression(
+    ctx: ForConditionalExpressionContext
+  ): SequenceExpression {
+    return this.visitForExpression(ctx.forExpression());
+  }
+
+  visitForUpdateExpression(
+    ctx: ForUpdateExpressionContext
+  ): SequenceExpression {
+    return this.visitForExpression(ctx.forExpression());
   }
 
   visitFunctionDeclarator(
