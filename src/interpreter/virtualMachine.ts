@@ -10,6 +10,8 @@ import {
   type BreakDoneInstr,
   type BreakInstr,
   type CallInstr,
+  type ContinueDoneInstr,
+  type ContinueInstr,
   type DoneInstr,
   type EnterProgramInstr,
   type FallthroughDoneInstr,
@@ -108,6 +110,12 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     const functionInstrAddress = convertToAddress(state.stash.pop());
     state.memory.stackFunctionCallAllocate(args, instr.numOfVars);
     state.memory.moveToInstr(functionInstrAddress);
+  },
+  Continue: (instr: ContinueInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('ContinueDone');
+  },
+  ContinueDone: (instr: ContinueDoneInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstr();
   },
   Done: (instr: DoneInstr, state: VirtualMachineState) => {},
   EnterProgram: (instr: EnterProgramInstr, state: VirtualMachineState) => {

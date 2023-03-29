@@ -11,6 +11,8 @@ export type Instr =
   | BreakInstr
   | BreakDoneInstr
   | CallInstr
+  | ContinueInstr
+  | ContinueDoneInstr
   | DoneInstr
   | EnterProgramInstr
   | FallthroughInstr
@@ -48,6 +50,14 @@ export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
   numOfVars: number;
+}
+
+export interface ContinueInstr extends BaseInstr {
+  type: 'Continue';
+}
+
+export interface ContinueDoneInstr extends BaseInstr {
+  type: 'ContinueDone';
 }
 
 export interface DoneInstr extends BaseInstr {

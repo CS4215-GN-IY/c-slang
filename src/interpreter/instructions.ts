@@ -17,7 +17,9 @@ import {
   type FallthroughDoneInstr,
   type JumpOnTrueInstr,
   type BreakDoneInstr,
-  type BreakInstr
+  type BreakInstr,
+  type ContinueInstr,
+  type ContinueDoneInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -53,6 +55,14 @@ export const constructCallInstr = (
   type: 'Call',
   numOfArgs,
   numOfVars
+});
+
+export const constructContinueInstr = (): ContinueInstr => ({
+  type: 'Continue'
+});
+
+export const constructContinueDoneInstr = (): ContinueDoneInstr => ({
+  type: 'ContinueDone'
 });
 
 export const constructDoneInstr = (): DoneInstr => ({

@@ -39,6 +39,8 @@ import {
   constructBreakDoneInstr,
   constructBreakInstr,
   constructCallInstr,
+  constructContinueDoneInstr,
+  constructContinueInstr,
   constructDoneInstr,
   constructEnterProgramInstr,
   constructFallthroughDoneInstr,
@@ -239,7 +241,10 @@ const compilers: CompilerMapping = {
     node: ContinueStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    const continueInstr = constructContinueInstr();
+    instructions.push(continueInstr);
+  },
   DefaultStatement: (
     node: DefaultStatement,
     instructions: Instr[],
@@ -259,6 +264,8 @@ const compilers: CompilerMapping = {
   ) => {
     const loopStart = instructions.length;
     compile(node.body, instructions, symbolTable);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
     compile(node.predicate, instructions, symbolTable);
     const jumpOnTrueInstr = constructJumpOnTrueInstr(loopStart);
     instructions.push(jumpOnTrueInstr);
@@ -293,6 +300,8 @@ const compilers: CompilerMapping = {
       instructions.push(jumpOnFalseInstr);
     }
     compile(node.body, instructions, symbolTable);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
     if (isNotUndefined(node.update)) {
       compile(node.update, instructions, symbolTable);
     }
@@ -513,6 +522,8 @@ const compilers: CompilerMapping = {
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
     compile(node.body, instructions, symbolTable);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
     const gotoInstr = constructGotoInstr(loopStart);
     instructions.push(gotoInstr);
     const breakDoneInstr = constructBreakDoneInstr();
