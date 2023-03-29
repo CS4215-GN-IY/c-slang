@@ -26,7 +26,8 @@ import {
   type MatchCaseInstr,
   type PopInstr,
   type TeardownInstr,
-  type UnaryOperationInstr
+  type UnaryOperationInstr,
+  type LoadAddressInstr
 } from './types/instructions';
 import {
   convertToAddress,
@@ -152,6 +153,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       state.memory.moveToNextInstr();
     }
   },
+  LoadAddress: (instr: LoadAddressInstr, state: VirtualMachineState) => {
+    const address = state.memory.getAddressAtOffset(instr.scope, instr.offset);
+    state.stash.push(address);
+    state.memory.moveToNextInstr();
+  },
   LoadConstant: (instr: LoadConstantInstr, state: VirtualMachineState) => {
     state.stash.push(instr.value);
     state.memory.moveToNextInstr();
@@ -195,7 +201,9 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   },
   UnaryOperation: (instr: UnaryOperationInstr, state: VirtualMachineState) => {
     const operand = state.stash.pop();
-    state.stash.push(evaluateUnaryOperation(instr.operator, operand));
+    state.stash.push(
+      evaluateUnaryOperation(instr.operator, operand, state.memory)
+    );
     state.memory.moveToNextInstr();
   }
 };

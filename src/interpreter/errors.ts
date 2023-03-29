@@ -2,6 +2,8 @@ export class InterpreterError extends Error {}
 
 export class InvalidCallError extends InterpreterError {}
 
+export class InvalidLValueError extends InterpreterError {}
+
 export class InvalidScopeError extends InterpreterError {}
 
 export class RedeclaredNameError extends InterpreterError {}
@@ -27,8 +29,6 @@ export class TypeError extends InterpreterError {
 }
 
 export class UndeclaredNameError extends InterpreterError {}
-
-export class UnsupportedAssignmentError extends InterpreterError {}
 
 export class UnsupportedDeclarationError extends InterpreterError {}
 

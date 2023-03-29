@@ -48,6 +48,7 @@ import {
   constructJumpInstr,
   constructJumpOnFalseInstr,
   constructJumpOnTrueInstr,
+  constructLoadAddressInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
   constructLoadSymbolInstr,
@@ -89,7 +90,10 @@ import {
   getSymbolTableEntryInFrame
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
-import { constructAssignmentExpressionAssignInstr } from './compilerUtils';
+import {
+  constructAssignmentExpressionAssignInstr,
+  getSymbolTableEntryOfExpression
+} from './compilerUtils';
 import {
   addBlockLabelFrameEntries,
   constructFunctionLabelFrame,
@@ -542,8 +546,24 @@ const compilers: CompilerMapping = {
       compile(node.operand, instructions, symbolTable, labelFrame);
       const unaryOperationInstr = constructUnaryOperationInstr(node.operator);
       instructions.push(unaryOperationInstr);
-      
+      return;
     }
+
+    if (node.operator === '&') {
+      const symbolTableEntry = getSymbolTableEntryOfExpression(
+        node.operand,
+        symbolTable
+      );
+      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+      instructions.push(loadAddressInstr);
+      return;
+    }
+
+    // TODO: Support sizeof after variable sizes are supported.
+    throw new UnsupportedOperatorError(
+      node.operator,
+      UnsupportedOperatorErrorType.UNARY
+    );
   },
   UpdateExpression: (
     node: UpdateExpression,

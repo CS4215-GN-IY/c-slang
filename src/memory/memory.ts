@@ -55,6 +55,17 @@ export class Memory {
     }
   }
 
+  public getAddressAtOffset(segment: Segment, offset: number): number {
+    switch (segment) {
+      case Segment.DATA:
+        return this.virtualMemory.dataGetAddressAtOffset(offset);
+      case Segment.STACK:
+        return this.virtualMemory.stackGetAddressAtOffset(offset);
+      default:
+        throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
+    }
+  }
+
   public stackFunctionCallAllocate(args: number[], numOfVars: number): void {
     const returnAddress = this.textMemory.getNextInstrAddress();
     this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);

@@ -75,6 +75,17 @@ export class VirtualMemory {
     }
   }
 
+  public dataGetAddressAtOffset(offset: number): number {
+    return (
+      this.segmentAddresses[Segment.DATA].baseAddress +
+      offset * PageTable.ENTRY_SIZE
+    );
+  }
+
+  public stackGetAddressAtOffset(offset: number): number {
+    return this.rbp + offset * PageTable.ENTRY_SIZE;
+  }
+
   public dataGetByOffset(offset: number): number {
     const address =
       this.segmentAddresses[Segment.DATA].baseAddress +

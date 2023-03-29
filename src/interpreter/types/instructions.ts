@@ -20,6 +20,7 @@ export type Instr =
   | JumpInstr
   | JumpOnFalseInstr
   | JumpOnTrueInstr
+  | LoadAddressInstr
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
@@ -93,6 +94,12 @@ export interface JumpOnTrueInstr extends BaseInstr {
   instrAddress: number;
 }
 
+export interface LoadAddressInstr extends BaseInstr {
+  type: 'LoadAddress';
+  scope: Segment;
+  offset: number;
+}
+
 export interface LoadConstantInstr extends BaseInstr {
   type: 'LoadConstant';
   value: Value;
@@ -144,5 +151,5 @@ export type BinaryOperator =
   | '^'
   | '|';
 
-export const UNARY_OPERATORS = ['+', '-', '~', '!'] as const;
+export const UNARY_OPERATORS = ['+', '-', '~', '!', '*'] as const;
 export type UnaryOperator = (typeof UNARY_OPERATORS)[number];

@@ -21,7 +21,8 @@ import {
   type ContinueInstr,
   type ContinueDoneInstr,
   type UnaryOperationInstr,
-  type UnaryOperator
+  type UnaryOperator,
+  type LoadAddressInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -103,6 +104,14 @@ export const constructJumpOnTrueInstr = (
 ): JumpOnTrueInstr => ({
   type: 'JumpOnTrue',
   instrAddress
+});
+
+export const constructLoadAddressInstr = (
+  entry: SymbolTableEntry
+): LoadAddressInstr => ({
+  type: 'LoadAddress',
+  scope: getSegmentScope(entry.scope),
+  offset: entry.offset
 });
 
 export const constructLoadConstantInstr = (
