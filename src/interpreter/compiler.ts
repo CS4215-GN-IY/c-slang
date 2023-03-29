@@ -36,6 +36,8 @@ import {
 import {
   constructAssignInstr,
   constructBinaryOperationInstr,
+  constructBreakDoneInstr,
+  constructBreakInstr,
   constructCallInstr,
   constructDoneInstr,
   constructEnterProgramInstr,
@@ -157,7 +159,11 @@ const compilers: CompilerMapping = {
     node: BreakStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    // TODO: Figure out how to check that a break statement is only in a loop or switch block.
+    const breakInstr = constructBreakInstr();
+    instructions.push(breakInstr);
+  },
   CallExpression: (
     node: CallExpression,
     instructions: Instr[],
@@ -254,6 +260,8 @@ const compilers: CompilerMapping = {
     compile(node.predicate, instructions, symbolTable);
     const jumpOnTrueInstr = constructJumpOnTrueInstr(loopStart);
     instructions.push(jumpOnTrueInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
   },
   EmptyStatement: (
     node: EmptyStatement,
@@ -288,6 +296,8 @@ const compilers: CompilerMapping = {
     }
     const gotoInstr = constructGotoInstr(loopStart);
     instructions.push(gotoInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
     if (isNotUndefined(jumpOnFalseInstr)) {
       jumpOnFalseInstr.instrAddress = instructions.length;
     }
@@ -501,6 +511,8 @@ const compilers: CompilerMapping = {
     compile(node.body, instructions, symbolTable);
     const gotoInstr = constructGotoInstr(loopStart);
     instructions.push(gotoInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;
   }
 };

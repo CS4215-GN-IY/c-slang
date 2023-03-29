@@ -15,7 +15,9 @@ import {
   type MatchCaseInstr,
   type FallthroughInstr,
   type FallthroughDoneInstr,
-  type JumpOnTrueInstr
+  type JumpOnTrueInstr,
+  type BreakDoneInstr,
+  type BreakInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -34,6 +36,14 @@ export const constructBinaryOperationInstr = (
 ): BinaryOperationInstr => ({
   type: 'BinaryOperation',
   operator
+});
+
+export const constructBreakInstr = (): BreakInstr => ({
+  type: 'Break'
+});
+
+export const constructBreakDoneInstr = (): BreakDoneInstr => ({
+  type: 'BreakDone'
 });
 
 export const constructCallInstr = (

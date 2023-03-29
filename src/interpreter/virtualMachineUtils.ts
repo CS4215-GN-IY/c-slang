@@ -127,6 +127,10 @@ export function evaluateBinaryExpression(
       return left ^ right;
     case '|':
       return left | right;
+    case '==':
+      return convertBooleanToPredicate(left === right);
+    case '!=':
+      return convertBooleanToPredicate(left !== right);
     default:
       throw new UnsupportedOperatorError(
         operator,

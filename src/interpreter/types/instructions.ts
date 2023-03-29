@@ -8,6 +8,8 @@ interface BaseInstr {
 export type Instr =
   | AssignInstr
   | BinaryOperationInstr
+  | BreakInstr
+  | BreakDoneInstr
   | CallInstr
   | DoneInstr
   | EnterProgramInstr
@@ -32,6 +34,14 @@ export interface AssignInstr extends BaseInstr {
 export interface BinaryOperationInstr extends BaseInstr {
   type: 'BinaryOperation';
   operator: BinaryOperator;
+}
+
+export interface BreakInstr extends BaseInstr {
+  type: 'Break';
+}
+
+export interface BreakDoneInstr extends BaseInstr {
+  type: 'BreakDone';
 }
 
 export interface CallInstr extends BaseInstr {

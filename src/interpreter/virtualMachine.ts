@@ -7,6 +7,8 @@ import {
 import {
   type AssignInstr,
   type BinaryOperationInstr,
+  type BreakDoneInstr,
+  type BreakInstr,
   type CallInstr,
   type DoneInstr,
   type EnterProgramInstr,
@@ -89,6 +91,12 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     const left = state.stash.pop();
     typeCheckBinaryOperation(instr.operator, left, right);
     state.stash.push(evaluateBinaryExpression(instr.operator, left, right));
+    state.memory.moveToNextInstr();
+  },
+  Break: (instr: BreakInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('BreakDone');
+  },
+  BreakDone: (instr: BreakDoneInstr, state: VirtualMachineState) => {
     state.memory.moveToNextInstr();
   },
   Call: (instr: CallInstr, state: VirtualMachineState) => {
