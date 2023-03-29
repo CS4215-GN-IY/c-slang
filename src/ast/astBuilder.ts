@@ -529,7 +529,7 @@ export class ASTBuilder implements CVisitor<any> {
   visitDirectAbstractDeclarator(
     ctx: DirectAbstractDeclaratorContext
   ): Identifier {
-    throw new UnreachableCaseError();
+    throw new Error('Method not implemented.');
   }
 
   visitDirectDeclarator(ctx: DirectDeclaratorContext): Identifier {
