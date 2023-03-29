@@ -774,4 +774,23 @@ describe('compile and run', () => {
     const expectedResult = undefined;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles goto statement', () => {
+    const code = `
+        int main() {
+            int i = 0;
+            hi:
+                i += 1;
+                if (i > 2) {
+                    return i;
+                }
+            goto hi;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 3;
+    expect(result).toEqual(expectedResult);
+  });
 });

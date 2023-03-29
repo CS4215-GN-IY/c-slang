@@ -28,3 +28,10 @@ export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
 interface VariableSymbolTableEntry extends BaseSymbolTableEntry {
   nameType: 'Variable';
 }
+
+export type LabelFrame = Record<string, LabelEntry>;
+
+export interface LabelEntry {
+  name: string;
+  instrAddress: number;
+}

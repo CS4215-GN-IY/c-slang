@@ -11,6 +11,7 @@ import {
   type EmptyStatement,
   type ForStatement,
   type Identifier,
+  type IdentifierStatement,
   type VariableDeclaration
 } from './types';
 
@@ -44,6 +45,12 @@ export const isEmptyStatement = (node: BaseNode): node is EmptyStatement => {
 
 export const isForStatement = (node: BaseNode): node is ForStatement => {
   return node.type === 'ForStatement';
+};
+
+export const isIdentifierStatement = (
+  node: BaseNode
+): node is IdentifierStatement => {
+  return node.type === 'IdentifierStatement';
 };
 
 export const isBinaryOperator = (

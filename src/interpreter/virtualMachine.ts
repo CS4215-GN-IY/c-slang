@@ -181,7 +181,9 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     }
   },
   Pop: (instr: PopInstr, state: VirtualMachineState) => {
-    state.stash.pop();
+    if (state.stash.size() > 0) {
+      state.stash.pop();
+    }
     state.memory.moveToNextInstr();
   },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
