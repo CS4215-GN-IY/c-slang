@@ -11,7 +11,10 @@ import {
   type BinaryOperationInstr,
   type BinaryOperator,
   type JumpOnFalseInstr,
-  type PopInstr
+  type PopInstr,
+  type MatchCaseInstr,
+  type FallthroughInstr,
+  type FallthroughDoneInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -52,6 +55,14 @@ export const constructEnterProgramInstr = (
   numOfDeclarations
 });
 
+export const constructFallthroughInstr = (): FallthroughInstr => ({
+  type: 'Fallthrough'
+});
+
+export const constructFallthroughDoneInstr = (): FallthroughDoneInstr => ({
+  type: 'FallthroughDone'
+});
+
 export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
   type: 'Goto',
   instrAddress
@@ -84,6 +95,10 @@ export const constructLoadSymbolInstr = (
   type: 'LoadSymbol',
   scope: getSegmentScope(entry.scope),
   offset: entry.offset
+});
+
+export const constructMatchCaseInstr = (): MatchCaseInstr => ({
+  type: 'MatchCase'
 });
 
 export const constructPopInstr = (): PopInstr => ({

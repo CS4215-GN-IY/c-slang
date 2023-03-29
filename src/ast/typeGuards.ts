@@ -6,6 +6,7 @@ import {
   type BaseNode,
   BINARY_OPERATORS,
   type BinaryOperator,
+  type CaseStatement,
   type Constant,
   type EmptyStatement,
   type ForStatement,
@@ -31,6 +32,10 @@ export const isVariableDeclaration = (
   node: BaseNode
 ): node is VariableDeclaration => {
   return node.type === 'VariableDeclaration';
+};
+
+export const isCaseStatement = (node: BaseNode): node is CaseStatement => {
+  return node.type === 'CaseStatement';
 };
 
 export const isEmptyStatement = (node: BaseNode): node is EmptyStatement => {

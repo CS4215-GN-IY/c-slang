@@ -11,11 +11,14 @@ export type Instr =
   | CallInstr
   | DoneInstr
   | EnterProgramInstr
+  | FallthroughInstr
+  | FallthroughDoneInstr
   | GotoInstr
   | JumpOnFalseInstr
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
+  | MatchCaseInstr
   | PopInstr
   | TeardownInstr;
 
@@ -45,6 +48,14 @@ export interface EnterProgramInstr extends BaseInstr {
   numOfDeclarations: number;
 }
 
+export interface FallthroughInstr extends BaseInstr {
+  type: 'Fallthrough';
+}
+
+export interface FallthroughDoneInstr extends BaseInstr {
+  type: 'FallthroughDone';
+}
+
 export interface GotoInstr extends BaseInstr {
   type: 'Goto';
   instrAddress: number;
@@ -69,6 +80,10 @@ export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
   scope: Segment;
   offset: number;
+}
+
+export interface MatchCaseInstr extends BaseInstr {
+  type: 'MatchCase';
 }
 
 export interface PopInstr extends BaseInstr {

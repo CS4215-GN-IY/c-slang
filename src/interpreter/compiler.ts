@@ -39,17 +39,21 @@ import {
   constructCallInstr,
   constructDoneInstr,
   constructEnterProgramInstr,
+  constructFallthroughDoneInstr,
+  constructFallthroughInstr,
   constructGotoInstr,
   constructJumpOnFalseInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
   constructLoadSymbolInstr,
+  constructMatchCaseInstr,
   constructPopInstr,
   constructTeardownInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
   isBinaryOperator,
+  isCaseStatement,
   isEmptyStatement,
   isIdentifier
 } from '../ast/typeGuards';
@@ -185,7 +189,20 @@ const compilers: CompilerMapping = {
     node: CaseStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    compile(node.label, instructions, symbolTable);
+    const matchCaseInstr = constructMatchCaseInstr();
+    instructions.push(matchCaseInstr);
+    if (!isCaseStatement(node.body)) {
+      const fallthroughDoneInstr = constructFallthroughDoneInstr();
+      instructions.push(fallthroughDoneInstr);
+    }
+    compile(node.body, instructions, symbolTable);
+    if (!isCaseStatement(node.body)) {
+      const fallthroughInstr = constructFallthroughInstr();
+      instructions.push(fallthroughInstr);
+    }
+  },
   ConditionalExpression: (
     node: ConditionalExpression,
     instructions: Instr[],
@@ -218,7 +235,14 @@ const compilers: CompilerMapping = {
     node: DefaultStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    // If this pop instruction is reached, no cases matched, pop value used for matching from the virtual machine stash.
+    const popInstr = constructPopInstr();
+    instructions.push(popInstr);
+    const fallthroughDoneInstr = constructFallthroughDoneInstr();
+    instructions.push(fallthroughDoneInstr);
+    compile(node.body, instructions, symbolTable);
+  },
   DoWhileStatement: (
     node: DoWhileStatement,
     instructions: Instr[],
@@ -413,7 +437,12 @@ const compilers: CompilerMapping = {
     node: SwitchStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    compile(node.discriminant, instructions, symbolTable);
+    compile(node.body, instructions, symbolTable);
+    const fallthroughDoneInstr = constructFallthroughDoneInstr();
+    instructions.push(fallthroughDoneInstr);
+  },
   UnaryExpression: (
     node: UnaryExpression,
     instructions: Instr[],

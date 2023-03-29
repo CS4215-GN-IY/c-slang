@@ -72,12 +72,20 @@ export class Memory {
     return this.textMemory.getCurrentInstr();
   }
 
+  public getNextInstr(): Instr {
+    return this.textMemory.getNextInstr();
+  }
+
   public moveToNextInstr(): void {
     this.textMemory.moveToNextInstr();
   }
 
   public moveToInstr(instrAddress: number): void {
     this.textMemory.moveToInstr(instrAddress);
+  }
+
+  public moveToNextInstrAfterType(type: string): void {
+    this.textMemory.moveToNextInstrAfterType(type);
   }
 
   public isAtDoneInstr(): boolean {

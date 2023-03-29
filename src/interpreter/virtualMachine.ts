@@ -10,12 +10,15 @@ import {
   type CallInstr,
   type DoneInstr,
   type EnterProgramInstr,
+  type FallthroughDoneInstr,
+  type FallthroughInstr,
   type GotoInstr,
   type Instr,
   type JumpOnFalseInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
+  type MatchCaseInstr,
   type PopInstr,
   type TeardownInstr
 } from './types/instructions';
@@ -102,6 +105,15 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.memory.dataAllocate(instr.numOfDeclarations);
     state.memory.moveToNextInstr();
   },
+  Fallthrough: (instr: FallthroughInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('FallthroughDone');
+  },
+  FallthroughDone: (
+    instr: FallthroughDoneInstr,
+    state: VirtualMachineState
+  ) => {
+    state.memory.moveToNextInstr();
+  },
   Goto: (instr: GotoInstr, state: VirtualMachineState) => {
     state.memory.moveToInstr(instr.instrAddress);
   },
@@ -125,6 +137,23 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     const value = state.memory.getByOffset(instr.scope, instr.offset);
     state.stash.push(value);
     state.memory.moveToNextInstr();
+  },
+  MatchCase: (instr: MatchCaseInstr, state: VirtualMachineState) => {
+    const caseValue = state.stash.pop();
+    const valueToMatch = state.stash.peek();
+    const fallthroughDoneInstrType = 'FallthroughDone';
+    if (caseValue === valueToMatch) {
+      state.memory.moveToNextInstrAfterType(fallthroughDoneInstrType);
+      // Once a match is found, there is no need to match again, pop valueToMatch.
+      state.stash.pop();
+      return;
+    }
+    if (state.memory.getNextInstr().type === fallthroughDoneInstrType) {
+      const fallthroughInstrType = 'Fallthrough';
+      state.memory.moveToNextInstrAfterType(fallthroughInstrType);
+    } else {
+      state.memory.moveToNextInstr();
+    }
   },
   Pop: (instr: PopInstr, state: VirtualMachineState) => {
     state.stash.pop();
