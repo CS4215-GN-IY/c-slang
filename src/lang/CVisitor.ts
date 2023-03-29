@@ -51,6 +51,8 @@ import { FunctionSpecifierContext } from './CParser';
 import { AlignmentSpecifierContext } from './CParser';
 import { DeclaratorContext } from './CParser';
 import { DirectDeclaratorContext } from './CParser';
+import { FunctionDeclaratorContext } from './CParser';
+import { FunctionDirectDeclaratorContext } from './CParser';
 import { NestedParenthesesBlockContext } from './CParser';
 import { PointerContext } from './CParser';
 import { TypeQualifierListContext } from './CParser';
@@ -78,6 +80,8 @@ import { SelectionStatementContext } from './CParser';
 import { IterationStatementContext } from './CParser';
 import { ForConditionContext } from './CParser';
 import { ForDeclarationContext } from './CParser';
+import { ForConditionalExpressionContext } from './CParser';
+import { ForUpdateExpressionContext } from './CParser';
 import { ForExpressionContext } from './CParser';
 import { JumpStatementContext } from './CParser';
 import { CompilationUnitContext } from './CParser';
@@ -440,6 +444,22 @@ export interface CVisitor<Result> extends ParseTreeVisitor<Result> {
   visitDirectDeclarator?: (ctx: DirectDeclaratorContext) => Result;
 
   /**
+   * Visit a parse tree produced by `CParser.functionDeclarator`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitFunctionDeclarator?: (ctx: FunctionDeclaratorContext) => Result;
+
+  /**
+   * Visit a parse tree produced by `CParser.functionDirectDeclarator`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitFunctionDirectDeclarator?: (
+    ctx: FunctionDirectDeclaratorContext
+  ) => Result;
+
+  /**
    * Visit a parse tree produced by `CParser.nestedParenthesesBlock`.
    * @param ctx the parse tree
    * @return the visitor result
@@ -631,6 +651,22 @@ export interface CVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitForDeclaration?: (ctx: ForDeclarationContext) => Result;
+
+  /**
+   * Visit a parse tree produced by `CParser.forConditionalExpression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitForConditionalExpression?: (
+    ctx: ForConditionalExpressionContext
+  ) => Result;
+
+  /**
+   * Visit a parse tree produced by `CParser.forUpdateExpression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitForUpdateExpression?: (ctx: ForUpdateExpressionContext) => Result;
 
   /**
    * Visit a parse tree produced by `CParser.forExpression`.

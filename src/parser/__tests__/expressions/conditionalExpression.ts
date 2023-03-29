@@ -14,6 +14,7 @@ describe('conditional expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -65,6 +66,7 @@ describe('conditional expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [

@@ -51,6 +51,8 @@ import { FunctionSpecifierContext } from './CParser';
 import { AlignmentSpecifierContext } from './CParser';
 import { DeclaratorContext } from './CParser';
 import { DirectDeclaratorContext } from './CParser';
+import { FunctionDeclaratorContext } from './CParser';
+import { FunctionDirectDeclaratorContext } from './CParser';
 import { NestedParenthesesBlockContext } from './CParser';
 import { PointerContext } from './CParser';
 import { TypeQualifierListContext } from './CParser';
@@ -78,6 +80,8 @@ import { SelectionStatementContext } from './CParser';
 import { IterationStatementContext } from './CParser';
 import { ForConditionContext } from './CParser';
 import { ForDeclarationContext } from './CParser';
+import { ForConditionalExpressionContext } from './CParser';
+import { ForUpdateExpressionContext } from './CParser';
 import { ForExpressionContext } from './CParser';
 import { JumpStatementContext } from './CParser';
 import { CompilationUnitContext } from './CParser';
@@ -633,6 +637,30 @@ export interface CListener extends ParseTreeListener {
   exitDirectDeclarator?: (ctx: DirectDeclaratorContext) => void;
 
   /**
+   * Enter a parse tree produced by `CParser.functionDeclarator`.
+   * @param ctx the parse tree
+   */
+  enterFunctionDeclarator?: (ctx: FunctionDeclaratorContext) => void;
+  /**
+   * Exit a parse tree produced by `CParser.functionDeclarator`.
+   * @param ctx the parse tree
+   */
+  exitFunctionDeclarator?: (ctx: FunctionDeclaratorContext) => void;
+
+  /**
+   * Enter a parse tree produced by `CParser.functionDirectDeclarator`.
+   * @param ctx the parse tree
+   */
+  enterFunctionDirectDeclarator?: (
+    ctx: FunctionDirectDeclaratorContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by `CParser.functionDirectDeclarator`.
+   * @param ctx the parse tree
+   */
+  exitFunctionDirectDeclarator?: (ctx: FunctionDirectDeclaratorContext) => void;
+
+  /**
    * Enter a parse tree produced by `CParser.nestedParenthesesBlock`.
    * @param ctx the parse tree
    */
@@ -930,6 +958,30 @@ export interface CListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitForDeclaration?: (ctx: ForDeclarationContext) => void;
+
+  /**
+   * Enter a parse tree produced by `CParser.forConditionalExpression`.
+   * @param ctx the parse tree
+   */
+  enterForConditionalExpression?: (
+    ctx: ForConditionalExpressionContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by `CParser.forConditionalExpression`.
+   * @param ctx the parse tree
+   */
+  exitForConditionalExpression?: (ctx: ForConditionalExpressionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `CParser.forUpdateExpression`.
+   * @param ctx the parse tree
+   */
+  enterForUpdateExpression?: (ctx: ForUpdateExpressionContext) => void;
+  /**
+   * Exit a parse tree produced by `CParser.forUpdateExpression`.
+   * @param ctx the parse tree
+   */
+  exitForUpdateExpression?: (ctx: ForUpdateExpressionContext) => void;
 
   /**
    * Enter a parse tree produced by `CParser.forExpression`.

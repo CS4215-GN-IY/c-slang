@@ -1,45 +1,9 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types';
 
-describe('return statement', () => {
-  it('handles argument', () => {
-    const code = 'int main() { return 0; }';
-    const ast = parse(code);
-    const expectedAst: Program = {
-      type: 'Program',
-      body: [
-        {
-          type: 'FunctionDeclaration',
-          id: {
-            type: 'Identifier',
-            name: 'main'
-          },
-          params: [],
-          body: {
-            type: 'BlockStatement',
-            items: [
-              {
-                type: 'ReturnStatement',
-                argument: {
-                  type: 'SequenceExpression',
-                  expressions: [
-                    {
-                      type: 'Constant',
-                      value: 0
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      ]
-    };
-    expect(ast).toEqual(expectedAst);
-  });
-
-  it('handles binary expression argument', () => {
-    const code = 'int main() { return 1 + 2; }';
+describe('function definition', () => {
+  test('handles function definitions without parameters', () => {
+    const code = 'int main() { return 3 + 7; }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -64,11 +28,11 @@ describe('return statement', () => {
                       operator: '+',
                       left: {
                         type: 'Constant',
-                        value: 1
+                        value: 3
                       },
                       right: {
                         type: 'Constant',
-                        value: 2
+                        value: 7
                       }
                     }
                   ]
@@ -82,8 +46,8 @@ describe('return statement', () => {
     expect(ast).toEqual(expectedAst);
   });
 
-  it('handles no argument', () => {
-    const code = 'int f() { return; }';
+  test('handles function definitions with parameters', () => {
+    const code = 'int sum(int a, int b) { return a + b; }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -92,14 +56,40 @@ describe('return statement', () => {
           type: 'FunctionDeclaration',
           id: {
             type: 'Identifier',
-            name: 'f'
+            name: 'sum'
           },
-          params: [],
+          params: [
+            {
+              type: 'Identifier',
+              name: 'a'
+            },
+            {
+              type: 'Identifier',
+              name: 'b'
+            }
+          ],
           body: {
             type: 'BlockStatement',
             items: [
               {
-                type: 'ReturnStatement'
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'SequenceExpression',
+                  expressions: [
+                    {
+                      type: 'BinaryExpression',
+                      operator: '+',
+                      left: {
+                        type: 'Identifier',
+                        name: 'a'
+                      },
+                      right: {
+                        type: 'Identifier',
+                        name: 'b'
+                      }
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -108,11 +98,9 @@ describe('return statement', () => {
     };
     expect(ast).toEqual(expectedAst);
   });
-});
 
-describe('goto statement', () => {
-  it('goes to identifier', () => {
-    const code = 'int main() { x : return 0; goto x; }';
+  test('handles function definitions which return a function pointer', () => {
+    const code = 'int (*g(int a, int b))() { return f; }';
     const ast = parse(code);
     const expectedAst: Program = {
       type: 'Program',
@@ -121,36 +109,76 @@ describe('goto statement', () => {
           type: 'FunctionDeclaration',
           id: {
             type: 'Identifier',
-            name: 'main'
+            name: 'g'
           },
-          params: [],
+          params: [
+            {
+              type: 'Identifier',
+              name: 'a'
+            },
+            {
+              type: 'Identifier',
+              name: 'b'
+            }
+          ],
           body: {
             type: 'BlockStatement',
             items: [
               {
-                type: 'IdentifierStatement',
-                label: {
-                  type: 'Identifier',
-                  name: 'x'
-                },
-                body: {
-                  type: 'ReturnStatement',
-                  argument: {
-                    type: 'SequenceExpression',
-                    expressions: [
-                      {
-                        type: 'Constant',
-                        value: 0
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                type: 'GotoStatement',
+                type: 'ReturnStatement',
                 argument: {
-                  type: 'Identifier',
-                  name: 'x'
+                  type: 'SequenceExpression',
+                  expressions: [
+                    {
+                      type: 'Identifier',
+                      name: 'f'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles function definitions which return a function which returns a function pointer', () => {
+    const code = 'int (*(*h(int a, int b))())() { return g; }';
+    const ast = parse(code);
+    const expectedAst: Program = {
+      type: 'Program',
+      body: [
+        {
+          type: 'FunctionDeclaration',
+          id: {
+            type: 'Identifier',
+            name: 'h'
+          },
+          params: [
+            {
+              type: 'Identifier',
+              name: 'a'
+            },
+            {
+              type: 'Identifier',
+              name: 'b'
+            }
+          ],
+          body: {
+            type: 'BlockStatement',
+            items: [
+              {
+                type: 'ReturnStatement',
+                argument: {
+                  type: 'SequenceExpression',
+                  expressions: [
+                    {
+                      type: 'Identifier',
+                      name: 'g'
+                    }
+                  ]
                 }
               }
             ]

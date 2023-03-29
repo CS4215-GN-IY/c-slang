@@ -71,3 +71,9 @@ export interface ForCondition extends BaseReturnValue {
   predicate?: SequenceExpression;
   update?: SequenceExpression;
 }
+
+export interface FunctionDirectDeclaratorReturnValue extends BaseReturnValue {
+  type: 'FunctionDirectDeclarator';
+  functionId: Identifier;
+  functionParams: Identifier[];
+}
