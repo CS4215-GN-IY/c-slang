@@ -96,7 +96,7 @@ export type IterationStatement =
 
 export interface DoWhileStatement extends BaseStatement {
   type: 'DoWhileStatement';
-  test: SequenceExpression;
+  predicate: SequenceExpression;
   body: Statement;
 }
 

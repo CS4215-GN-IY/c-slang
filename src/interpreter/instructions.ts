@@ -14,7 +14,8 @@ import {
   type PopInstr,
   type MatchCaseInstr,
   type FallthroughInstr,
-  type FallthroughDoneInstr
+  type FallthroughDoneInstr,
+  type JumpOnTrueInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -72,6 +73,13 @@ export const constructJumpOnFalseInstr = (
   instrAddress: number
 ): JumpOnFalseInstr => ({
   type: 'JumpOnFalse',
+  instrAddress
+});
+
+export const constructJumpOnTrueInstr = (
+  instrAddress: number
+): JumpOnTrueInstr => ({
+  type: 'JumpOnTrue',
   instrAddress
 });
 

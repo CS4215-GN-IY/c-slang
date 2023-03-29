@@ -43,6 +43,7 @@ import {
   constructFallthroughInstr,
   constructGotoInstr,
   constructJumpOnFalseInstr,
+  constructJumpOnTrueInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
   constructLoadSymbolInstr,
@@ -247,7 +248,13 @@ const compilers: CompilerMapping = {
     node: DoWhileStatement,
     instructions: Instr[],
     symbolTable: SymbolTable
-  ) => {},
+  ) => {
+    const loopStart = instructions.length;
+    compile(node.body, instructions, symbolTable);
+    compile(node.predicate, instructions, symbolTable);
+    const jumpOnTrueInstr = constructJumpOnTrueInstr(loopStart);
+    instructions.push(jumpOnTrueInstr);
+  },
   EmptyStatement: (
     node: EmptyStatement,
     instructions: Instr[],

@@ -15,6 +15,7 @@ import {
   type GotoInstr,
   type Instr,
   type JumpOnFalseInstr,
+  type JumpOnTrueInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
@@ -123,6 +124,14 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       state.memory.moveToNextInstr();
     } else {
       state.memory.moveToInstr(instr.instrAddress);
+    }
+  },
+  JumpOnTrue: (instr: JumpOnTrueInstr, state: VirtualMachineState) => {
+    const predicate = convertToPredicate(state.stash.pop());
+    if (isTrue(predicate)) {
+      state.memory.moveToInstr(instr.instrAddress);
+    } else {
+      state.memory.moveToNextInstr();
     }
   },
   LoadConstant: (instr: LoadConstantInstr, state: VirtualMachineState) => {

@@ -15,6 +15,7 @@ export type Instr =
   | FallthroughDoneInstr
   | GotoInstr
   | JumpOnFalseInstr
+  | JumpOnTrueInstr
   | LoadConstantInstr
   | LoadFunctionInstr
   | LoadSymbolInstr
@@ -63,6 +64,11 @@ export interface GotoInstr extends BaseInstr {
 
 export interface JumpOnFalseInstr extends BaseInstr {
   type: 'JumpOnFalse';
+  instrAddress: number;
+}
+
+export interface JumpOnTrueInstr extends BaseInstr {
+  type: 'JumpOnTrue';
   instrAddress: number;
 }
 
