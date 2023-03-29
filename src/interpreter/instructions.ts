@@ -3,7 +3,7 @@ import {
   type CallInstr,
   type DoneInstr,
   type TeardownInstr,
-  type GotoInstr,
+  type JumpInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
@@ -84,8 +84,8 @@ export const constructFallthroughDoneInstr = (): FallthroughDoneInstr => ({
   type: 'FallthroughDone'
 });
 
-export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
-  type: 'Goto',
+export const constructJumpInstr = (instrAddress: number): JumpInstr => ({
+  type: 'Jump',
   instrAddress
 });
 

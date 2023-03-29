@@ -45,7 +45,7 @@ import {
   constructEnterProgramInstr,
   constructFallthroughDoneInstr,
   constructFallthroughInstr,
-  constructGotoInstr,
+  constructJumpInstr,
   constructJumpOnFalseInstr,
   constructJumpOnTrueInstr,
   constructLoadConstantInstr,
@@ -223,11 +223,11 @@ const compilers: CompilerMapping = {
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
     compile(node.consequent, instructions, symbolTable);
-    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;
     compile(node.alternate, instructions, symbolTable);
-    gotoInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddress = instructions.length;
   },
   Constant: (
     node: Constant,
@@ -307,8 +307,8 @@ const compilers: CompilerMapping = {
     if (isNotUndefined(node.update)) {
       compile(node.update, instructions, symbolTable);
     }
-    const gotoInstr = constructGotoInstr(loopStart);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(loopStart);
+    instructions.push(jumpInstr);
     const breakDoneInstr = constructBreakDoneInstr();
     instructions.push(breakDoneInstr);
     if (isNotUndefined(jumpOnFalseInstr)) {
@@ -322,8 +322,8 @@ const compilers: CompilerMapping = {
   ) => {
     const loadFunctionInstr = constructLoadFunctionInstr(PLACEHOLDER_ADDRESS);
     instructions.push(loadFunctionInstr);
-    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
 
     loadFunctionInstr.functionInstrAddress = instructions.length;
 
@@ -341,7 +341,7 @@ const compilers: CompilerMapping = {
     const teardownInstr = constructTeardownInstr();
     instructions.push(teardownInstr);
 
-    gotoInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddress = instructions.length;
 
     const assignInstr = constructAssignInstr(
       getSymbolTableEntry(node.id.name, symbolTable)
@@ -377,7 +377,7 @@ const compilers: CompilerMapping = {
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
     compile(node.consequent, instructions, symbolTable);
-    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
+    const gotoInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
     instructions.push(gotoInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;
     if (isNotUndefined(node.alternate)) {
@@ -529,7 +529,7 @@ const compilers: CompilerMapping = {
     compile(node.body, instructions, symbolTable);
     const continueDoneInstr = constructContinueDoneInstr();
     instructions.push(continueDoneInstr);
-    const gotoInstr = constructGotoInstr(loopStart);
+    const gotoInstr = constructJumpInstr(loopStart);
     instructions.push(gotoInstr);
     const breakDoneInstr = constructBreakDoneInstr();
     instructions.push(breakDoneInstr);

@@ -16,7 +16,7 @@ import {
   type EnterProgramInstr,
   type FallthroughDoneInstr,
   type FallthroughInstr,
-  type GotoInstr,
+  type JumpInstr,
   type Instr,
   type JumpOnFalseInstr,
   type JumpOnTrueInstr,
@@ -131,7 +131,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   ) => {
     state.memory.moveToNextInstr();
   },
-  Goto: (instr: GotoInstr, state: VirtualMachineState) => {
+  Jump: (instr: JumpInstr, state: VirtualMachineState) => {
     state.memory.moveToInstr(instr.instrAddress);
   },
   JumpOnFalse: (instr: JumpOnFalseInstr, state: VirtualMachineState) => {
