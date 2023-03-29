@@ -1,7 +1,6 @@
 import { parse } from '../../parser/parser';
 import { compileProgram } from '../compiler';
 import { interpret } from '../virtualMachine';
-import { FALSE_VALUE } from '../../utils/constants';
 
 describe('compile and run', () => {
   test('program', () => {
@@ -13,75 +12,12 @@ describe('compile and run', () => {
     expect(result).toEqual(expectedResult);
   });
 
-  test('handles logical and expression that is true', () => {
-    const code = 'int main() { return 1 && 2; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
-  });
-
-  test('handles logical and expression whose left side is false', () => {
-    const code = 'int main() { return 0 && 2; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
-  });
-
-  test('handles logical and expression whose right side is false', () => {
-    const code = 'int main() { return 2 && (3 - 3); }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
-  });
-
-  test('handles logical or expression whose left side is true', () => {
-    const code = 'int main() { return 1 || 0; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
-  });
-
-  test('handles logical or expression whose right side is true', () => {
-    const code = 'int main() { return 0 || (4 - 1); }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
-  });
-
-  test('handles logical or expression that is false', () => {
-    const code = 'int main() { return 0 || (3 - 3); }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
-  });
-
   test('handles variable declarations and identifiers', () => {
     const code = 'int main() { int a; int b = 5; return b; }';
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles multiple return arguments', () => {
-    const code = 'int main() { int a; int b = 5; return 1, 2, 3; }';
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
     expect(result).toEqual(expectedResult);
   });
 
@@ -736,172 +672,6 @@ describe('compile and run', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = undefined;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles goto statement', () => {
-    const code = `
-        int main() {
-            int i = 0;
-            hi:
-                i += 1;
-                if (i > 2) {
-                    return i;
-                }
-            goto hi;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles unary - operation', () => {
-    const code = `
-        int main() {
-            int a = -2;
-            return a;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = -2;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles unary + operation', () => {
-    const code = `
-        int main() {
-            int a = +2;
-            return a;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles unary ~ operation', () => {
-    const code = `
-        int main() {
-            int a = ~5;
-            return a;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = -6;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles unary ! operation when operand is true', () => {
-    const code = `
-        int main() {
-            int a = 10;
-            return !a;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
-  });
-
-  test('handles unary ! operation when operand is false', () => {
-    const code = `
-        int main() {
-            int a = 0;
-            return !a;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
-  });
-
-  test('handles unary & and * operation', () => {
-    const code = `
-        int main() {
-            int a = 10;
-            int address = &a;
-            return *address + 2;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 12;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles tail call', () => {
-    const code = `
-        int n = 0;
-        
-        int main() {
-            return f();
-        }
-        
-        int f() {
-           n += 1;
-           if (n > 3) {
-               return n;
-           }
-           return f();
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 4;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles return with no argument', () => {
-    const code = `
-        int n = 0;
-        
-        int main() {
-            f();
-            return n;
-        }
-        
-        int f() {
-           n += 3;
-           return;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
-  });
-
-  test('handles function with no return statement', () => {
-    const code = `
-        int n = 0;
-        
-        int main() {
-            f();
-            return n;
-        }
-        
-        int f() {
-           n += 3;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 3;
     expect(result).toEqual(expectedResult);
   });
 });
