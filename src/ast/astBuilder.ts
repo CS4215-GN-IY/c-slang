@@ -742,8 +742,8 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForUpdateExpression(
-    ctx: ForUpdateExpressionContext
+  visitForConditionalExpression(
+    ctx: ForConditionalExpressionContext
   ): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
@@ -755,8 +755,8 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForConditionalExpression(
-    ctx: ForConditionalExpressionContext
+  visitForUpdateExpression(
+    ctx: ForUpdateExpressionContext
   ): SequenceExpression {
     const assignmentExpressions = ctx.assignmentExpression();
     return {
