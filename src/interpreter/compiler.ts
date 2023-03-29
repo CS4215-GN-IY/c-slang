@@ -51,11 +51,14 @@ import {
   constructLoadAddressInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
+  constructLoadReturnAddressInstr,
   constructLoadSymbolInstr,
   constructMatchCaseInstr,
   constructPopInstr,
+  constructTailCallInstr,
   constructTeardownInstr,
   constructUnaryOperationInstr,
+  isLoadReturnAddressInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
@@ -211,6 +214,8 @@ const compilers: CompilerMapping = {
     node.arguments.forEach((arg) => {
       compile(arg, instructions, symbolTable, labelFrame);
     });
+    const loadReturnAddressInstr = constructLoadReturnAddressInstr();
+    instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
       functionEntry.numOfVariables
@@ -496,9 +501,12 @@ const compilers: CompilerMapping = {
     if (isNotUndefined(node.argument)) {
       compile(node.argument, instructions, symbolTable, labelFrame);
     }
-    // TODO: Handle tail call.
-    const teardownInstr = constructTeardownInstr();
-    instructions.push(teardownInstr);
+    if (isLoadReturnAddressInstr(instructions[instructions.length - 2])) {
+      instructions[instructions.length - 2] = constructTailCallInstr();
+    } else {
+      const teardownInstr = constructTeardownInstr();
+      instructions.push(teardownInstr);
+    }
   },
   SequenceExpression: (
     node: SequenceExpression,

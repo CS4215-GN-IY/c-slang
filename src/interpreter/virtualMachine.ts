@@ -27,7 +27,9 @@ import {
   type PopInstr,
   type TeardownInstr,
   type UnaryOperationInstr,
-  type LoadAddressInstr
+  type LoadAddressInstr,
+  type TailCallInstr,
+  type LoadReturnAddressInstr
 } from './types/instructions';
 import {
   convertToAddress,
@@ -105,13 +107,18 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.memory.moveToNextInstr();
   },
   Call: (instr: CallInstr, state: VirtualMachineState) => {
+    const returnAddress = state.stash.pop();
     // First item popped from the stash should be the arg for the first param and so on.
     const args: Value[] = [];
     for (let i = 0; i < instr.numOfArgs; i++) {
       args.push(state.stash.pop());
     }
     const functionInstrAddress = convertToAddress(state.stash.pop());
-    state.memory.stackFunctionCallAllocate(args, instr.numOfVars);
+    state.memory.stackFunctionCallAllocate(
+      args,
+      instr.numOfVars,
+      returnAddress
+    );
     state.memory.moveToInstr(functionInstrAddress);
   },
   Continue: (instr: ContinueInstr, state: VirtualMachineState) => {
@@ -166,6 +173,13 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.stash.push(instr.functionInstrAddress);
     state.memory.moveToNextInstr();
   },
+  LoadReturnAddress: (
+    instr: LoadReturnAddressInstr,
+    state: VirtualMachineState
+  ) => {
+    state.stash.push(state.memory.getInstrAddressByOffset(2));
+    state.memory.moveToNextInstr();
+  },
   LoadSymbol: (instr: LoadSymbolInstr, state: VirtualMachineState) => {
     const value = state.memory.getByOffset(instr.scope, instr.offset);
     state.stash.push(value);
@@ -192,6 +206,12 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     if (state.stash.size() > 0) {
       state.stash.pop();
     }
+    state.memory.moveToNextInstr();
+  },
+  TailCall: (instr: TailCallInstr, state: VirtualMachineState) => {
+    const returnAddress = state.memory.getReturnAddress();
+    state.stash.push(returnAddress);
+    state.memory.stackFunctionCallTeardown();
     state.memory.moveToNextInstr();
   },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {

@@ -876,4 +876,27 @@ describe('compile and run', () => {
     const expectedResult = 12;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles tail call', () => {
+    const code = `
+        int n = 0;
+        
+        int main() {
+            return f();
+        }
+        
+        int f() {
+           n += 1;
+           if (n > 3) {
+               return n;
+           }
+           return f();
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 4;
+    expect(result).toEqual(expectedResult);
+  });
 });

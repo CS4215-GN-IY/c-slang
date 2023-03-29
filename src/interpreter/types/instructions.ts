@@ -23,9 +23,11 @@ export type Instr =
   | LoadAddressInstr
   | LoadConstantInstr
   | LoadFunctionInstr
+  | LoadReturnAddressInstr
   | LoadSymbolInstr
   | MatchCaseInstr
   | PopInstr
+  | TailCallInstr
   | TeardownInstr
   | UnaryOperationInstr;
 
@@ -110,6 +112,10 @@ export interface LoadFunctionInstr extends BaseInstr {
   functionInstrAddress: number;
 }
 
+export interface LoadReturnAddressInstr extends BaseInstr {
+  type: 'LoadReturnAddress';
+}
+
 export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
   scope: Segment;
@@ -122,6 +128,10 @@ export interface MatchCaseInstr extends BaseInstr {
 
 export interface PopInstr extends BaseInstr {
   type: 'Pop';
+}
+
+export interface TailCallInstr extends BaseInstr {
+  type: 'TailCall';
 }
 
 export interface TeardownInstr extends BaseInstr {

@@ -22,7 +22,10 @@ import {
   type ContinueDoneInstr,
   type UnaryOperationInstr,
   type UnaryOperator,
-  type LoadAddressInstr
+  type LoadAddressInstr,
+  type Instr,
+  type TailCallInstr,
+  type LoadReturnAddressInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -128,6 +131,10 @@ export const constructLoadFunctionInstr = (
   functionInstrAddress
 });
 
+export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
+  type: 'LoadReturnAddress'
+});
+
 export const constructLoadSymbolInstr = (
   entry: SymbolTableEntry
 ): LoadSymbolInstr => ({
@@ -144,6 +151,10 @@ export const constructPopInstr = (): PopInstr => ({
   type: 'Pop'
 });
 
+export const constructTailCallInstr = (): TailCallInstr => ({
+  type: 'TailCall'
+});
+
 export const constructTeardownInstr = (): TeardownInstr => ({
   type: 'Teardown'
 });
@@ -154,3 +165,9 @@ export const constructUnaryOperationInstr = (
   type: 'UnaryOperation',
   operator
 });
+
+export const isLoadReturnAddressInstr = (
+  instr: Instr
+): instr is LoadReturnAddressInstr => {
+  return instr.type === 'LoadReturnAddress';
+};

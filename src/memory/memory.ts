@@ -66,8 +66,11 @@ export class Memory {
     }
   }
 
-  public stackFunctionCallAllocate(args: number[], numOfVars: number): void {
-    const returnAddress = this.textMemory.getNextInstrAddress();
+  public stackFunctionCallAllocate(
+    args: number[],
+    numOfVars: number,
+    returnAddress: number
+  ): void {
     this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
   }
 
@@ -85,6 +88,10 @@ export class Memory {
 
   public getNextInstr(): Instr {
     return this.textMemory.getNextInstr();
+  }
+
+  public getInstrAddressByOffset(offset: number): number {
+    return this.textMemory.getInstrAddressByOffset(offset);
   }
 
   public moveToNextInstr(): void {

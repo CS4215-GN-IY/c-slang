@@ -16,8 +16,8 @@ export class TextMemory {
     return this.instructions[this.rip + 1];
   }
 
-  public getNextInstrAddress(): number {
-    return this.rip + 1;
+  public getInstrAddressByOffset(offset: number): number {
+    return this.rip + offset;
   }
 
   public moveToNextInstr(): void {
