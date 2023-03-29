@@ -54,6 +54,7 @@ import {
   constructMatchCaseInstr,
   constructPopInstr,
   constructTeardownInstr,
+  constructUnaryOperationInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
@@ -95,6 +96,7 @@ import {
   getLabelEntry,
   updateLabelEntryInstrAddress
 } from './labelFrame';
+import { isUnaryOperator } from './virtualMachineUtils';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
@@ -535,7 +537,14 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
-  ) => {},
+  ) => {
+    if (isUnaryOperator(node.operator)) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+      const unaryOperationInstr = constructUnaryOperationInstr(node.operator);
+      instructions.push(unaryOperationInstr);
+      
+    }
+  },
   UpdateExpression: (
     node: UpdateExpression,
     instructions: Instr[],

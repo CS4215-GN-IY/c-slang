@@ -25,7 +25,8 @@ export type Instr =
   | LoadSymbolInstr
   | MatchCaseInstr
   | PopInstr
-  | TeardownInstr;
+  | TeardownInstr
+  | UnaryOperationInstr;
 
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
@@ -120,6 +121,11 @@ export interface TeardownInstr extends BaseInstr {
   type: 'Teardown';
 }
 
+export interface UnaryOperationInstr extends BaseInstr {
+  type: 'UnaryOperation';
+  operator: UnaryOperator;
+}
+
 export type BinaryOperator =
   | '*'
   | '/'
@@ -137,3 +143,6 @@ export type BinaryOperator =
   | '&'
   | '^'
   | '|';
+
+export const UNARY_OPERATORS = ['+', '-', '~', '!'] as const;
+export type UnaryOperator = (typeof UNARY_OPERATORS)[number];

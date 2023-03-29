@@ -1,5 +1,4 @@
 import { type TypeofResult } from './types/virtualMachineUtils';
-import { type BinaryOperator } from '../ast/types';
 import {
   TypeError,
   TypeErrorContext,
@@ -8,11 +7,18 @@ import {
 } from './errors';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 import { type Value } from './types/virtualMachine';
+import {
+  type BinaryOperator,
+  UNARY_OPERATORS,
+  type UnaryOperator
+} from './types/instructions';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 export const isTrue = (num: number): boolean => num !== FALSE_VALUE;
+export const isUnaryOperator = (operator: string): operator is UnaryOperator =>
+  UNARY_OPERATORS.includes(operator as UnaryOperator);
 
 export const convertToAddress = (address: Value): number => {
   return convertToNumber(address, TypeErrorContext.ADDRESS);
@@ -138,3 +144,27 @@ export function evaluateBinaryExpression(
       );
   }
 }
+
+export const evaluateUnaryOperation = (
+  operator: UnaryOperator,
+  operand: Value
+): Value => {
+  if (!isNumber(operand)) {
+    throw new TypeError('number', typeOf(operand), TypeErrorContext.NA);
+  }
+  switch (operator) {
+    case '+':
+      return operand;
+    case '-':
+      return -operand;
+    case '!':
+      return isTrue(operand) ? FALSE_VALUE : ARBITRARY_TRUE_VALUE;
+    case '~':
+      return ~operand;
+    default:
+      throw new UnsupportedOperatorError(
+        operator,
+        UnsupportedOperatorErrorType.UNARY
+      );
+  }
+};

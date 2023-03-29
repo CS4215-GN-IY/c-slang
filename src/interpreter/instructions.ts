@@ -19,7 +19,9 @@ import {
   type BreakDoneInstr,
   type BreakInstr,
   type ContinueInstr,
-  type ContinueDoneInstr
+  type ContinueDoneInstr,
+  type UnaryOperationInstr,
+  type UnaryOperator
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -135,4 +137,11 @@ export const constructPopInstr = (): PopInstr => ({
 
 export const constructTeardownInstr = (): TeardownInstr => ({
   type: 'Teardown'
+});
+
+export const constructUnaryOperationInstr = (
+  operator: UnaryOperator
+): UnaryOperationInstr => ({
+  type: 'UnaryOperation',
+  operator
 });

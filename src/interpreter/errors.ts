@@ -34,7 +34,8 @@ export class UnsupportedDeclarationError extends InterpreterError {}
 
 export enum UnsupportedOperatorErrorType {
   BINARY = 'binary ',
-  LOGICAL = 'logical '
+  LOGICAL = 'logical ',
+  UNARY = 'unary'
 }
 
 export class UnsupportedOperatorError extends InterpreterError {

@@ -25,12 +25,14 @@ import {
   type LoadSymbolInstr,
   type MatchCaseInstr,
   type PopInstr,
-  type TeardownInstr
+  type TeardownInstr,
+  type UnaryOperationInstr
 } from './types/instructions';
 import {
   convertToAddress,
   convertToPredicate,
   evaluateBinaryExpression,
+  evaluateUnaryOperation,
   isTrue,
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
@@ -190,5 +192,10 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToInstr(returnAddress);
+  },
+  UnaryOperation: (instr: UnaryOperationInstr, state: VirtualMachineState) => {
+    const operand = state.stash.pop();
+    state.stash.push(evaluateUnaryOperation(instr.operator, operand));
+    state.memory.moveToNextInstr();
   }
 };
