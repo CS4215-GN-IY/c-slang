@@ -32,11 +32,20 @@ export type Statement =
 
 export interface BaseStatement extends BaseNode {}
 
-export type LabeledStatement = IdentifierStatement | DefaultStatement;
+export type LabeledStatement =
+  | IdentifierStatement
+  | CaseStatement
+  | DefaultStatement;
 
 export interface IdentifierStatement extends BaseStatement {
   type: 'IdentifierStatement';
   label: Identifier;
+  body: Statement;
+}
+
+export interface CaseStatement extends BaseStatement {
+  type: 'CaseStatement';
+  label: Expression;
   body: Statement;
 }
 
@@ -87,21 +96,21 @@ export type IterationStatement =
 
 export interface DoWhileStatement extends BaseStatement {
   type: 'DoWhileStatement';
-  test: SequenceExpression;
+  predicate: SequenceExpression;
   body: Statement;
 }
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
   init?: VariableDeclaration | SequenceExpression;
-  test?: SequenceExpression;
+  predicate?: SequenceExpression;
   update?: SequenceExpression;
   body: Statement;
 }
 
 export interface WhileStatement extends BaseStatement {
   type: 'WhileStatement';
-  test: SequenceExpression;
+  predicate: SequenceExpression;
   body: Statement;
 }
 
@@ -211,23 +220,25 @@ export interface BinaryExpression extends BaseExpression {
   right: Expression;
 }
 
-export type BinaryOperator =
-  | '*'
-  | '/'
-  | '%'
-  | '+'
-  | '-'
-  | '<<'
-  | '>>'
-  | '<'
-  | '>'
-  | '<='
-  | '>='
-  | '=='
-  | '!='
-  | '&'
-  | '^'
-  | '|';
+export const BINARY_OPERATORS = [
+  '*',
+  '/',
+  '%',
+  '+',
+  '-',
+  '<<',
+  '>>',
+  '<',
+  '>',
+  '<=',
+  '>=',
+  '==',
+  '!=',
+  '&',
+  '^',
+  '|'
+] as const;
+export type BinaryOperator = (typeof BINARY_OPERATORS)[number];
 
 export interface LogicalExpression extends BaseExpression {
   type: 'LogicalExpression';

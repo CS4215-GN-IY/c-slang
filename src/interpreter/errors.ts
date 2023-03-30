@@ -2,6 +2,8 @@ export class InterpreterError extends Error {}
 
 export class InvalidCallError extends InterpreterError {}
 
+export class InvalidLValueError extends InterpreterError {}
+
 export class InvalidScopeError extends InterpreterError {}
 
 export class RedeclaredNameError extends InterpreterError {}
@@ -32,7 +34,8 @@ export class UnsupportedDeclarationError extends InterpreterError {}
 
 export enum UnsupportedOperatorErrorType {
   BINARY = 'binary ',
-  LOGICAL = 'logical '
+  LOGICAL = 'logical ',
+  UNARY = 'unary '
 }
 
 export class UnsupportedOperatorError extends InterpreterError {

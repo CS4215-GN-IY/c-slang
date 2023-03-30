@@ -19,9 +19,13 @@ import {
   UndeclaredNameError,
   UnsupportedDeclarationError
 } from './errors';
-import { isEmptyStatement, isVariableDeclaration } from '../ast/typeGuards';
+import {
+  isEmptyStatement,
+  isForStatement,
+  isVariableDeclaration
+} from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
-import { isNotNull } from '../utils/typeGuards';
+import { isNotNull, isNotUndefined } from '../utils/typeGuards';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -78,18 +82,26 @@ export const addFunctionSymbolTableEntries = (
   });
 
   offset = 0;
-  const bodyDeclarations = isEmptyStatement(node.body)
-    ? []
-    : node.body.items.filter(isVariableDeclaration);
-  bodyDeclarations.forEach((declaration) => {
-    const entries = constructVariableDeclarationSymbolTableEntries(
-      declaration,
-      'Function',
-      offset
-    );
-    addToFrame(frame, ...entries);
-    offset += entries.length;
-  });
+  if (!isEmptyStatement(node.body)) {
+    node.body.items.forEach((item) => {
+      const declaration = isVariableDeclaration(item)
+        ? item
+        : isForStatement(item) &&
+          isNotUndefined(item.init) &&
+          isVariableDeclaration(item.init)
+        ? item.init
+        : undefined;
+      if (isNotUndefined(declaration)) {
+        const entries = constructVariableDeclarationSymbolTableEntries(
+          declaration,
+          'Function',
+          offset
+        );
+        addToFrame(frame, ...entries);
+        offset += entries.length;
+      }
+    });
+  }
 
   const functionEntry = getFunctionSymbolTableEntry(node.id.name, symbolTable);
   functionEntry.numOfVariables += offset;
@@ -110,17 +122,23 @@ export const addBlockSymbolTableEntries = (
     throw new InvalidScopeError('Block is not inside a function.');
   }
   let offset = symbolTable.parent.numOfVariables;
-  const declarations = block.items.filter((item): item is VariableDeclaration =>
-    isVariableDeclaration(item)
-  );
-  declarations.forEach((declaration) => {
-    const entries = constructVariableDeclarationSymbolTableEntries(
-      declaration,
-      'Block',
-      offset
-    );
-    addToFrame(frame, ...entries);
-    offset += entries.length;
+  block.items.forEach((item) => {
+    const declaration = isVariableDeclaration(item)
+      ? item
+      : isForStatement(item) &&
+        isNotUndefined(item.init) &&
+        isVariableDeclaration(item.init)
+      ? item.init
+      : undefined;
+    if (isNotUndefined(declaration)) {
+      const entries = constructVariableDeclarationSymbolTableEntries(
+        declaration,
+        'Block',
+        offset
+      );
+      addToFrame(frame, ...entries);
+      offset += entries.length;
+    }
   });
 
   symbolTable.parent.numOfVariables = offset;

@@ -7,21 +7,35 @@ import {
 import {
   type AssignInstr,
   type BinaryOperationInstr,
+  type BreakDoneInstr,
+  type BreakInstr,
   type CallInstr,
+  type ContinueDoneInstr,
+  type ContinueInstr,
   type DoneInstr,
   type EnterProgramInstr,
-  type GotoInstr,
+  type FallthroughDoneInstr,
+  type FallthroughInstr,
+  type JumpInstr,
   type Instr,
   type JumpOnFalseInstr,
+  type JumpOnTrueInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
-  type TeardownInstr
+  type MatchCaseInstr,
+  type PopInstr,
+  type TeardownInstr,
+  type UnaryOperationInstr,
+  type LoadAddressInstr,
+  type TailCallInstr,
+  type LoadReturnAddressInstr
 } from './types/instructions';
 import {
   convertToAddress,
   convertToPredicate,
   evaluateBinaryExpression,
+  evaluateUnaryOperation,
   isTrue,
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
@@ -86,22 +100,48 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.stash.push(evaluateBinaryExpression(instr.operator, left, right));
     state.memory.moveToNextInstr();
   },
+  Break: (instr: BreakInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('BreakDone');
+  },
+  BreakDone: (instr: BreakDoneInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstr();
+  },
   Call: (instr: CallInstr, state: VirtualMachineState) => {
+    const returnAddress = state.stash.pop();
     // First item popped from the stash should be the arg for the first param and so on.
     const args: Value[] = [];
     for (let i = 0; i < instr.numOfArgs; i++) {
       args.push(state.stash.pop());
     }
     const functionInstrAddress = convertToAddress(state.stash.pop());
-    state.memory.stackFunctionCallAllocate(args, instr.numOfVars);
+    state.memory.stackFunctionCallAllocate(
+      args,
+      instr.numOfVars,
+      returnAddress
+    );
     state.memory.moveToInstr(functionInstrAddress);
+  },
+  Continue: (instr: ContinueInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('ContinueDone');
+  },
+  ContinueDone: (instr: ContinueDoneInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstr();
   },
   Done: (instr: DoneInstr, state: VirtualMachineState) => {},
   EnterProgram: (instr: EnterProgramInstr, state: VirtualMachineState) => {
     state.memory.dataAllocate(instr.numOfDeclarations);
     state.memory.moveToNextInstr();
   },
-  Goto: (instr: GotoInstr, state: VirtualMachineState) => {
+  Fallthrough: (instr: FallthroughInstr, state: VirtualMachineState) => {
+    state.memory.moveToNextInstrAfterType('FallthroughDone');
+  },
+  FallthroughDone: (
+    instr: FallthroughDoneInstr,
+    state: VirtualMachineState
+  ) => {
+    state.memory.moveToNextInstr();
+  },
+  Jump: (instr: JumpInstr, state: VirtualMachineState) => {
     state.memory.moveToInstr(instr.instrAddress);
   },
   JumpOnFalse: (instr: JumpOnFalseInstr, state: VirtualMachineState) => {
@@ -112,6 +152,19 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       state.memory.moveToInstr(instr.instrAddress);
     }
   },
+  JumpOnTrue: (instr: JumpOnTrueInstr, state: VirtualMachineState) => {
+    const predicate = convertToPredicate(state.stash.pop());
+    if (isTrue(predicate)) {
+      state.memory.moveToInstr(instr.instrAddress);
+    } else {
+      state.memory.moveToNextInstr();
+    }
+  },
+  LoadAddress: (instr: LoadAddressInstr, state: VirtualMachineState) => {
+    const address = state.memory.getAddressAtOffset(instr.scope, instr.offset);
+    state.stash.push(address);
+    state.memory.moveToNextInstr();
+  },
   LoadConstant: (instr: LoadConstantInstr, state: VirtualMachineState) => {
     state.stash.push(instr.value);
     state.memory.moveToNextInstr();
@@ -120,26 +173,57 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.stash.push(instr.functionInstrAddress);
     state.memory.moveToNextInstr();
   },
+  LoadReturnAddress: (
+    instr: LoadReturnAddressInstr,
+    state: VirtualMachineState
+  ) => {
+    state.stash.push(state.memory.getInstrAddressByOffset(2));
+    state.memory.moveToNextInstr();
+  },
   LoadSymbol: (instr: LoadSymbolInstr, state: VirtualMachineState) => {
     const value = state.memory.getByOffset(instr.scope, instr.offset);
     state.stash.push(value);
     state.memory.moveToNextInstr();
   },
-  Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
-    // Topmost return value should be from the rightmost return argument. We only want that.
-    // TODO: Replace this if the logic is shifted to be handled in sequence expression.
-    if (instr.numOfReturnArgs > 0) {
-      const returnValue = state.stash.pop();
-      let numOfUnusedReturnValues = instr.numOfReturnArgs - 1;
-      while (numOfUnusedReturnValues > 0) {
-        state.stash.pop();
-        numOfUnusedReturnValues -= 1;
-      }
-      state.stash.push(returnValue);
+  MatchCase: (instr: MatchCaseInstr, state: VirtualMachineState) => {
+    const caseValue = state.stash.pop();
+    const valueToMatch = state.stash.peek();
+    const fallthroughDoneInstrType = 'FallthroughDone';
+    if (caseValue === valueToMatch) {
+      state.memory.moveToNextInstrAfterType(fallthroughDoneInstrType);
+      // Once a match is found, there is no need to match again, pop valueToMatch.
+      state.stash.pop();
+      return;
     }
-
+    if (state.memory.getNextInstr().type === fallthroughDoneInstrType) {
+      const fallthroughInstrType = 'Fallthrough';
+      state.memory.moveToNextInstrAfterType(fallthroughInstrType);
+    } else {
+      state.memory.moveToNextInstr();
+    }
+  },
+  Pop: (instr: PopInstr, state: VirtualMachineState) => {
+    if (state.stash.size() > 0) {
+      state.stash.pop();
+    }
+    state.memory.moveToNextInstr();
+  },
+  TailCall: (instr: TailCallInstr, state: VirtualMachineState) => {
+    const returnAddress = state.memory.getReturnAddress();
+    state.stash.push(returnAddress);
+    state.memory.stackFunctionCallTeardown();
+    state.memory.moveToNextInstr();
+  },
+  Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
     const returnAddress = state.memory.getReturnAddress();
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToInstr(returnAddress);
+  },
+  UnaryOperation: (instr: UnaryOperationInstr, state: VirtualMachineState) => {
+    const operand = state.stash.pop();
+    state.stash.push(
+      evaluateUnaryOperation(instr.operator, operand, state.memory)
+    );
+    state.memory.moveToNextInstr();
   }
 };

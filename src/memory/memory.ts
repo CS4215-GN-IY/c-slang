@@ -55,8 +55,22 @@ export class Memory {
     }
   }
 
-  public stackFunctionCallAllocate(args: number[], numOfVars: number): void {
-    const returnAddress = this.textMemory.getNextInstrAddress();
+  public getAddressAtOffset(segment: Segment, offset: number): number {
+    switch (segment) {
+      case Segment.DATA:
+        return this.virtualMemory.dataGetAddressAtOffset(offset);
+      case Segment.STACK:
+        return this.virtualMemory.stackGetAddressAtOffset(offset);
+      default:
+        throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
+    }
+  }
+
+  public stackFunctionCallAllocate(
+    args: number[],
+    numOfVars: number,
+    returnAddress: number
+  ): void {
     this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
   }
 
@@ -72,12 +86,24 @@ export class Memory {
     return this.textMemory.getCurrentInstr();
   }
 
+  public getNextInstr(): Instr {
+    return this.textMemory.getNextInstr();
+  }
+
+  public getInstrAddressByOffset(offset: number): number {
+    return this.textMemory.getInstrAddressByOffset(offset);
+  }
+
   public moveToNextInstr(): void {
     this.textMemory.moveToNextInstr();
   }
 
   public moveToInstr(instrAddress: number): void {
     this.textMemory.moveToInstr(instrAddress);
+  }
+
+  public moveToNextInstrAfterType(type: string): void {
+    this.textMemory.moveToNextInstrAfterType(type);
   }
 
   public isAtDoneInstr(): boolean {

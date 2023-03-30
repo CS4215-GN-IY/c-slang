@@ -1,18 +1,25 @@
 import { type TypeofResult } from './types/virtualMachineUtils';
-import { type BinaryOperator } from '../ast/types';
 import {
   TypeError,
   TypeErrorContext,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
-import { FALSE_VALUE } from '../utils/constants';
+import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 import { type Value } from './types/virtualMachine';
+import {
+  type BinaryOperator,
+  UNARY_OPERATORS,
+  type UnaryOperator
+} from './types/instructions';
+import { type Memory } from '../memory/memory';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
 const isString = (v: Value): v is string => typeOf(v) === 'string';
 export const isTrue = (num: number): boolean => num !== FALSE_VALUE;
+export const isUnaryOperator = (operator: string): operator is UnaryOperator =>
+  UNARY_OPERATORS.includes(operator as UnaryOperator);
 
 export const convertToAddress = (address: Value): number => {
   return convertToNumber(address, TypeErrorContext.ADDRESS);
@@ -20,6 +27,10 @@ export const convertToAddress = (address: Value): number => {
 
 export const convertToPredicate = (value: Value): number => {
   return convertToNumber(value, TypeErrorContext.PREDICATE);
+};
+
+export const convertBooleanToPredicate = (value: boolean): number => {
+  return value ? ARBITRARY_TRUE_VALUE : FALSE_VALUE;
 };
 
 export const convertToNumber = (
@@ -42,6 +53,11 @@ export const typeCheckBinaryOperation = (
     case '*':
     case '/':
     case '%':
+    case '<<':
+    case '>>':
+    case '&':
+    case '^':
+    case '|':
       if (!isNumber(left)) {
         throw new TypeError('number', typeOf(left), TypeErrorContext.LHS);
       }
@@ -67,6 +83,9 @@ export const typeCheckBinaryOperation = (
       if (isString(left) && !isString(right)) {
         throw new TypeError('string', typeOf(right), TypeErrorContext.RHS);
       }
+      break;
+    case '==':
+    case '!=':
       break;
     default:
       throw new UnsupportedOperatorError(
@@ -98,13 +117,27 @@ export function evaluateBinaryExpression(
     case '%':
       return left % right;
     case '<=':
-      return left <= right;
+      return convertBooleanToPredicate(left <= right);
     case '<':
-      return left < right;
+      return convertBooleanToPredicate(left < right);
     case '>':
-      return left > right;
+      return convertBooleanToPredicate(left > right);
     case '>=':
-      return left >= right;
+      return convertBooleanToPredicate(left >= right);
+    case '<<':
+      return left << right;
+    case '>>':
+      return left >> right;
+    case '&':
+      return left & right;
+    case '^':
+      return left ^ right;
+    case '|':
+      return left | right;
+    case '==':
+      return convertBooleanToPredicate(left === right);
+    case '!=':
+      return convertBooleanToPredicate(left !== right);
     default:
       throw new UnsupportedOperatorError(
         operator,
@@ -112,3 +145,30 @@ export function evaluateBinaryExpression(
       );
   }
 }
+
+export const evaluateUnaryOperation = (
+  operator: UnaryOperator,
+  operand: Value,
+  memory: Memory
+): Value => {
+  if (!isNumber(operand)) {
+    throw new TypeError('number', typeOf(operand), TypeErrorContext.NA);
+  }
+  switch (operator) {
+    case '+':
+      return operand;
+    case '-':
+      return -operand;
+    case '!':
+      return isTrue(operand) ? FALSE_VALUE : ARBITRARY_TRUE_VALUE;
+    case '~':
+      return ~operand;
+    case '*':
+      return memory.get(operand);
+    default:
+      throw new UnsupportedOperatorError(
+        operator,
+        UnsupportedOperatorErrorType.UNARY
+      );
+  }
+};

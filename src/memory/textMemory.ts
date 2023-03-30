@@ -12,8 +12,12 @@ export class TextMemory {
     return this.instructions[this.rip];
   }
 
-  public getNextInstrAddress(): number {
-    return this.rip + 1;
+  public getNextInstr(): Instr {
+    return this.instructions[this.rip + 1];
+  }
+
+  public getInstrAddressByOffset(offset: number): number {
+    return this.rip + offset;
   }
 
   public moveToNextInstr(): void {
@@ -22,6 +26,14 @@ export class TextMemory {
 
   public moveToInstr(instrAddress: number): void {
     this.rip = instrAddress;
+  }
+
+  public moveToNextInstrAfterType(type: string): void {
+    this.rip += 1;
+    while (this.instructions[this.rip].type !== type) {
+      this.rip += 1;
+    }
+    this.rip += 1;
   }
 
   public isDone(): boolean {

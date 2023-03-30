@@ -4,9 +4,14 @@ import {
 } from './astBuilderInternalTypes';
 import {
   type BaseNode,
+  BINARY_OPERATORS,
+  type BinaryOperator,
+  type CaseStatement,
   type Constant,
   type EmptyStatement,
+  type ForStatement,
   type Identifier,
+  type IdentifierStatement,
   type VariableDeclaration
 } from './types';
 
@@ -30,6 +35,27 @@ export const isVariableDeclaration = (
   return node.type === 'VariableDeclaration';
 };
 
+export const isCaseStatement = (node: BaseNode): node is CaseStatement => {
+  return node.type === 'CaseStatement';
+};
+
 export const isEmptyStatement = (node: BaseNode): node is EmptyStatement => {
   return node.type === 'EmptyStatement';
+};
+
+export const isForStatement = (node: BaseNode): node is ForStatement => {
+  return node.type === 'ForStatement';
+};
+
+export const isIdentifierStatement = (
+  node: BaseNode
+): node is IdentifierStatement => {
+  return node.type === 'IdentifierStatement';
+};
+
+export const isBinaryOperator = (
+  operator: string
+): operator is BinaryOperator => {
+  // Typecast is safe as it is only used to check if the operator is a binary operator.
+  return BINARY_OPERATORS.includes(operator as BinaryOperator);
 };

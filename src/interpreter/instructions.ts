@@ -3,14 +3,29 @@ import {
   type CallInstr,
   type DoneInstr,
   type TeardownInstr,
-  type GotoInstr,
+  type JumpInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
   type LoadSymbolInstr,
   type EnterProgramInstr,
   type BinaryOperationInstr,
   type BinaryOperator,
-  type JumpOnFalseInstr
+  type JumpOnFalseInstr,
+  type PopInstr,
+  type MatchCaseInstr,
+  type FallthroughInstr,
+  type FallthroughDoneInstr,
+  type JumpOnTrueInstr,
+  type BreakDoneInstr,
+  type BreakInstr,
+  type ContinueInstr,
+  type ContinueDoneInstr,
+  type UnaryOperationInstr,
+  type UnaryOperator,
+  type LoadAddressInstr,
+  type Instr,
+  type TailCallInstr,
+  type LoadReturnAddressInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -31,6 +46,14 @@ export const constructBinaryOperationInstr = (
   operator
 });
 
+export const constructBreakInstr = (): BreakInstr => ({
+  type: 'Break'
+});
+
+export const constructBreakDoneInstr = (): BreakDoneInstr => ({
+  type: 'BreakDone'
+});
+
 export const constructCallInstr = (
   numOfArgs: number,
   numOfVars: number
@@ -38,6 +61,14 @@ export const constructCallInstr = (
   type: 'Call',
   numOfArgs,
   numOfVars
+});
+
+export const constructContinueInstr = (): ContinueInstr => ({
+  type: 'Continue'
+});
+
+export const constructContinueDoneInstr = (): ContinueDoneInstr => ({
+  type: 'ContinueDone'
 });
 
 export const constructDoneInstr = (): DoneInstr => ({
@@ -51,8 +82,16 @@ export const constructEnterProgramInstr = (
   numOfDeclarations
 });
 
-export const constructGotoInstr = (instrAddress: number): GotoInstr => ({
-  type: 'Goto',
+export const constructFallthroughInstr = (): FallthroughInstr => ({
+  type: 'Fallthrough'
+});
+
+export const constructFallthroughDoneInstr = (): FallthroughDoneInstr => ({
+  type: 'FallthroughDone'
+});
+
+export const constructJumpInstr = (instrAddress: number): JumpInstr => ({
+  type: 'Jump',
   instrAddress
 });
 
@@ -61,6 +100,21 @@ export const constructJumpOnFalseInstr = (
 ): JumpOnFalseInstr => ({
   type: 'JumpOnFalse',
   instrAddress
+});
+
+export const constructJumpOnTrueInstr = (
+  instrAddress: number
+): JumpOnTrueInstr => ({
+  type: 'JumpOnTrue',
+  instrAddress
+});
+
+export const constructLoadAddressInstr = (
+  entry: SymbolTableEntry
+): LoadAddressInstr => ({
+  type: 'LoadAddress',
+  scope: getSegmentScope(entry.scope),
+  offset: entry.offset
 });
 
 export const constructLoadConstantInstr = (
@@ -77,6 +131,10 @@ export const constructLoadFunctionInstr = (
   functionInstrAddress
 });
 
+export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
+  type: 'LoadReturnAddress'
+});
+
 export const constructLoadSymbolInstr = (
   entry: SymbolTableEntry
 ): LoadSymbolInstr => ({
@@ -85,9 +143,31 @@ export const constructLoadSymbolInstr = (
   offset: entry.offset
 });
 
-export const constructTeardownInstr = (
-  numOfReturnArgs: number
-): TeardownInstr => ({
-  type: 'Teardown',
-  numOfReturnArgs
+export const constructMatchCaseInstr = (): MatchCaseInstr => ({
+  type: 'MatchCase'
 });
+
+export const constructPopInstr = (): PopInstr => ({
+  type: 'Pop'
+});
+
+export const constructTailCallInstr = (): TailCallInstr => ({
+  type: 'TailCall'
+});
+
+export const constructTeardownInstr = (): TeardownInstr => ({
+  type: 'Teardown'
+});
+
+export const constructUnaryOperationInstr = (
+  operator: UnaryOperator
+): UnaryOperationInstr => ({
+  type: 'UnaryOperation',
+  operator
+});
+
+export const isLoadReturnAddressInstr = (
+  instr: Instr
+): instr is LoadReturnAddressInstr => {
+  return instr.type === 'LoadReturnAddress';
+};

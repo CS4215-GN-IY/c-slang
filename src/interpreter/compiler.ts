@@ -6,6 +6,7 @@ import {
   type BlockStatement,
   type BreakStatement,
   type CallExpression,
+  type CaseStatement,
   type ConditionalExpression,
   type Constant,
   type ContinueStatement,
@@ -35,18 +36,37 @@ import {
 import {
   constructAssignInstr,
   constructBinaryOperationInstr,
+  constructBreakDoneInstr,
+  constructBreakInstr,
   constructCallInstr,
+  constructContinueDoneInstr,
+  constructContinueInstr,
   constructDoneInstr,
   constructEnterProgramInstr,
-  constructGotoInstr,
+  constructFallthroughDoneInstr,
+  constructFallthroughInstr,
+  constructJumpInstr,
   constructJumpOnFalseInstr,
+  constructJumpOnTrueInstr,
+  constructLoadAddressInstr,
   constructLoadConstantInstr,
   constructLoadFunctionInstr,
+  constructLoadReturnAddressInstr,
   constructLoadSymbolInstr,
+  constructMatchCaseInstr,
+  constructPopInstr,
+  constructTailCallInstr,
   constructTeardownInstr,
+  constructUnaryOperationInstr,
+  isLoadReturnAddressInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
-import { isEmptyStatement, isIdentifier } from '../ast/typeGuards';
+import {
+  isBinaryOperator,
+  isCaseStatement,
+  isEmptyStatement,
+  isIdentifier
+} from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
@@ -54,12 +74,15 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import {
+  constructAssignmentExpression,
+  constructBinaryExpression,
   constructConditionalExpression,
   constructFalseConstant,
   constructMainCallExpression,
+  constructOneConstant,
   constructTrueConstant
 } from '../ast/constructors';
-import { type SymbolTable } from './types/symbolTable';
+import { type LabelFrame, type SymbolTable } from './types/symbolTable';
 import {
   addBlockSymbolTableEntries,
   addFunctionSymbolTableEntries,
@@ -69,7 +92,18 @@ import {
   getSymbolTableEntry,
   getSymbolTableEntryInFrame
 } from './symbolTable';
-import { type Instr } from './types/instructions';
+import { type Instr, type JumpOnFalseInstr } from './types/instructions';
+import {
+  constructAssignmentExpressionAssignInstr,
+  getSymbolTableEntryOfExpression
+} from './compilerUtils';
+import {
+  addBlockLabelFrameEntries,
+  constructFunctionLabelFrame,
+  getLabelEntry,
+  updateLabelEntryInstrAddress
+} from './labelFrame';
+import { isUnaryOperator } from './virtualMachineUtils';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
@@ -78,60 +112,90 @@ export const compileProgram = (ast: Program): Instr[] => {
     parent: null
   };
   const instructions: Instr[] = [];
-  compile(ast, instructions, symbolTable);
+  const labelFrame: LabelFrame = {};
+  compile(ast, instructions, symbolTable, labelFrame);
   return instructions;
 };
 
 const compile = (
   node: Node,
   instructions: Instr[],
-  symbolTable: SymbolTable
+  symbolTable: SymbolTable,
+  labelFrame: LabelFrame
 ): void => {
   // The typecast allows for mapping to a specific evaluator instr type from their union type.
   // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
-  compilers[node.type](node as any, instructions, symbolTable);
+  compilers[node.type](node as any, instructions, symbolTable, labelFrame);
 };
 
 const compilers: CompilerMapping = {
   ArrayAccessExpression: (
     node: ArrayAccessExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {},
   AssignmentExpression: (
     node: AssignmentExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    const binaryOperator = node.operator.slice(0, -1);
+    if (isBinaryOperator(binaryOperator)) {
+      const binaryExpression = constructBinaryExpression(
+        binaryOperator,
+        node.left,
+        node.right
+      );
+      compile(binaryExpression, instructions, symbolTable, labelFrame);
+    } else {
+      compile(node.right, instructions, symbolTable, labelFrame);
+    }
+    const assignInstr = constructAssignmentExpressionAssignInstr(
+      node.left,
+      symbolTable
+    );
+    instructions.push(assignInstr);
+  },
   BinaryExpression: (
     node: BinaryExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
-    compile(node.left, instructions, symbolTable);
-    compile(node.right, instructions, symbolTable);
+    compile(node.left, instructions, symbolTable, labelFrame);
+    compile(node.right, instructions, symbolTable, labelFrame);
     const binaryOperationInstr = constructBinaryOperationInstr(node.operator);
     instructions.push(binaryOperationInstr);
   },
   BlockStatement: (
     node: BlockStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     const blockSymbolTable = addBlockSymbolTableEntries(node, symbolTable);
+    addBlockLabelFrameEntries(node, labelFrame);
     node.items.forEach((item) => {
-      compile(item, instructions, blockSymbolTable);
+      compile(item, instructions, blockSymbolTable, labelFrame);
     });
   },
   BreakStatement: (
     node: BreakStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    // TODO: Figure out how to check that a break statement is only in a loop or switch block.
+    const breakInstr = constructBreakInstr();
+    instructions.push(breakInstr);
+  },
   CallExpression: (
     node: CallExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     if (!isIdentifier(node.callee)) {
       throw new InvalidCallError('Cannot call non-identifier.');
@@ -146,35 +210,58 @@ const compilers: CompilerMapping = {
       );
     }
 
-    compile(node.callee, instructions, symbolTable);
+    compile(node.callee, instructions, symbolTable, labelFrame);
     node.arguments.forEach((arg) => {
-      compile(arg, instructions, symbolTable);
+      compile(arg, instructions, symbolTable, labelFrame);
     });
+    const loadReturnAddressInstr = constructLoadReturnAddressInstr();
+    instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
       functionEntry.numOfVariables
     );
     instructions.push(callInstr);
   },
+  CaseStatement: (
+    node: CaseStatement,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    compile(node.label, instructions, symbolTable, labelFrame);
+    const matchCaseInstr = constructMatchCaseInstr();
+    instructions.push(matchCaseInstr);
+    if (!isCaseStatement(node.body)) {
+      const fallthroughDoneInstr = constructFallthroughDoneInstr();
+      instructions.push(fallthroughDoneInstr);
+    }
+    compile(node.body, instructions, symbolTable, labelFrame);
+    if (!isCaseStatement(node.body)) {
+      const fallthroughInstr = constructFallthroughInstr();
+      instructions.push(fallthroughInstr);
+    }
+  },
   ConditionalExpression: (
     node: ConditionalExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
-    compile(node.predicate, instructions, symbolTable);
+    compile(node.predicate, instructions, symbolTable, labelFrame);
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
-    compile(node.consequent, instructions, symbolTable);
-    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    instructions.push(gotoInstr);
+    compile(node.consequent, instructions, symbolTable, labelFrame);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;
-    compile(node.alternate, instructions, symbolTable);
-    gotoInstr.instrAddress = instructions.length;
+    compile(node.alternate, instructions, symbolTable, labelFrame);
+    jumpInstr.instrAddress = instructions.length;
   },
   Constant: (
     node: Constant,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     const loadConstantInstr = constructLoadConstantInstr(node.value);
     instructions.push(loadConstantInstr);
@@ -182,42 +269,97 @@ const compilers: CompilerMapping = {
   ContinueStatement: (
     node: ContinueStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    const continueInstr = constructContinueInstr();
+    instructions.push(continueInstr);
+  },
   DefaultStatement: (
     node: DefaultStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    // If this pop instruction is reached, no cases matched, pop value used for matching from the virtual machine stash.
+    const popInstr = constructPopInstr();
+    instructions.push(popInstr);
+    const fallthroughDoneInstr = constructFallthroughDoneInstr();
+    instructions.push(fallthroughDoneInstr);
+    compile(node.body, instructions, symbolTable, labelFrame);
+  },
   DoWhileStatement: (
     node: DoWhileStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    const loopStart = instructions.length;
+    compile(node.body, instructions, symbolTable, labelFrame);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
+    compile(node.predicate, instructions, symbolTable, labelFrame);
+    const jumpOnTrueInstr = constructJumpOnTrueInstr(loopStart);
+    instructions.push(jumpOnTrueInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
+  },
   EmptyStatement: (
     node: EmptyStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {},
   ExpressionStatement: (
     node: ExpressionStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    compile(node.sequence, instructions, symbolTable, labelFrame);
+    const popInstr = constructPopInstr();
+    instructions.push(popInstr);
+  },
   ForStatement: (
     node: ForStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    if (isNotUndefined(node.init)) {
+      compile(node.init, instructions, symbolTable, labelFrame);
+    }
+    const loopStart = instructions.length;
+    let jumpOnFalseInstr: JumpOnFalseInstr | undefined;
+    if (isNotUndefined(node.predicate)) {
+      compile(node.predicate, instructions, symbolTable, labelFrame);
+      jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+      instructions.push(jumpOnFalseInstr);
+    }
+    compile(node.body, instructions, symbolTable, labelFrame);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
+    if (isNotUndefined(node.update)) {
+      compile(node.update, instructions, symbolTable, labelFrame);
+    }
+    const jumpInstr = constructJumpInstr(loopStart);
+    instructions.push(jumpInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
+    if (isNotUndefined(jumpOnFalseInstr)) {
+      jumpOnFalseInstr.instrAddress = instructions.length;
+    }
+  },
   FunctionDeclaration: (
     node: FunctionDeclaration,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     const loadFunctionInstr = constructLoadFunctionInstr(PLACEHOLDER_ADDRESS);
     instructions.push(loadFunctionInstr);
-    const gotoInstr = constructGotoInstr(PLACEHOLDER_ADDRESS);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
 
     loadFunctionInstr.functionInstrAddress = instructions.length;
 
@@ -227,16 +369,16 @@ const compilers: CompilerMapping = {
       node,
       symbolTable
     );
+    const newLabelFrame = constructFunctionLabelFrame(node);
     if (!isEmptyStatement(node.body)) {
       node.body.items.forEach((item) => {
-        compile(item, instructions, functionSymbolTable);
+        compile(item, instructions, functionSymbolTable, newLabelFrame);
       });
     }
-    // This will be executed only if the function does not encounter any return statement. So numOfReturnArgs is 0.
-    const teardownInstr = constructTeardownInstr(0);
+    const teardownInstr = constructTeardownInstr();
     instructions.push(teardownInstr);
 
-    gotoInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddress = instructions.length;
 
     const assignInstr = constructAssignInstr(
       getSymbolTableEntry(node.id.name, symbolTable)
@@ -246,12 +388,18 @@ const compilers: CompilerMapping = {
   GotoStatement: (
     node: GotoStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    const labelEntry = getLabelEntry(node.argument.name, labelFrame);
+    const jumpInstr = constructJumpInstr(labelEntry.instrAddress);
+    instructions.push(jumpInstr);
+  },
   Identifier: (
     node: Identifier,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     const loadSymbolInstr = constructLoadSymbolInstr(
       getSymbolTableEntry(node.name, symbolTable)
@@ -261,17 +409,39 @@ const compilers: CompilerMapping = {
   IdentifierStatement: (
     node: IdentifierStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    updateLabelEntryInstrAddress(
+      node.label.name,
+      instructions.length,
+      labelFrame
+    );
+    compile(node.body, instructions, symbolTable, labelFrame);
+  },
   IfStatement: (
     node: IfStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    compile(node.predicate, instructions, symbolTable, labelFrame);
+    const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpOnFalseInstr);
+    compile(node.consequent, instructions, symbolTable, labelFrame);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
+    jumpOnFalseInstr.instrAddress = instructions.length;
+    if (isNotUndefined(node.alternate)) {
+      compile(node.alternate, instructions, symbolTable, labelFrame);
+    }
+    jumpInstr.instrAddress = instructions.length;
+  },
   LogicalExpression: (
     node: LogicalExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     let conditionalExpression;
     if (node.operator === '&&') {
@@ -294,83 +464,149 @@ const compilers: CompilerMapping = {
         UnsupportedOperatorErrorType.LOGICAL
       );
     }
-    compile(conditionalExpression, instructions, symbolTable);
+    compile(conditionalExpression, instructions, symbolTable, labelFrame);
   },
   MemberExpression: (
     node: MemberExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {},
-  Program: (node: Program, instructions: Instr[], symbolTable: SymbolTable) => {
+  Program: (
+    node: Program,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame
+  ) => {
     const programSymbolTable = addProgramSymbolTableEntries(node, symbolTable);
     const enterProgramInstr = constructEnterProgramInstr(
       getNumOfEntriesInFrame(programSymbolTable.head)
     );
     instructions.push(enterProgramInstr);
     node.body.forEach((item) => {
-      compile(item, instructions, programSymbolTable);
+      compile(item, instructions, programSymbolTable, labelFrame);
     });
     const mainCallExpression = constructMainCallExpression();
-    compile(mainCallExpression, instructions, programSymbolTable);
+    compile(mainCallExpression, instructions, programSymbolTable, labelFrame);
     const doneInstr = constructDoneInstr();
     instructions.push(doneInstr);
   },
   ReturnStatement: (
     node: ReturnStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
-    // TODO: Check if return with no argument works correctly.
-    let numOfReturnArgs = 0;
     if (isNotUndefined(node.argument)) {
-      numOfReturnArgs = node.argument.expressions.length;
-      // Should evaluate arguments from left to right.
-      node.argument.expressions.forEach((arg) => {
-        compile(arg, instructions, symbolTable);
-      });
+      compile(node.argument, instructions, symbolTable, labelFrame);
     }
-    // TODO: Handle tail call.
-    const teardownInstr = constructTeardownInstr(numOfReturnArgs);
-    instructions.push(teardownInstr);
+    // Perform a tail call if the last instruction is a CallInstr.
+    // A CallInstr should be preceded by a LoadReturnAddressInstr,
+    // so we can check whether the second last instruction is that.
+    if (isLoadReturnAddressInstr(instructions[instructions.length - 2])) {
+      instructions[instructions.length - 2] = constructTailCallInstr();
+    } else {
+      const teardownInstr = constructTeardownInstr();
+      instructions.push(teardownInstr);
+    }
   },
   SequenceExpression: (
     node: SequenceExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
+    if (node.expressions.length === 0) {
+      return;
+    }
     node.expressions.forEach((expression) => {
-      compile(expression, instructions, symbolTable);
+      compile(expression, instructions, symbolTable, labelFrame);
+      const popInstr = constructPopInstr();
+      instructions.push(popInstr);
     });
+    // Remove the last pop instruction as we want to
+    // pop everything from the virtual machine stash except the last expression.
+    instructions.pop();
   },
   StringLiteral: (
     node: StringLiteral,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {},
   SwitchStatement: (
     node: SwitchStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    compile(node.discriminant, instructions, symbolTable, labelFrame);
+    compile(node.body, instructions, symbolTable, labelFrame);
+    const fallthroughDoneInstr = constructFallthroughDoneInstr();
+    instructions.push(fallthroughDoneInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
+  },
   UnaryExpression: (
     node: UnaryExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    if (isUnaryOperator(node.operator)) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+      const unaryOperationInstr = constructUnaryOperationInstr(node.operator);
+      instructions.push(unaryOperationInstr);
+      return;
+    }
+
+    if (node.operator === '&') {
+      const symbolTableEntry = getSymbolTableEntryOfExpression(
+        node.operand,
+        symbolTable
+      );
+      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+      instructions.push(loadAddressInstr);
+      return;
+    }
+
+    // TODO: Support sizeof after variable sizes are supported.
+    throw new UnsupportedOperatorError(
+      node.operator,
+      UnsupportedOperatorErrorType.UNARY
+    );
+  },
   UpdateExpression: (
     node: UpdateExpression,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {},
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    if (!node.isPrefix) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+    }
+    const assignmentOperator = node.operator === '++' ? '+=' : '-=';
+    const oneConstant = constructOneConstant();
+    const assignmentExpression = constructAssignmentExpression(
+      assignmentOperator,
+      node.operand,
+      oneConstant
+    );
+    compile(assignmentExpression, instructions, symbolTable, labelFrame);
+    if (node.isPrefix) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+    }
+  },
   VariableDeclaration: (
     node: VariableDeclaration,
     instructions: Instr[],
-    symbolTable: SymbolTable
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
   ) => {
     node.declarations.forEach((declarator) => {
       const initialValue = declarator.initialValue;
       if (isNotUndefined(initialValue)) {
-        compile(initialValue, instructions, symbolTable);
+        compile(initialValue, instructions, symbolTable, labelFrame);
         // Declaration names should have been added to the symbol table by the parent scope.
         // Should only need to assign for declaration in last frame.
         const entry = getSymbolTableEntryInFrame(
@@ -385,6 +621,20 @@ const compilers: CompilerMapping = {
   WhileStatement: (
     node: WhileStatement,
     instructions: Instr[],
-    symbolTable: SymbolTable
-  ) => {}
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    const loopStart = instructions.length;
+    compile(node.predicate, instructions, symbolTable, labelFrame);
+    const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpOnFalseInstr);
+    compile(node.body, instructions, symbolTable, labelFrame);
+    const continueDoneInstr = constructContinueDoneInstr();
+    instructions.push(continueDoneInstr);
+    const jumpInstr = constructJumpInstr(loopStart);
+    instructions.push(jumpInstr);
+    const breakDoneInstr = constructBreakDoneInstr();
+    instructions.push(breakDoneInstr);
+    jumpOnFalseInstr.instrAddress = instructions.length;
+  }
 };
