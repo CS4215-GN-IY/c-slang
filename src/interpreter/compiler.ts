@@ -582,6 +582,9 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
+    if (!node.isPrefix) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+    }
     const assignmentOperator = node.operator === '++' ? '+=' : '-=';
     const oneConstant = constructOneConstant();
     const assignmentExpression = constructAssignmentExpression(
@@ -590,6 +593,9 @@ const compilers: CompilerMapping = {
       oneConstant
     );
     compile(assignmentExpression, instructions, symbolTable, labelFrame);
+    if (node.isPrefix) {
+      compile(node.operand, instructions, symbolTable, labelFrame);
+    }
   },
   VariableDeclaration: (
     node: VariableDeclaration,
