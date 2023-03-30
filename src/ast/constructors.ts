@@ -10,6 +10,9 @@ import {
   type EmptyStatement,
   type Expression,
   type Identifier,
+  type SquareBracketExpressionlessContent,
+  type SquareBracketExpressionContent,
+  type SquareBracketStarContent,
   type StringLiteral
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
@@ -122,3 +125,24 @@ export const constructMainCallExpression = (): CallExpression => {
     arguments: []
   };
 };
+
+export const constructSquareBracketExpressionlessContent =
+  (): SquareBracketExpressionlessContent => ({
+    type: 'SquareBracketExpressionlessContent'
+  });
+
+export const constructSquareBracketExpressionContent = (
+  expression: Expression,
+  hasStaticBeforeTypes: boolean,
+  hasStaticAfterTypes: boolean
+): SquareBracketExpressionContent => ({
+  type: 'SquareBracketExpressionContent',
+  expression,
+  hasStaticBeforeTypes,
+  hasStaticAfterTypes
+});
+
+export const constructSquareBracketStarContent =
+  (): SquareBracketStarContent => ({
+    type: 'SquareBracketStarContent'
+  });

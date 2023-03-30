@@ -282,7 +282,7 @@ export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
   // TODO: Add declaration specifiers
   id: Identifier;
-  params: Identifier[];
+  params: DeclaratorPattern[];
   body: BlockOrEmptyStatement;
 }
 
@@ -295,6 +295,54 @@ export interface VariableDeclaration extends BaseDeclaration {
 
 export interface VariableDeclarator extends BaseNode {
   type: 'VariableDeclarator';
-  id: Identifier;
+  pattern: DeclaratorPattern;
   initialValue?: Expression;
 }
+
+export type DeclaratorPattern =
+  | ArrayPattern
+  | FunctionPattern
+  | Identifier
+  | PointerPattern;
+
+export interface PointerPattern extends BaseNode {
+  type: 'PointerPattern';
+  pattern: DeclaratorPattern;
+}
+
+export interface ArrayPattern extends BaseNode {
+  type: 'ArrayPattern';
+  id: DeclaratorPattern;
+  bracketContents: SquareBracketContent[];
+}
+
+export type SquareBracketContent =
+  | SquareBracketExpressionContent
+  | SquareBracketExpressionlessContent
+  | SquareBracketStarContent;
+
+export interface SquareBracketExpressionContent extends BaseNode {
+  type: 'SquareBracketExpressionContent';
+  // TODO: Add type list when types are supported.
+  expression: Expression;
+  hasStaticBeforeTypes: boolean;
+  hasStaticAfterTypes: boolean;
+}
+
+export interface SquareBracketExpressionlessContent extends BaseNode {
+  type: 'SquareBracketExpressionlessContent';
+  // TODO: Add type list when types are supported.
+}
+
+export interface SquareBracketStarContent extends BaseNode {
+  type: 'SquareBracketStarContent';
+  // TODO: Add type list when types are supported.
+}
+
+export interface FunctionPattern extends BaseNode {
+  type: 'FunctionPattern';
+  id: DeclaratorPattern;
+  bracketContents: RoundBracketContent[];
+}
+
+export type RoundBracketContent = DeclaratorPattern[];

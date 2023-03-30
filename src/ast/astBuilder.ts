@@ -18,7 +18,11 @@ import {
   type VariableDeclaration,
   type VariableDeclarator,
   type UnaryOperator,
-  type AssignmentOperator
+  type AssignmentOperator,
+  type DeclaratorPattern,
+  type ArrayPattern,
+  type SquareBracketContent,
+  type FunctionPattern
 } from './types';
 import {
   type ErrorNode,
@@ -132,11 +136,18 @@ import {
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
-import { isTypedefNameReturnValue } from './typeGuards';
+import {
+  isArrayPattern,
+  isFunctionPattern,
+  isTypedefNameReturnValue
+} from './typeGuards';
 import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
+  constructSquareBracketExpressionContent,
+  constructSquareBracketExpressionlessContent,
+  constructSquareBracketStarContent,
   constructStringLiteral
 } from './constructors';
 
@@ -449,7 +460,7 @@ export class ASTBuilder implements CVisitor<any> {
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
         type: 'VariableDeclarator',
-        id: typedefNameReturnValue.typedefName
+        pattern: typedefNameReturnValue.typedefName
       });
     });
 
@@ -510,7 +521,7 @@ export class ASTBuilder implements CVisitor<any> {
     return declarationSpecifiers.map(this.visitDeclarationSpecifier, this);
   }
 
-  visitDeclarator(ctx: DeclaratorContext): Identifier {
+  visitDeclarator(ctx: DeclaratorContext): DeclaratorPattern {
     // TODO: Rework this to account for pointers.
     const directDeclarator = ctx.directDeclarator();
     return this.visitDirectDeclarator(directDeclarator);
@@ -534,18 +545,107 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitDirectDeclarator(ctx: DirectDeclaratorContext): Identifier {
+  visitDirectDeclarator(ctx: DirectDeclaratorContext): DeclaratorPattern {
     const identifier = ctx.Identifier();
     if (identifier !== undefined) {
       return constructIdentifier(identifier);
     }
 
+    const declarator = ctx.declarator();
+    const leftBracket = ctx.LeftBracket();
+    const rightBracket = ctx.RightBracket();
+    const leftParen = ctx.LeftParen();
+    const rightParen = ctx.RightParen();
     const directDeclarator = ctx.directDeclarator();
-    if (directDeclarator !== undefined) {
-      return this.visitDirectDeclarator(directDeclarator);
+    const star = ctx.Star();
+    const assignmentExpression = ctx.assignmentExpression();
+
+    // Handle '(' declarator ')'.
+    // Usages include declaring a pointer, e.g. (*ptr).
+    if (
+      declarator !== undefined &&
+      leftParen !== undefined &&
+      rightParen !== undefined
+    ) {
+      return {
+        type: 'PointerPattern',
+        pattern: this.visitDeclarator(declarator)
+      };
     }
 
-    // TODO: Add other cases in future
+    // Handle directDeclarator [ assignmentExpression? ] cases.
+    // Examples of the different cases: https://stackoverflow.com/questions/3693429/c-parameter-array-declarators.
+    if (
+      directDeclarator !== undefined &&
+      leftBracket !== undefined &&
+      rightBracket !== undefined &&
+      star === undefined
+    ) {
+      const bracketContent: SquareBracketContent =
+        assignmentExpression === undefined
+          ? constructSquareBracketExpressionlessContent()
+          : constructSquareBracketExpressionContent(
+              this.visitAssignmentExpression(assignmentExpression),
+              // TODO: Handle static
+              false,
+              false
+            );
+      const pattern = this.visitDirectDeclarator(directDeclarator);
+      const arrayPattern: ArrayPattern = isArrayPattern(pattern)
+        ? pattern
+        : {
+            type: 'ArrayPattern',
+            id: pattern,
+            bracketContents: []
+          };
+      arrayPattern.bracketContents.push(bracketContent);
+      return arrayPattern;
+    }
+
+    if (
+      directDeclarator !== undefined &&
+      assignmentExpression === undefined &&
+      star !== undefined &&
+      leftBracket !== undefined &&
+      rightBracket !== undefined
+    ) {
+      const pattern = this.visitDirectDeclarator(directDeclarator);
+      const arrayPattern: ArrayPattern = isArrayPattern(pattern)
+        ? pattern
+        : {
+            type: 'ArrayPattern',
+            id: pattern,
+            bracketContents: []
+          };
+      arrayPattern.bracketContents.push(constructSquareBracketStarContent());
+      return arrayPattern;
+    }
+
+    // Handle directDeclarator () cases.
+    if (
+      directDeclarator !== undefined &&
+      leftParen !== undefined &&
+      rightParen !== undefined
+    ) {
+      const parameterTypeList = ctx.parameterTypeList();
+      const identifierList = ctx.identifierList();
+      const params: DeclaratorPattern[] =
+        parameterTypeList !== undefined
+          ? this.visitParameterTypeList(parameterTypeList)
+          : identifierList !== undefined
+          ? this.visitIdentifierList(identifierList)
+          : [];
+      const pattern = this.visitDirectDeclarator(directDeclarator);
+      const functionPattern: FunctionPattern = isFunctionPattern(pattern)
+        ? pattern
+        : {
+            type: 'FunctionPattern',
+            id: pattern,
+            bracketContents: []
+          };
+      functionPattern.bracketContents.push(params);
+      return functionPattern;
+    }
 
     throw new UnreachableCaseError();
   }
@@ -731,7 +831,7 @@ export class ASTBuilder implements CVisitor<any> {
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
         type: 'VariableDeclarator',
-        id: typedefNameReturnValue.typedefName
+        pattern: typedefNameReturnValue.typedefName
       });
     });
 
@@ -805,7 +905,7 @@ export class ASTBuilder implements CVisitor<any> {
     ctx: FunctionDirectDeclaratorContext
   ): FunctionDirectDeclaratorReturnValue {
     let functionId: Identifier | undefined;
-    let functionParams: Identifier[] | undefined;
+    let functionParams: DeclaratorPattern[] | undefined;
 
     const identifier = ctx.Identifier();
     if (identifier !== undefined) {
@@ -865,7 +965,7 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnsupportedKeywordError('_Generic');
   }
 
-  visitIdentifierList(ctx: IdentifierListContext): BaseNode {
+  visitIdentifierList(ctx: IdentifierListContext): Identifier[] {
     throw new Error('Method not implemented.');
   }
 
@@ -909,7 +1009,7 @@ export class ASTBuilder implements CVisitor<any> {
 
     return {
       type: 'VariableDeclarator',
-      id: this.visitDeclarator(ctx.declarator()),
+      pattern: this.visitDeclarator(ctx.declarator()),
       initialValue
     };
   }
@@ -1154,7 +1254,9 @@ export class ASTBuilder implements CVisitor<any> {
     throw new Error('Method not implemented.');
   }
 
-  visitParameterDeclaration(ctx: ParameterDeclarationContext): Identifier {
+  visitParameterDeclaration(
+    ctx: ParameterDeclarationContext
+  ): DeclaratorPattern {
     // TODO: Handle declaration specifiers.
     const declarator = ctx.declarator();
     if (declarator !== undefined) {
@@ -1195,12 +1297,12 @@ export class ASTBuilder implements CVisitor<any> {
     throw new UnreachableCaseError();
   }
 
-  visitParameterList(ctx: ParameterListContext): Identifier[] {
+  visitParameterList(ctx: ParameterListContext): DeclaratorPattern[] {
     const parameterDeclarations = ctx.parameterDeclaration();
     return parameterDeclarations.map(this.visitParameterDeclaration, this);
   }
 
-  visitParameterTypeList(ctx: ParameterTypeListContext): Identifier[] {
+  visitParameterTypeList(ctx: ParameterTypeListContext): DeclaratorPattern[] {
     // TODO: Handle variadic arguments.
     const parameterList = ctx.parameterList();
     return this.visitParameterList(parameterList);

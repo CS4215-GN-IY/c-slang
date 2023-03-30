@@ -14,7 +14,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'a'
               }
@@ -38,21 +38,21 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'a'
               }
             },
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'b'
               }
             },
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'c'
               }
@@ -80,7 +80,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'a'
               }
@@ -93,7 +93,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'b'
               }
@@ -106,7 +106,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'c'
               }
@@ -130,7 +130,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           declarations: [
             {
               type: 'VariableDeclarator',
-              id: {
+              pattern: {
                 type: 'Identifier',
                 name: 'a'
               },

@@ -39,7 +39,7 @@ describe('selection statement', () => {
                 declarations: [
                   {
                     type: 'VariableDeclarator',
-                    id: {
+                    pattern: {
                       name: 'i',
                       type: 'Identifier'
                     },
@@ -187,7 +187,7 @@ describe('selection statement', () => {
                 declarations: [
                   {
                     type: 'VariableDeclarator',
-                    id: {
+                    pattern: {
                       name: 'i',
                       type: 'Identifier'
                     },

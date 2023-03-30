@@ -2,7 +2,8 @@ import { type TypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
   type SequenceExpression,
   type Identifier,
-  type VariableDeclaration
+  type VariableDeclaration,
+  type DeclaratorPattern
 } from './types';
 
 export interface BaseReturnValue {
@@ -75,5 +76,5 @@ export interface ForCondition extends BaseReturnValue {
 export interface FunctionDirectDeclaratorReturnValue extends BaseReturnValue {
   type: 'FunctionDirectDeclarator';
   functionId: Identifier;
-  functionParams: Identifier[];
+  functionParams: DeclaratorPattern[];
 }
