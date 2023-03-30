@@ -60,12 +60,18 @@ describe('function definition', () => {
           },
           params: [
             {
-              type: 'Identifier',
-              name: 'a'
+              type: 'ParameterDeclaration',
+              declarator: {
+                type: 'Identifier',
+                name: 'a'
+              }
             },
             {
-              type: 'Identifier',
-              name: 'b'
+              type: 'ParameterDeclaration',
+              declarator: {
+                type: 'Identifier',
+                name: 'b'
+              }
             }
           ],
           body: {
@@ -117,12 +123,18 @@ describe('function definition', () => {
               },
               params: [
                 {
-                  type: 'Identifier',
-                  name: 'a'
+                  type: 'ParameterDeclaration',
+                  declarator: {
+                    type: 'Identifier',
+                    name: 'a'
+                  }
                 },
                 {
-                  type: 'Identifier',
-                  name: 'b'
+                  type: 'ParameterDeclaration',
+                  declarator: {
+                    type: 'Identifier',
+                    name: 'b'
+                  }
                 }
               ]
             }
@@ -173,12 +185,18 @@ describe('function definition', () => {
                   },
                   params: [
                     {
-                      type: 'Identifier',
-                      name: 'a'
+                      type: 'ParameterDeclaration',
+                      declarator: {
+                        type: 'Identifier',
+                        name: 'a'
+                      }
                     },
                     {
-                      type: 'Identifier',
-                      name: 'b'
+                      type: 'ParameterDeclaration',
+                      declarator: {
+                        type: 'Identifier',
+                        name: 'b'
+                      }
                     }
                   ]
                 }

@@ -10,10 +10,13 @@ import {
   type EmptyStatement,
   type Expression,
   type Identifier,
-  type SquareBracketExpressionlessContent,
-  type SquareBracketExpressionContent,
-  type SquareBracketStarContent,
-  type StringLiteral
+  type BracketExpressionlessContent,
+  type BracketExpressionContent,
+  type BracketStarContent,
+  type StringLiteral,
+  type DeclaratorPattern,
+  type AbstractDeclaratorPattern,
+  type ParameterDeclaration
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
@@ -126,23 +129,29 @@ export const constructMainCallExpression = (): CallExpression => {
   };
 };
 
-export const constructSquareBracketExpressionlessContent =
-  (): SquareBracketExpressionlessContent => ({
-    type: 'SquareBracketExpressionlessContent'
+export const constructBracketExpressionlessContent =
+  (): BracketExpressionlessContent => ({
+    type: 'BracketExpressionlessContent'
   });
 
-export const constructSquareBracketExpressionContent = (
+export const constructBracketExpressionContent = (
   expression: Expression,
   hasStaticBeforeTypes: boolean,
   hasStaticAfterTypes: boolean
-): SquareBracketExpressionContent => ({
-  type: 'SquareBracketExpressionContent',
+): BracketExpressionContent => ({
+  type: 'BracketExpressionContent',
   expression,
   hasStaticBeforeTypes,
   hasStaticAfterTypes
 });
 
-export const constructSquareBracketStarContent =
-  (): SquareBracketStarContent => ({
-    type: 'SquareBracketStarContent'
-  });
+export const constructBracketStarContent = (): BracketStarContent => ({
+  type: 'BracketStarContent'
+});
+
+export const constructParameterDeclaration = (
+  declarator: DeclaratorPattern | AbstractDeclaratorPattern
+): ParameterDeclaration => ({
+  type: 'ParameterDeclaration',
+  declarator
+});

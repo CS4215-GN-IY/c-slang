@@ -282,7 +282,7 @@ export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
   // TODO: Add declaration specifiers
   id: DeclaratorPattern;
-  params: DeclaratorPattern[];
+  params: ParameterDeclaration[];
   body: BlockOrEmptyStatement;
 }
 
@@ -313,34 +313,60 @@ export interface PointerPattern extends BaseNode {
 export interface ArrayPattern extends BaseNode {
   type: 'ArrayPattern';
   id: DeclaratorPattern;
-  bracketContents: SquareBracketContent[];
+  bracketContents: BracketContent[];
 }
 
-export type SquareBracketContent =
-  | SquareBracketExpressionContent
-  | SquareBracketExpressionlessContent
-  | SquareBracketStarContent;
+export type BracketContent =
+  | BracketExpressionContent
+  | BracketExpressionlessContent
+  | BracketStarContent;
 
-export interface SquareBracketExpressionContent extends BaseNode {
-  type: 'SquareBracketExpressionContent';
+export interface BracketExpressionContent extends BaseNode {
+  type: 'BracketExpressionContent';
   // TODO: Add type list when types are supported.
   expression: Expression;
   hasStaticBeforeTypes: boolean;
   hasStaticAfterTypes: boolean;
 }
 
-export interface SquareBracketExpressionlessContent extends BaseNode {
-  type: 'SquareBracketExpressionlessContent';
+export interface BracketExpressionlessContent extends BaseNode {
+  type: 'BracketExpressionlessContent';
   // TODO: Add type list when types are supported.
 }
 
-export interface SquareBracketStarContent extends BaseNode {
-  type: 'SquareBracketStarContent';
+export interface BracketStarContent extends BaseNode {
+  type: 'BracketStarContent';
   // TODO: Add type list when types are supported.
 }
 
 export interface FunctionPattern extends BaseNode {
   type: 'FunctionPattern';
   id: DeclaratorPattern;
-  params: DeclaratorPattern[];
+  params: ParameterDeclaration[];
+}
+
+export interface ParameterDeclaration {
+  type: 'ParameterDeclaration';
+  declarator: DeclaratorPattern | AbstractDeclaratorPattern;
+}
+
+export type AbstractDeclaratorPattern =
+  | AbstractDeclaratorPointerPattern
+  | BracketContent
+  | AbstractDeclaratorParamPattern
+  | AbstractDeclaratorSequencePattern;
+
+export interface AbstractDeclaratorPointerPattern extends BaseNode {
+  type: 'AbstractDeclaratorPointerPattern';
+  pattern?: AbstractDeclaratorPattern;
+}
+
+export interface AbstractDeclaratorParamPattern extends BaseNode {
+  type: 'AbstractDeclaratorParamPattern';
+  params: ParameterDeclaration[];
+}
+
+export interface AbstractDeclaratorSequencePattern extends BaseNode {
+  type: 'AbstractDeclaratorSequencePattern';
+  declarators: AbstractDeclaratorPattern[];
 }

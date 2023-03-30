@@ -21,7 +21,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'SquareBracketExpressionContent',
+                    type: 'BracketExpressionContent',
                     expression: {
                       type: 'Constant',
                       value: 2
@@ -59,7 +59,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'SquareBracketExpressionContent',
+                    type: 'BracketExpressionContent',
                     expression: {
                       type: 'Constant',
                       value: 2
@@ -68,7 +68,7 @@ describe('declarator', () => {
                     hasStaticBeforeTypes: false
                   },
                   {
-                    type: 'SquareBracketExpressionContent',
+                    type: 'BracketExpressionContent',
                     expression: {
                       type: 'Constant',
                       value: 5
@@ -106,12 +106,18 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    name: 'i',
-                    type: 'Identifier'
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'Identifier',
+                      name: 'i'
+                    }
                   },
                   {
-                    name: 'a',
-                    type: 'Identifier'
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'Identifier',
+                      name: 'a'
+                    }
                   }
                 ]
               }
@@ -143,20 +149,26 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    name: 'i',
-                    type: 'Identifier'
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'Identifier',
+                      name: 'i'
+                    }
                   },
                   {
-                    type: 'ArrayPattern',
-                    id: {
-                      name: 'a',
-                      type: 'Identifier'
-                    },
-                    bracketContents: [
-                      {
-                        type: 'SquareBracketExpressionlessContent'
-                      }
-                    ]
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'ArrayPattern',
+                      id: {
+                        name: 'a',
+                        type: 'Identifier'
+                      },
+                      bracketContents: [
+                        {
+                          type: 'BracketExpressionlessContent'
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -188,20 +200,26 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    name: 'i',
-                    type: 'Identifier'
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'Identifier',
+                      name: 'i'
+                    }
                   },
                   {
-                    type: 'ArrayPattern',
-                    id: {
-                      name: 'a',
-                      type: 'Identifier'
-                    },
-                    bracketContents: [
-                      {
-                        type: 'SquareBracketStarContent'
-                      }
-                    ]
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'ArrayPattern',
+                      id: {
+                        name: 'a',
+                        type: 'Identifier'
+                      },
+                      bracketContents: [
+                        {
+                          type: 'BracketStarContent'
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -233,26 +251,32 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    name: 'i',
-                    type: 'Identifier'
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'Identifier',
+                      name: 'i'
+                    }
                   },
                   {
-                    type: 'ArrayPattern',
-                    id: {
-                      name: 'a',
-                      type: 'Identifier'
-                    },
-                    bracketContents: [
-                      {
-                        type: 'SquareBracketExpressionContent',
-                        expression: {
-                          type: 'Identifier',
-                          name: 'i'
-                        },
-                        hasStaticAfterTypes: false,
-                        hasStaticBeforeTypes: false
-                      }
-                    ]
+                    type: 'ParameterDeclaration',
+                    declarator: {
+                      type: 'ArrayPattern',
+                      id: {
+                        name: 'a',
+                        type: 'Identifier'
+                      },
+                      bracketContents: [
+                        {
+                          type: 'BracketExpressionContent',
+                          expression: {
+                            type: 'Identifier',
+                            name: 'i'
+                          },
+                          hasStaticAfterTypes: false,
+                          hasStaticBeforeTypes: false
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -316,8 +340,11 @@ describe('declarator', () => {
                     },
                     params: [
                       {
-                        name: 'a',
-                        type: 'Identifier'
+                        type: 'ParameterDeclaration',
+                        declarator: {
+                          type: 'Identifier',
+                          name: 'a'
+                        }
                       }
                     ]
                   }
@@ -360,8 +387,11 @@ describe('declarator', () => {
                         },
                         params: [
                           {
-                            name: 'a',
-                            type: 'Identifier'
+                            type: 'ParameterDeclaration',
+                            declarator: {
+                              type: 'Identifier',
+                              name: 'a'
+                            }
                           }
                         ]
                       }
@@ -402,7 +432,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'SquareBracketExpressionContent',
+                    type: 'BracketExpressionContent',
                     expression: {
                       type: 'Constant',
                       value: 10
