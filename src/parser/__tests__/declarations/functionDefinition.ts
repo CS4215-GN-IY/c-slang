@@ -108,19 +108,26 @@ describe('function definition', () => {
         {
           type: 'FunctionDeclaration',
           id: {
-            type: 'Identifier',
-            name: 'g'
-          },
-          params: [
-            {
-              type: 'Identifier',
-              name: 'a'
-            },
-            {
-              type: 'Identifier',
-              name: 'b'
+            type: 'PointerPattern',
+            pattern: {
+              type: 'FunctionPattern',
+              id: {
+                type: 'Identifier',
+                name: 'g'
+              },
+              params: [
+                {
+                  type: 'Identifier',
+                  name: 'a'
+                },
+                {
+                  type: 'Identifier',
+                  name: 'b'
+                }
+              ]
             }
-          ],
+          },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [
@@ -153,19 +160,33 @@ describe('function definition', () => {
         {
           type: 'FunctionDeclaration',
           id: {
-            type: 'Identifier',
-            name: 'h'
-          },
-          params: [
-            {
-              type: 'Identifier',
-              name: 'a'
-            },
-            {
-              type: 'Identifier',
-              name: 'b'
+            type: 'PointerPattern',
+            pattern: {
+              type: 'FunctionPattern',
+              id: {
+                type: 'PointerPattern',
+                pattern: {
+                  type: 'FunctionPattern',
+                  id: {
+                    type: 'Identifier',
+                    name: 'h'
+                  },
+                  params: [
+                    {
+                      type: 'Identifier',
+                      name: 'a'
+                    },
+                    {
+                      type: 'Identifier',
+                      name: 'b'
+                    }
+                  ]
+                }
+              },
+              params: []
             }
-          ],
+          },
+          params: [],
           body: {
             type: 'BlockStatement',
             items: [

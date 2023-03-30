@@ -21,8 +21,7 @@ import {
   type AssignmentOperator,
   type DeclaratorPattern,
   type ArrayPattern,
-  type SquareBracketContent,
-  type FunctionPattern
+  type SquareBracketContent
 } from './types';
 import {
   type ErrorNode,
@@ -71,9 +70,7 @@ import {
   type ForDeclarationContext,
   type ForExpressionContext,
   type ForUpdateExpressionContext,
-  type FunctionDeclaratorContext,
   type FunctionDefinitionContext,
-  type FunctionDirectDeclaratorContext,
   type FunctionSpecifierContext,
   type GenericAssociationContext,
   type GenericAssocListContext,
@@ -128,7 +125,6 @@ import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
   type ForCondition,
-  type FunctionDirectDeclaratorReturnValue,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
   type VisitFunctionSpecifierReturnValue,
@@ -639,15 +635,16 @@ export class ASTBuilder implements CVisitor<any> {
           ? this.visitIdentifierList(identifierList)
           : [];
       const pattern = this.visitDirectDeclarator(directDeclarator);
-      const functionPattern: FunctionPattern = isFunctionPattern(pattern)
-        ? pattern
-        : {
-            type: 'FunctionPattern',
-            id: pattern,
-            bracketContents: []
-          };
-      functionPattern.bracketContents.push(params);
-      return functionPattern;
+      if (isFunctionPattern(pattern)) {
+        throw new BrokenInvariantError(
+          'Encountered an invalid function declarator.'
+        );
+      }
+      return {
+        type: 'FunctionPattern',
+        id: pattern,
+        params
+      };
     }
 
     // E.g. Not handling bit field specifier
@@ -870,21 +867,13 @@ export class ASTBuilder implements CVisitor<any> {
     return this.visitForExpression(ctx.forExpression());
   }
 
-  visitFunctionDeclarator(
-    ctx: FunctionDeclaratorContext
-  ): FunctionDirectDeclaratorReturnValue {
-    // TODO: Rework this to account for pointers.
-    const functionDirectDeclarator = ctx.functionDirectDeclarator();
-    return this.visitFunctionDirectDeclarator(functionDirectDeclarator);
-  }
-
   visitFunctionDefinition(ctx: FunctionDefinitionContext): FunctionDeclaration {
-    const functionDeclarator = ctx.functionDeclarator();
+    const declarator = ctx.declarator();
     const compoundStatement = ctx.compoundStatement();
 
-    if (functionDeclarator === undefined) {
+    if (declarator === undefined) {
       throw new BrokenInvariantError(
-        'Encountered a FunctionDefinition without a FunctionDeclarator.'
+        'Encountered a FunctionDefinition without a Declarator.'
       );
     }
 
@@ -894,60 +883,18 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
 
-    const processedFunctionDeclarator =
-      this.visitFunctionDeclarator(functionDeclarator);
-
-    return {
-      type: 'FunctionDeclaration',
-      id: processedFunctionDeclarator.functionId,
-      params: processedFunctionDeclarator.functionParams,
-      body: this.visitCompoundStatement(compoundStatement)
-    };
-  }
-
-  visitFunctionDirectDeclarator(
-    ctx: FunctionDirectDeclaratorContext
-  ): FunctionDirectDeclaratorReturnValue {
-    let functionId: Identifier | undefined;
-    let functionParams: DeclaratorPattern[] | undefined;
-
-    const identifier = ctx.Identifier();
-    if (identifier !== undefined) {
-      functionId = constructIdentifier(identifier);
-    }
-
-    const functionDeclarator = ctx.functionDeclarator();
-    if (functionDeclarator !== undefined) {
-      const processedFunctionDeclarator =
-        this.visitFunctionDeclarator(functionDeclarator);
-      // In the case of functions which return function pointers, the function name & params
-      // are the ones that are the most deeply embedded. Note that functions returning functions
-      // can be chained to infinity, with each function in the chain adding one level to the
-      // recursion of the parse tree.
-      functionId = processedFunctionDeclarator.functionId;
-      functionParams = processedFunctionDeclarator.functionParams;
-    }
-
-    if (functionId === undefined) {
+    const processedDeclarator = this.visitDeclarator(declarator);
+    if (!isFunctionPattern(processedDeclarator)) {
       throw new BrokenInvariantError(
-        'Function ID is undefined when it should be defined.'
+        'Encountered an invalid Declarator for a FunctionDefinition'
       );
     }
 
-    const parameterTypeList = ctx.parameterTypeList();
-    if (parameterTypeList !== undefined) {
-      const processedParameterTypeList =
-        this.visitParameterTypeList(parameterTypeList);
-      if (functionParams === undefined) {
-        functionParams = processedParameterTypeList;
-      }
-      // TODO: Handle the case where the parameters are part of the function pointer type.
-    }
-
     return {
-      type: 'FunctionDirectDeclarator',
-      functionId,
-      functionParams: functionParams ?? []
+      type: 'FunctionDeclaration',
+      id: processedDeclarator.id,
+      params: processedDeclarator.params,
+      body: this.visitCompoundStatement(compoundStatement)
     };
   }
 

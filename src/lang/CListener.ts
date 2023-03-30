@@ -52,8 +52,6 @@ import { FunctionSpecifierContext } from "./CParser";
 import { AlignmentSpecifierContext } from "./CParser";
 import { DeclaratorContext } from "./CParser";
 import { DirectDeclaratorContext } from "./CParser";
-import { FunctionDeclaratorContext } from "./CParser";
-import { FunctionDirectDeclaratorContext } from "./CParser";
 import { NestedParenthesesBlockContext } from "./CParser";
 import { PointerContext } from "./CParser";
 import { TypeQualifierListContext } from "./CParser";
@@ -635,28 +633,6 @@ export interface CListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitDirectDeclarator?: (ctx: DirectDeclaratorContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `CParser.functionDeclarator`.
-	 * @param ctx the parse tree
-	 */
-	enterFunctionDeclarator?: (ctx: FunctionDeclaratorContext) => void;
-	/**
-	 * Exit a parse tree produced by `CParser.functionDeclarator`.
-	 * @param ctx the parse tree
-	 */
-	exitFunctionDeclarator?: (ctx: FunctionDeclaratorContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `CParser.functionDirectDeclarator`.
-	 * @param ctx the parse tree
-	 */
-	enterFunctionDirectDeclarator?: (ctx: FunctionDirectDeclaratorContext) => void;
-	/**
-	 * Exit a parse tree produced by `CParser.functionDirectDeclarator`.
-	 * @param ctx the parse tree
-	 */
-	exitFunctionDirectDeclarator?: (ctx: FunctionDirectDeclaratorContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `CParser.nestedParenthesesBlock`.

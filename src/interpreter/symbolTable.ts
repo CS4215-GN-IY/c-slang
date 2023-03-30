@@ -104,7 +104,10 @@ export const addFunctionSymbolTableEntries = (
     });
   }
 
-  const functionEntry = getFunctionSymbolTableEntry(node.id.name, symbolTable);
+  const functionEntry = getFunctionSymbolTableEntry(
+    getNameFromDeclaratorPattern(node.id),
+    symbolTable
+  );
   functionEntry.numOfVariables += offset;
 
   return {
@@ -234,7 +237,7 @@ const constructFunctionDeclarationSymbolTableEntry = (
   offset: number
 ): SymbolTableEntry => {
   return {
-    name: functionDeclaration.id.name,
+    name: getNameFromDeclaratorPattern(functionDeclaration.id),
     nameType: 'Function',
     offset,
     scope,

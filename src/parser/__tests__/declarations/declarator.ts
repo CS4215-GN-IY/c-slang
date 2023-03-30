@@ -1,6 +1,6 @@
 import { parse } from '../../parser';
 
-describe('direct declarator', () => {
+describe('declarator', () => {
   test('handles one dimensional array declaration', () => {
     const code = 'int arr[2];';
     const ast = parse(code);
@@ -104,17 +104,15 @@ describe('direct declarator', () => {
                   name: 'f',
                   type: 'Identifier'
                 },
-                bracketContents: [
-                  [
-                    {
-                      name: 'i',
-                      type: 'Identifier'
-                    },
-                    {
-                      name: 'a',
-                      type: 'Identifier'
-                    }
-                  ]
+                params: [
+                  {
+                    name: 'i',
+                    type: 'Identifier'
+                  },
+                  {
+                    name: 'a',
+                    type: 'Identifier'
+                  }
                 ]
               }
             }
@@ -143,25 +141,23 @@ describe('direct declarator', () => {
                   name: 'f',
                   type: 'Identifier'
                 },
-                bracketContents: [
-                  [
-                    {
-                      name: 'i',
+                params: [
+                  {
+                    name: 'i',
+                    type: 'Identifier'
+                  },
+                  {
+                    type: 'ArrayPattern',
+                    id: {
+                      name: 'a',
                       type: 'Identifier'
                     },
-                    {
-                      type: 'ArrayPattern',
-                      id: {
-                        name: 'a',
-                        type: 'Identifier'
-                      },
-                      bracketContents: [
-                        {
-                          type: 'SquareBracketExpressionlessContent'
-                        }
-                      ]
-                    }
-                  ]
+                    bracketContents: [
+                      {
+                        type: 'SquareBracketExpressionlessContent'
+                      }
+                    ]
+                  }
                 ]
               }
             }
@@ -190,25 +186,23 @@ describe('direct declarator', () => {
                   name: 'f',
                   type: 'Identifier'
                 },
-                bracketContents: [
-                  [
-                    {
-                      name: 'i',
+                params: [
+                  {
+                    name: 'i',
+                    type: 'Identifier'
+                  },
+                  {
+                    type: 'ArrayPattern',
+                    id: {
+                      name: 'a',
                       type: 'Identifier'
                     },
-                    {
-                      type: 'ArrayPattern',
-                      id: {
-                        name: 'a',
-                        type: 'Identifier'
-                      },
-                      bracketContents: [
-                        {
-                          type: 'SquareBracketStarContent'
-                        }
-                      ]
-                    }
-                  ]
+                    bracketContents: [
+                      {
+                        type: 'SquareBracketStarContent'
+                      }
+                    ]
+                  }
                 ]
               }
             }
@@ -237,31 +231,29 @@ describe('direct declarator', () => {
                   name: 'f',
                   type: 'Identifier'
                 },
-                bracketContents: [
-                  [
-                    {
-                      name: 'i',
+                params: [
+                  {
+                    name: 'i',
+                    type: 'Identifier'
+                  },
+                  {
+                    type: 'ArrayPattern',
+                    id: {
+                      name: 'a',
                       type: 'Identifier'
                     },
-                    {
-                      type: 'ArrayPattern',
-                      id: {
-                        name: 'a',
-                        type: 'Identifier'
-                      },
-                      bracketContents: [
-                        {
-                          type: 'SquareBracketExpressionContent',
-                          expression: {
-                            type: 'Identifier',
-                            name: 'i'
-                          },
-                          hasStaticAfterTypes: false,
-                          hasStaticBeforeTypes: false
-                        }
-                      ]
-                    }
-                  ]
+                    bracketContents: [
+                      {
+                        type: 'SquareBracketExpressionContent',
+                        expression: {
+                          type: 'Identifier',
+                          name: 'i'
+                        },
+                        hasStaticAfterTypes: false,
+                        hasStaticBeforeTypes: false
+                      }
+                    ]
+                  }
                 ]
               }
             }
@@ -290,7 +282,7 @@ describe('direct declarator', () => {
                   name: 'main',
                   type: 'Identifier'
                 },
-                bracketContents: [[]]
+                params: []
               }
             }
           ]
@@ -322,17 +314,15 @@ describe('direct declarator', () => {
                       name: 'g',
                       type: 'Identifier'
                     },
-                    bracketContents: [
-                      [
-                        {
-                          name: 'a',
-                          type: 'Identifier'
-                        }
-                      ]
+                    params: [
+                      {
+                        name: 'a',
+                        type: 'Identifier'
+                      }
                     ]
                   }
                 },
-                bracketContents: [[]]
+                params: []
               }
             }
           ]
@@ -368,20 +358,18 @@ describe('direct declarator', () => {
                           type: 'Identifier',
                           name: 'h'
                         },
-                        bracketContents: [
-                          [
-                            {
-                              name: 'a',
-                              type: 'Identifier'
-                            }
-                          ]
+                        params: [
+                          {
+                            name: 'a',
+                            type: 'Identifier'
+                          }
                         ]
                       }
                     },
-                    bracketContents: [[]]
+                    params: []
                   }
                 },
-                bracketContents: [[]]
+                params: []
               }
             }
           ]

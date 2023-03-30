@@ -281,7 +281,7 @@ export interface BaseDeclaration extends BaseStatement {}
 export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
   // TODO: Add declaration specifiers
-  id: Identifier;
+  id: DeclaratorPattern;
   params: DeclaratorPattern[];
   body: BlockOrEmptyStatement;
 }
@@ -342,7 +342,5 @@ export interface SquareBracketStarContent extends BaseNode {
 export interface FunctionPattern extends BaseNode {
   type: 'FunctionPattern';
   id: DeclaratorPattern;
-  bracketContents: RoundBracketContent[];
+  params: DeclaratorPattern[];
 }
-
-export type RoundBracketContent = DeclaratorPattern[];
