@@ -429,13 +429,13 @@ const compilers: CompilerMapping = {
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
     compile(node.consequent, instructions, symbolTable, labelFrame);
-    const gotoInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
+    instructions.push(jumpInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;
     if (isNotUndefined(node.alternate)) {
       compile(node.alternate, instructions, symbolTable, labelFrame);
     }
-    gotoInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddress = instructions.length;
   },
   LogicalExpression: (
     node: LogicalExpression,
@@ -500,6 +500,9 @@ const compilers: CompilerMapping = {
     if (isNotUndefined(node.argument)) {
       compile(node.argument, instructions, symbolTable, labelFrame);
     }
+    // Perform a tail call if the last instruction is a CallInstr.
+    // A CallInstr should be preceded by a LoadReturnAddressInstr,
+    // so we can check whether the second last instruction is that.
     if (isLoadReturnAddressInstr(instructions[instructions.length - 2])) {
       instructions[instructions.length - 2] = constructTailCallInstr();
     } else {
@@ -521,7 +524,8 @@ const compilers: CompilerMapping = {
       const popInstr = constructPopInstr();
       instructions.push(popInstr);
     });
-    // Pop everything from the virtual machine stash except the last expression.
+    // Remove the last pop instruction as we want to
+    // pop everything from the virtual machine stash except the last expression.
     instructions.pop();
   },
   StringLiteral: (
@@ -621,8 +625,8 @@ const compilers: CompilerMapping = {
     compile(node.body, instructions, symbolTable, labelFrame);
     const continueDoneInstr = constructContinueDoneInstr();
     instructions.push(continueDoneInstr);
-    const gotoInstr = constructJumpInstr(loopStart);
-    instructions.push(gotoInstr);
+    const jumpInstr = constructJumpInstr(loopStart);
+    instructions.push(jumpInstr);
     const breakDoneInstr = constructBreakDoneInstr();
     instructions.push(breakDoneInstr);
     jumpOnFalseInstr.instrAddress = instructions.length;

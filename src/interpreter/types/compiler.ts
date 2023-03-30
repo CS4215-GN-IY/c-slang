@@ -7,6 +7,6 @@ export type CompilerMapping = {
     node: Extract<Node, { type: NodeType }>,
     instructions: Instr[],
     symbolTable: SymbolTable,
-    labelsFrame: LabelFrame
+    labelFrame: LabelFrame
   ) => void;
 };
