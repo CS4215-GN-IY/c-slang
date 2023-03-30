@@ -1,6 +1,6 @@
-import {parse} from "../../parser/parser";
-import {compileProgram} from "../compiler";
-import {interpret} from "../virtualMachine";
+import { parse } from '../../parser/parser';
+import { compileProgram } from '../compiler';
+import { interpret } from '../virtualMachine';
 
 describe('update expression', () => {
   test('handles postfix ++ update', () => {
@@ -62,4 +62,4 @@ describe('update expression', () => {
     const expectedResult = 0;
     expect(result).toEqual(expectedResult);
   });
-})
+});
