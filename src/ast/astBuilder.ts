@@ -146,7 +146,7 @@ import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
-  constructParameterDeclaration,
+  constructParameterDeclaratorDeclaration,
   constructBracketExpressionContent,
   constructBracketExpressionlessContent,
   constructBracketStarContent,
@@ -792,7 +792,7 @@ export class ASTBuilder implements CVisitor<any> {
           ? this.visitParameterTypeList(parameterTypeList)
           : identifierList !== undefined
           ? this.visitIdentifierList(identifierList).map((identifier) =>
-              constructParameterDeclaration(identifier)
+              constructParameterDeclaratorDeclaration(identifier)
             )
           : [];
       const pattern = this.visitDirectDeclarator(directDeclarator);
@@ -1373,7 +1373,7 @@ export class ASTBuilder implements CVisitor<any> {
     const declarator = ctx.declarator();
     if (declarator !== undefined) {
       return {
-        type: 'ParameterDeclaration',
+        type: 'ParameterDeclaratorDeclaration',
         declarator: this.visitDeclarator(declarator)
       };
     }
@@ -1381,37 +1381,10 @@ export class ASTBuilder implements CVisitor<any> {
     const abstractDeclarator = ctx.abstractDeclarator();
     if (abstractDeclarator !== undefined) {
       return {
-        type: 'ParameterDeclaration',
+        type: 'ParameterAbstractDeclaratorDeclaration',
         declarator: this.visitAbstractDeclarator(abstractDeclarator)
       };
     }
-
-    // const declarationSpecifiers = ctx.declarationSpecifiers();
-    // if (declarationSpecifiers !== undefined) {
-    //   const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
-    //     declarationSpecifiers
-    //   );
-    //   const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
-    //     isTypedefNameReturnValue
-    //   );
-    //   if (typedefNameReturnValues.length === 1) {
-    //     return typedefNameReturnValues[0].typedefName;
-    //   }
-    // }
-    //
-    // const declarationSpecifiers2 = ctx.declarationSpecifiers2();
-    // if (declarationSpecifiers2 !== undefined) {
-    //   const processedDeclarationSpecifiers2 = this.visitDeclarationSpecifiers2(
-    //     declarationSpecifiers2
-    //   );
-    //   const typedefNameReturnValues = processedDeclarationSpecifiers2.filter(
-    //     isTypedefNameReturnValue
-    //   );
-    //   if (typedefNameReturnValues.length === 1) {
-    //     return typedefNameReturnValues[0].typedefName;
-    //   }
-    // }
-
     throw new UnreachableCaseError();
   }
 

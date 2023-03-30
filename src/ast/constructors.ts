@@ -15,8 +15,7 @@ import {
   type BracketStarContent,
   type StringLiteral,
   type DeclaratorPattern,
-  type AbstractDeclaratorPattern,
-  type ParameterDeclaration
+  type ParameterDeclaratorDeclaration
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
@@ -149,9 +148,9 @@ export const constructBracketStarContent = (): BracketStarContent => ({
   type: 'BracketStarContent'
 });
 
-export const constructParameterDeclaration = (
-  declarator: DeclaratorPattern | AbstractDeclaratorPattern
-): ParameterDeclaration => ({
-  type: 'ParameterDeclaration',
+export const constructParameterDeclaratorDeclaration = (
+  declarator: DeclaratorPattern
+): ParameterDeclaratorDeclaration => ({
+  type: 'ParameterDeclaratorDeclaration',
   declarator
 });

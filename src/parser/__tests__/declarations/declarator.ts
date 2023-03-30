@@ -106,14 +106,14 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
                     }
                   },
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'Identifier',
                       name: 'a'
@@ -149,14 +149,14 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
                     }
                   },
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -200,14 +200,14 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
                     }
                   },
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -251,14 +251,14 @@ describe('declarator', () => {
                 },
                 params: [
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
                     }
                   },
                   {
-                    type: 'ParameterDeclaration',
+                    type: 'ParameterDeclaratorDeclaration',
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -340,7 +340,7 @@ describe('declarator', () => {
                     },
                     params: [
                       {
-                        type: 'ParameterDeclaration',
+                        type: 'ParameterDeclaratorDeclaration',
                         declarator: {
                           type: 'Identifier',
                           name: 'a'
@@ -387,7 +387,7 @@ describe('declarator', () => {
                         },
                         params: [
                           {
-                            type: 'ParameterDeclaration',
+                            type: 'ParameterDeclaratorDeclaration',
                             declarator: {
                               type: 'Identifier',
                               name: 'a'

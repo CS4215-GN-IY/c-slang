@@ -345,9 +345,20 @@ export interface FunctionPattern extends BaseNode {
   params: ParameterDeclaration[];
 }
 
-export interface ParameterDeclaration {
-  type: 'ParameterDeclaration';
-  declarator: DeclaratorPattern | AbstractDeclaratorPattern;
+export type ParameterDeclaration =
+  | ParameterDeclaratorDeclaration
+  | ParameterAbstractDeclaratorDeclaration;
+
+export interface ParameterDeclaratorDeclaration {
+  type: 'ParameterDeclaratorDeclaration';
+  // TODO: Support declaration specifiers
+  declarator: DeclaratorPattern;
+}
+
+export interface ParameterAbstractDeclaratorDeclaration {
+  type: 'ParameterAbstractDeclaratorDeclaration';
+  // TODO: Support declaration specifiers
+  declarator?: AbstractDeclaratorPattern;
 }
 
 export type AbstractDeclaratorPattern =

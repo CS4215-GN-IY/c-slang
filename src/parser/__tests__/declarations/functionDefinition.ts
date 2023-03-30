@@ -60,14 +60,14 @@ describe('function definition', () => {
           },
           params: [
             {
-              type: 'ParameterDeclaration',
+              type: 'ParameterDeclaratorDeclaration',
               declarator: {
                 type: 'Identifier',
                 name: 'a'
               }
             },
             {
-              type: 'ParameterDeclaration',
+              type: 'ParameterDeclaratorDeclaration',
               declarator: {
                 type: 'Identifier',
                 name: 'b'
@@ -123,14 +123,14 @@ describe('function definition', () => {
               },
               params: [
                 {
-                  type: 'ParameterDeclaration',
+                  type: 'ParameterDeclaratorDeclaration',
                   declarator: {
                     type: 'Identifier',
                     name: 'a'
                   }
                 },
                 {
-                  type: 'ParameterDeclaration',
+                  type: 'ParameterDeclaratorDeclaration',
                   declarator: {
                     type: 'Identifier',
                     name: 'b'
@@ -185,14 +185,14 @@ describe('function definition', () => {
                   },
                   params: [
                     {
-                      type: 'ParameterDeclaration',
+                      type: 'ParameterDeclaratorDeclaration',
                       declarator: {
                         type: 'Identifier',
                         name: 'a'
                       }
                     },
                     {
-                      type: 'ParameterDeclaration',
+                      type: 'ParameterDeclaratorDeclaration',
                       declarator: {
                         type: 'Identifier',
                         name: 'b'
