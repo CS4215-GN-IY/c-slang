@@ -522,9 +522,15 @@ export class ASTBuilder implements CVisitor<any> {
   }
 
   visitDeclarator(ctx: DeclaratorContext): DeclaratorPattern {
-    // TODO: Rework this to account for pointers.
+    const pointer = ctx.pointer();
     const directDeclarator = ctx.directDeclarator();
-    return this.visitDirectDeclarator(directDeclarator);
+    const pattern = this.visitDirectDeclarator(directDeclarator);
+    return pointer === undefined
+      ? pattern
+      : {
+          type: 'PointerPattern',
+          pattern
+        };
   }
 
   visitDesignation(ctx: DesignationContext): BaseNode {
@@ -567,10 +573,7 @@ export class ASTBuilder implements CVisitor<any> {
       leftParen !== undefined &&
       rightParen !== undefined
     ) {
-      return {
-        type: 'PointerPattern',
-        pattern: this.visitDeclarator(declarator)
-      };
+      return this.visitDeclarator(declarator);
     }
 
     // Handle directDeclarator [ assignmentExpression? ] cases.
@@ -647,6 +650,7 @@ export class ASTBuilder implements CVisitor<any> {
       return functionPattern;
     }
 
+    // E.g. Not handling bit field specifier
     throw new UnreachableCaseError();
   }
 

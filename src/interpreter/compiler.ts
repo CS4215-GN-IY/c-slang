@@ -95,7 +95,7 @@ import {
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
 import {
   constructAssignmentExpressionAssignInstr,
-  getDeclaratorName,
+  getNameFromDeclaratorPattern,
   getSymbolTableEntryOfExpression
 } from './compilerUtils';
 import {
@@ -611,7 +611,7 @@ const compilers: CompilerMapping = {
         // Declaration names should have been added to the symbol table by the parent scope.
         // Should only need to assign for declaration in last frame.
         const entry = getSymbolTableEntryInFrame(
-          getDeclaratorName(declarator),
+          getNameFromDeclaratorPattern(declarator.pattern),
           symbolTable.head
         );
         const assignInstr = constructAssignInstr(entry);

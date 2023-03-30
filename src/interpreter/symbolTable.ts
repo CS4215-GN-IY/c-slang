@@ -26,7 +26,7 @@ import {
 } from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
-import { getDeclaratorName } from './compilerUtils';
+import { getNameFromDeclaratorPattern } from './compilerUtils';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -253,7 +253,7 @@ const constructVariableDeclarationSymbolTableEntries = (
   const allNames: SymbolTableEntry[] = [];
   variableDeclaration.declarations.forEach((declarator) => {
     allNames.push({
-      name: getDeclaratorName(declarator),
+      name: getNameFromDeclaratorPattern(declarator.pattern),
       nameType: 'Variable',
       offset,
       scope

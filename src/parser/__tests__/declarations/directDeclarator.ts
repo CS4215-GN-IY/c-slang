@@ -2,9 +2,7 @@ import { parse } from '../../parser';
 
 describe('direct declarator', () => {
   test('handles one dimensional array declaration', () => {
-    const code = `
-        int arr[2];
-    `;
+    const code = 'int arr[2];';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -42,9 +40,7 @@ describe('direct declarator', () => {
   });
 
   test('handles two dimensional array declaration', () => {
-    const code = `
-        int arr[2][5];
-    `;
+    const code = 'int arr[2][5];';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -91,9 +87,7 @@ describe('direct declarator', () => {
   });
 
   test('handles function declaration', () => {
-    const code = `
-        int f(int i, int a);
-    `;
+    const code = 'int f(int i, int a);';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -132,9 +126,7 @@ describe('direct declarator', () => {
   });
 
   test('handles function declaration with array param', () => {
-    const code = `
-        int f(int i, int a[]);
-    `;
+    const code = 'int f(int i, int a[]);';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -181,9 +173,7 @@ describe('direct declarator', () => {
   });
 
   test('handles function declaration with array param with *', () => {
-    const code = `
-        int f(int i, int a[*]);
-    `;
+    const code = 'int f(int i, int a[*]);';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -230,9 +220,7 @@ describe('direct declarator', () => {
   });
 
   test('handles function declaration with array param with expression', () => {
-    const code = `
-        int f(int i, int a[i]);
-    `;
+    const code = 'int f(int i, int a[i]);';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -285,9 +273,7 @@ describe('direct declarator', () => {
   });
 
   test('handles function declaration with no param', () => {
-    const code = `
-        int main();
-    `;
+    const code = 'int main();';
     const ast = parse(code);
     const expectedAst = {
       type: 'Program',
@@ -305,6 +291,138 @@ describe('direct declarator', () => {
                   type: 'Identifier'
                 },
                 bracketContents: [[]]
+              }
+            }
+          ]
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles function declaration pointer', () => {
+    const code = 'void (*g(int a))();';
+    const ast = parse(code);
+    const expectedAst = {
+      type: 'Program',
+      body: [
+        {
+          type: 'VariableDeclaration',
+          isConstant: false,
+          declarations: [
+            {
+              type: 'VariableDeclarator',
+              pattern: {
+                type: 'FunctionPattern',
+                id: {
+                  type: 'PointerPattern',
+                  pattern: {
+                    type: 'FunctionPattern',
+                    id: {
+                      name: 'g',
+                      type: 'Identifier'
+                    },
+                    bracketContents: [
+                      [
+                        {
+                          name: 'a',
+                          type: 'Identifier'
+                        }
+                      ]
+                    ]
+                  }
+                },
+                bracketContents: [[]]
+              }
+            }
+          ]
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles more function declaration pointer', () => {
+    const code = 'void (*(*h(int a))())();';
+    const ast = parse(code);
+    const expectedAst = {
+      type: 'Program',
+      body: [
+        {
+          type: 'VariableDeclaration',
+          isConstant: false,
+          declarations: [
+            {
+              type: 'VariableDeclarator',
+              pattern: {
+                type: 'FunctionPattern',
+                id: {
+                  type: 'PointerPattern',
+                  pattern: {
+                    type: 'FunctionPattern',
+                    id: {
+                      type: 'PointerPattern',
+                      pattern: {
+                        type: 'FunctionPattern',
+                        id: {
+                          type: 'Identifier',
+                          name: 'h'
+                        },
+                        bracketContents: [
+                          [
+                            {
+                              name: 'a',
+                              type: 'Identifier'
+                            }
+                          ]
+                        ]
+                      }
+                    },
+                    bracketContents: [[]]
+                  }
+                },
+                bracketContents: [[]]
+              }
+            }
+          ]
+        }
+      ]
+    };
+    expect(ast).toEqual(expectedAst);
+  });
+
+  test('handles pointer to array', () => {
+    const code = 'int (*ptr)[10];';
+    const ast = parse(code);
+    const expectedAst = {
+      type: 'Program',
+      body: [
+        {
+          type: 'VariableDeclaration',
+          isConstant: false,
+          declarations: [
+            {
+              type: 'VariableDeclarator',
+              pattern: {
+                type: 'ArrayPattern',
+                id: {
+                  type: 'PointerPattern',
+                  pattern: {
+                    name: 'ptr',
+                    type: 'Identifier'
+                  }
+                },
+                bracketContents: [
+                  {
+                    type: 'SquareBracketExpressionContent',
+                    expression: {
+                      type: 'Constant',
+                      value: 10
+                    },
+                    hasStaticAfterTypes: false,
+                    hasStaticBeforeTypes: false
+                  }
+                ]
               }
             }
           ]

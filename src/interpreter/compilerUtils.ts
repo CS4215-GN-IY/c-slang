@@ -1,8 +1,4 @@
-import {
-  type DeclaratorPattern,
-  type Expression,
-  type VariableDeclarator
-} from '../ast/types';
+import { type DeclaratorPattern, type Expression } from '../ast/types';
 import {
   isArrayPattern,
   isFunctionPattern,
@@ -35,26 +31,19 @@ export const getSymbolTableEntryOfExpression = (
   throw new InvalidLValueError();
 };
 
-export const getDeclaratorName = (declarator: VariableDeclarator): string => {
-  const pattern = declarator.pattern;
+export const getNameFromDeclaratorPattern = (
+  pattern: DeclaratorPattern
+): string => {
   if (isIdentifier(pattern)) {
     return pattern.name;
   }
 
-  if (isArrayPattern(pattern) && isIdentifier(pattern.id)) {
-    return pattern.id.name;
-  }
-
-  if (isFunctionPattern(pattern) && isIdentifier(pattern.id)) {
-    return pattern.id.name;
-  }
-
   if (isPointerPattern(pattern)) {
-    let pointerPattern: DeclaratorPattern = pattern;
-    while (!isIdentifier(pointerPattern)) {
-      pointerPattern = pattern.pattern;
-    }
-    return pointerPattern.name;
+    return getNameFromDeclaratorPattern(pattern.pattern);
+  }
+
+  if (isArrayPattern(pattern) || isFunctionPattern(pattern)) {
+    return getNameFromDeclaratorPattern(pattern.id);
   }
 
   throw new UnsupportedDeclarationError();
