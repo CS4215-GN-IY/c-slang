@@ -325,8 +325,13 @@ export interface BracketExpressionContent extends BaseNode {
   type: 'BracketExpressionContent';
   // TODO: Add type list when types are supported.
   expression: Expression;
-  hasStaticBeforeTypes: boolean;
-  hasStaticAfterTypes: boolean;
+  staticStatus: StaticStatus;
+}
+
+export enum StaticStatus {
+  AFTER_TYPES = 'AfterTypes',
+  BEFORE_TYPES = 'BeforeTypes',
+  NONE = 'None'
 }
 
 export interface BracketExpressionlessContent extends BaseNode {

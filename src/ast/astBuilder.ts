@@ -1,31 +1,32 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
+  type AbstractDeclaratorParamPattern,
+  type AbstractDeclaratorPattern,
+  type AbstractDeclaratorSequencePattern,
+  type ArrayPattern,
+  type AssignmentOperator,
   type BaseNode,
   type BlockItem,
   type BlockOrEmptyStatement,
+  type BracketContent,
+  type DeclaratorPattern,
   type Expression,
   type ExpressionOrEmptyStatement,
-  type SequenceExpression,
   type ExternalDeclaration,
   type FunctionDeclaration,
   type Identifier,
   type IterationStatement,
   type JumpStatement,
   type LabeledStatement,
+  type ParameterDeclaration,
   type Program,
   type SelectionStatement,
+  type SequenceExpression,
   type Statement,
-  type VariableDeclaration,
-  type VariableDeclarator,
+  StaticStatus,
   type UnaryOperator,
-  type AssignmentOperator,
-  type DeclaratorPattern,
-  type ArrayPattern,
-  type BracketContent,
-  type AbstractDeclaratorPattern,
-  type ParameterDeclaration,
-  type AbstractDeclaratorSequencePattern,
-  type AbstractDeclaratorParamPattern
+  type VariableDeclaration,
+  type VariableDeclarator
 } from './types';
 import {
   type ErrorNode,
@@ -143,13 +144,13 @@ import {
   isTypedefNameReturnValue
 } from './typeGuards';
 import {
+  constructBracketExpressionContent,
+  constructBracketExpressionlessContent,
+  constructBracketStarContent,
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
   constructParameterDeclaratorDeclaration,
-  constructBracketExpressionContent,
-  constructBracketExpressionlessContent,
-  constructBracketStarContent,
   constructStringLiteral
 } from './constructors';
 
@@ -597,8 +598,7 @@ export class ASTBuilder implements CVisitor<any> {
         : constructBracketExpressionContent(
             this.visitAssignmentExpression(assignmentExpression),
             // TODO: Handle static
-            false,
-            false
+            StaticStatus.NONE
           );
     }
 
@@ -639,8 +639,7 @@ export class ASTBuilder implements CVisitor<any> {
           : constructBracketExpressionContent(
               this.visitAssignmentExpression(assignmentExpression),
               // TODO: Handle static
-              false,
-              false
+              StaticStatus.NONE
             );
       const pattern = this.visitDirectAbstractDeclarator(
         directAbstractDeclarator
@@ -745,8 +744,7 @@ export class ASTBuilder implements CVisitor<any> {
           : constructBracketExpressionContent(
               this.visitAssignmentExpression(assignmentExpression),
               // TODO: Handle static
-              false,
-              false
+              StaticStatus.NONE
             );
       const pattern = this.visitDirectDeclarator(directDeclarator);
       const arrayPattern: ArrayPattern = isArrayPattern(pattern)

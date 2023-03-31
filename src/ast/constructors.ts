@@ -15,7 +15,8 @@ import {
   type BracketStarContent,
   type StringLiteral,
   type DeclaratorPattern,
-  type ParameterDeclaratorDeclaration
+  type ParameterDeclaratorDeclaration,
+  type StaticStatus
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
@@ -135,13 +136,11 @@ export const constructBracketExpressionlessContent =
 
 export const constructBracketExpressionContent = (
   expression: Expression,
-  hasStaticBeforeTypes: boolean,
-  hasStaticAfterTypes: boolean
+  staticStatus: StaticStatus
 ): BracketExpressionContent => ({
   type: 'BracketExpressionContent',
   expression,
-  hasStaticBeforeTypes,
-  hasStaticAfterTypes
+  staticStatus
 });
 
 export const constructBracketStarContent = (): BracketStarContent => ({

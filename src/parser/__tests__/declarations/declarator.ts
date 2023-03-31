@@ -1,4 +1,5 @@
 import { parse } from '../../parser';
+import { StaticStatus } from '../../../ast/types';
 
 describe('declarator', () => {
   test('handles one dimensional array declaration', () => {
@@ -26,8 +27,7 @@ describe('declarator', () => {
                       type: 'Constant',
                       value: 2
                     },
-                    hasStaticAfterTypes: false,
-                    hasStaticBeforeTypes: false
+                    staticStatus: StaticStatus.NONE
                   }
                 ]
               }
@@ -64,8 +64,7 @@ describe('declarator', () => {
                       type: 'Constant',
                       value: 2
                     },
-                    hasStaticAfterTypes: false,
-                    hasStaticBeforeTypes: false
+                    staticStatus: StaticStatus.NONE
                   },
                   {
                     type: 'BracketExpressionContent',
@@ -73,8 +72,7 @@ describe('declarator', () => {
                       type: 'Constant',
                       value: 5
                     },
-                    hasStaticAfterTypes: false,
-                    hasStaticBeforeTypes: false
+                    staticStatus: StaticStatus.NONE
                   }
                 ]
               }
@@ -272,8 +270,7 @@ describe('declarator', () => {
                             type: 'Identifier',
                             name: 'i'
                           },
-                          hasStaticAfterTypes: false,
-                          hasStaticBeforeTypes: false
+                          staticStatus: StaticStatus.NONE
                         }
                       ]
                     }
@@ -437,8 +434,7 @@ describe('declarator', () => {
                       type: 'Constant',
                       value: 10
                     },
-                    hasStaticAfterTypes: false,
-                    hasStaticBeforeTypes: false
+                    staticStatus: StaticStatus.NONE
                   }
                 ]
               }

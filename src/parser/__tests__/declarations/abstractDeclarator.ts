@@ -1,4 +1,5 @@
 import { parse } from '../../parser';
+import { StaticStatus } from '../../../ast/types';
 
 describe('abstract declarator', () => {
   test('bracket with no expression', () => {
@@ -63,8 +64,7 @@ describe('abstract declarator', () => {
                         type: 'Identifier',
                         name: 'i'
                       },
-                      hasStaticAfterTypes: false,
-                      hasStaticBeforeTypes: false
+                      staticStatus: StaticStatus.NONE
                     }
                   }
                 ]
