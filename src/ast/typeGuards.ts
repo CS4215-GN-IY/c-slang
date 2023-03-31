@@ -3,7 +3,7 @@ import {
   type TypedefNameReturnValue
 } from './astBuilderInternalTypes';
 import {
-  type AbstractDeclaratorSequencePattern,
+  type AbstractSequencePattern,
   type ArrayPattern,
   type BaseNode,
   BINARY_OPERATORS,
@@ -69,10 +69,10 @@ export const isPointerPattern = (node: BaseNode): node is PointerPattern => {
   return node.type === 'PointerPattern';
 };
 
-export const isAbstractDeclaratorSequencePattern = (
+export const isAbstractSequencePattern = (
   node: BaseNode
-): node is AbstractDeclaratorSequencePattern => {
-  return node.type === 'AbstractDeclaratorSequencePattern';
+): node is AbstractSequencePattern => {
+  return node.type === 'AbstractSequencePattern';
 };
 
 export const isBinaryOperator = (

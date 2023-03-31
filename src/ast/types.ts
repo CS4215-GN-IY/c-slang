@@ -317,12 +317,12 @@ export interface ArrayPattern extends BaseNode {
 }
 
 export type BracketContent =
-  | BracketExpressionContent
-  | BracketExpressionlessContent
-  | BracketStarContent;
+  | ExpressionBracketContent
+  | ExpressionlessBracketContent
+  | StarBracketContent;
 
-export interface BracketExpressionContent extends BaseNode {
-  type: 'BracketExpressionContent';
+export interface ExpressionBracketContent extends BaseNode {
+  type: 'ExpressionBracketContent';
   // TODO: Add type list when types are supported.
   expression: Expression;
   staticStatus: StaticStatus;
@@ -334,13 +334,13 @@ export enum StaticStatus {
   NONE = 'None'
 }
 
-export interface BracketExpressionlessContent extends BaseNode {
-  type: 'BracketExpressionlessContent';
+export interface ExpressionlessBracketContent extends BaseNode {
+  type: 'ExpressionlessBracketContent';
   // TODO: Add type list when types are supported.
 }
 
-export interface BracketStarContent extends BaseNode {
-  type: 'BracketStarContent';
+export interface StarBracketContent extends BaseNode {
+  type: 'StarBracketContent';
   // TODO: Add type list when types are supported.
 }
 
@@ -367,22 +367,22 @@ export interface ParameterAbstractDeclaratorDeclaration {
 }
 
 export type AbstractDeclaratorPattern =
-  | AbstractDeclaratorPointerPattern
-  | BracketContent
-  | AbstractDeclaratorParamPattern
-  | AbstractDeclaratorSequencePattern;
+  | AbstractPointerPattern
+  | AbstractParamPattern
+  | AbstractSequencePattern
+  | BracketContent;
 
-export interface AbstractDeclaratorPointerPattern extends BaseNode {
-  type: 'AbstractDeclaratorPointerPattern';
+export interface AbstractPointerPattern extends BaseNode {
+  type: 'AbstractPointerPattern';
   pattern?: AbstractDeclaratorPattern;
 }
 
-export interface AbstractDeclaratorParamPattern extends BaseNode {
-  type: 'AbstractDeclaratorParamPattern';
+export interface AbstractParamPattern extends BaseNode {
+  type: 'AbstractParamPattern';
   params: ParameterDeclaration[];
 }
 
-export interface AbstractDeclaratorSequencePattern extends BaseNode {
-  type: 'AbstractDeclaratorSequencePattern';
+export interface AbstractSequencePattern extends BaseNode {
+  type: 'AbstractSequencePattern';
   declarators: AbstractDeclaratorPattern[];
 }

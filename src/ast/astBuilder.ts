@@ -1,8 +1,8 @@
 import { type CVisitor } from '../lang/CVisitor';
 import {
-  type AbstractDeclaratorParamPattern,
+  type AbstractParamPattern,
   type AbstractDeclaratorPattern,
-  type AbstractDeclaratorSequencePattern,
+  type AbstractSequencePattern,
   type ArrayPattern,
   type AssignmentOperator,
   type BaseNode,
@@ -138,15 +138,15 @@ import {
   type VisitTypeSpecifierReturnValue
 } from './astBuilderInternalTypes';
 import {
-  isAbstractDeclaratorSequencePattern,
+  isAbstractSequencePattern,
   isArrayPattern,
   isFunctionPattern,
   isTypedefNameReturnValue
 } from './typeGuards';
 import {
-  constructBracketExpressionContent,
-  constructBracketExpressionlessContent,
-  constructBracketStarContent,
+  constructExpressionBracketContent,
+  constructExpressionlessBracketContent,
+  constructStarBracketContent,
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
@@ -179,7 +179,7 @@ export class ASTBuilder implements CVisitor<any> {
 
     if (pointer !== undefined && directAbstractDeclarator === undefined) {
       return {
-        type: 'AbstractDeclaratorPointerPattern'
+        type: 'AbstractPointerPattern'
       };
     }
 
@@ -190,7 +190,7 @@ export class ASTBuilder implements CVisitor<any> {
       return pointer === undefined
         ? pattern
         : {
-            type: 'AbstractDeclaratorPointerPattern',
+            type: 'AbstractPointerPattern',
             pattern
           };
     }
@@ -594,8 +594,8 @@ export class ASTBuilder implements CVisitor<any> {
       star === undefined
     ) {
       return assignmentExpression === undefined
-        ? constructBracketExpressionlessContent()
-        : constructBracketExpressionContent(
+        ? constructExpressionlessBracketContent()
+        : constructExpressionBracketContent(
             this.visitAssignmentExpression(assignmentExpression),
             // TODO: Handle static
             StaticStatus.NONE
@@ -608,7 +608,7 @@ export class ASTBuilder implements CVisitor<any> {
       rightBracket !== undefined &&
       star !== undefined
     ) {
-      return constructBracketStarContent();
+      return constructStarBracketContent();
     }
 
     if (
@@ -619,7 +619,7 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       const parameterTypeList = ctx.parameterTypeList();
       return {
-        type: 'AbstractDeclaratorParamPattern',
+        type: 'AbstractParamPattern',
         params:
           parameterTypeList === undefined
             ? []
@@ -635,8 +635,8 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       const bracketContent: BracketContent =
         assignmentExpression === undefined
-          ? constructBracketExpressionlessContent()
-          : constructBracketExpressionContent(
+          ? constructExpressionlessBracketContent()
+          : constructExpressionBracketContent(
               this.visitAssignmentExpression(assignmentExpression),
               // TODO: Handle static
               StaticStatus.NONE
@@ -644,11 +644,11 @@ export class ASTBuilder implements CVisitor<any> {
       const pattern = this.visitDirectAbstractDeclarator(
         directAbstractDeclarator
       );
-      const sequencePattern: AbstractDeclaratorSequencePattern =
-        isAbstractDeclaratorSequencePattern(pattern)
+      const sequencePattern: AbstractSequencePattern =
+        isAbstractSequencePattern(pattern)
           ? pattern
           : {
-              type: 'AbstractDeclaratorSequencePattern',
+              type: 'AbstractSequencePattern',
               declarators: [pattern]
             };
       sequencePattern.declarators.push(bracketContent);
@@ -664,14 +664,14 @@ export class ASTBuilder implements CVisitor<any> {
       const pattern = this.visitDirectAbstractDeclarator(
         directAbstractDeclarator
       );
-      const sequencePattern: AbstractDeclaratorSequencePattern =
-        isAbstractDeclaratorSequencePattern(pattern)
+      const sequencePattern: AbstractSequencePattern =
+        isAbstractSequencePattern(pattern)
           ? pattern
           : {
-              type: 'AbstractDeclaratorSequencePattern',
+              type: 'AbstractSequencePattern',
               declarators: [pattern]
             };
-      sequencePattern.declarators.push(constructBracketStarContent());
+      sequencePattern.declarators.push(constructStarBracketContent());
       return sequencePattern;
     }
 
@@ -681,8 +681,8 @@ export class ASTBuilder implements CVisitor<any> {
       rightParen !== undefined
     ) {
       const parameterTypeList = ctx.parameterTypeList();
-      const abstractDeclaratorParamPattern: AbstractDeclaratorParamPattern = {
-        type: 'AbstractDeclaratorParamPattern',
+      const abstractDeclaratorParamPattern: AbstractParamPattern = {
+        type: 'AbstractParamPattern',
         params:
           parameterTypeList === undefined
             ? []
@@ -691,11 +691,11 @@ export class ASTBuilder implements CVisitor<any> {
       const pattern = this.visitDirectAbstractDeclarator(
         directAbstractDeclarator
       );
-      const sequencePattern: AbstractDeclaratorSequencePattern =
-        isAbstractDeclaratorSequencePattern(pattern)
+      const sequencePattern: AbstractSequencePattern =
+        isAbstractSequencePattern(pattern)
           ? pattern
           : {
-              type: 'AbstractDeclaratorSequencePattern',
+              type: 'AbstractSequencePattern',
               declarators: [pattern]
             };
       sequencePattern.declarators.push(abstractDeclaratorParamPattern);
@@ -740,8 +740,8 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       const bracketContent: BracketContent =
         assignmentExpression === undefined
-          ? constructBracketExpressionlessContent()
-          : constructBracketExpressionContent(
+          ? constructExpressionlessBracketContent()
+          : constructExpressionBracketContent(
               this.visitAssignmentExpression(assignmentExpression),
               // TODO: Handle static
               StaticStatus.NONE
@@ -773,7 +773,7 @@ export class ASTBuilder implements CVisitor<any> {
             id: pattern,
             bracketContents: []
           };
-      arrayPattern.bracketContents.push(constructBracketStarContent());
+      arrayPattern.bracketContents.push(constructStarBracketContent());
       return arrayPattern;
     }
 

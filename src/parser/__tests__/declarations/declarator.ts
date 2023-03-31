@@ -22,7 +22,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'BracketExpressionContent',
+                    type: 'ExpressionBracketContent',
                     expression: {
                       type: 'Constant',
                       value: 2
@@ -59,7 +59,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'BracketExpressionContent',
+                    type: 'ExpressionBracketContent',
                     expression: {
                       type: 'Constant',
                       value: 2
@@ -67,7 +67,7 @@ describe('declarator', () => {
                     staticStatus: StaticStatus.NONE
                   },
                   {
-                    type: 'BracketExpressionContent',
+                    type: 'ExpressionBracketContent',
                     expression: {
                       type: 'Constant',
                       value: 5
@@ -163,7 +163,7 @@ describe('declarator', () => {
                       },
                       bracketContents: [
                         {
-                          type: 'BracketExpressionlessContent'
+                          type: 'ExpressionlessBracketContent'
                         }
                       ]
                     }
@@ -214,7 +214,7 @@ describe('declarator', () => {
                       },
                       bracketContents: [
                         {
-                          type: 'BracketStarContent'
+                          type: 'StarBracketContent'
                         }
                       ]
                     }
@@ -265,7 +265,7 @@ describe('declarator', () => {
                       },
                       bracketContents: [
                         {
-                          type: 'BracketExpressionContent',
+                          type: 'ExpressionBracketContent',
                           expression: {
                             type: 'Identifier',
                             name: 'i'
@@ -429,7 +429,7 @@ describe('declarator', () => {
                 },
                 bracketContents: [
                   {
-                    type: 'BracketExpressionContent',
+                    type: 'ExpressionBracketContent',
                     expression: {
                       type: 'Constant',
                       value: 10

@@ -24,7 +24,7 @@ describe('abstract declarator', () => {
                   {
                     type: 'ParameterAbstractDeclaratorDeclaration',
                     declarator: {
-                      type: 'BracketExpressionlessContent'
+                      type: 'ExpressionlessBracketContent'
                     }
                   }
                 ]
@@ -59,7 +59,7 @@ describe('abstract declarator', () => {
                   {
                     type: 'ParameterAbstractDeclaratorDeclaration',
                     declarator: {
-                      type: 'BracketExpressionContent',
+                      type: 'ExpressionBracketContent',
                       expression: {
                         type: 'Identifier',
                         name: 'i'

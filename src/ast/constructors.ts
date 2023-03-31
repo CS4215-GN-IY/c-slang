@@ -10,9 +10,9 @@ import {
   type EmptyStatement,
   type Expression,
   type Identifier,
-  type BracketExpressionlessContent,
-  type BracketExpressionContent,
-  type BracketStarContent,
+  type ExpressionlessBracketContent,
+  type ExpressionBracketContent,
+  type StarBracketContent,
   type StringLiteral,
   type DeclaratorPattern,
   type ParameterDeclaratorDeclaration,
@@ -129,22 +129,22 @@ export const constructMainCallExpression = (): CallExpression => {
   };
 };
 
-export const constructBracketExpressionlessContent =
-  (): BracketExpressionlessContent => ({
-    type: 'BracketExpressionlessContent'
+export const constructExpressionlessBracketContent =
+  (): ExpressionlessBracketContent => ({
+    type: 'ExpressionlessBracketContent'
   });
 
-export const constructBracketExpressionContent = (
+export const constructExpressionBracketContent = (
   expression: Expression,
   staticStatus: StaticStatus
-): BracketExpressionContent => ({
-  type: 'BracketExpressionContent',
+): ExpressionBracketContent => ({
+  type: 'ExpressionBracketContent',
   expression,
   staticStatus
 });
 
-export const constructBracketStarContent = (): BracketStarContent => ({
-  type: 'BracketStarContent'
+export const constructStarBracketContent = (): StarBracketContent => ({
+  type: 'StarBracketContent'
 });
 
 export const constructParameterDeclaratorDeclaration = (
