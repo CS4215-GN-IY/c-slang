@@ -1379,13 +1379,13 @@ export class ASTBuilder implements CVisitor<any> {
     }
 
     const abstractDeclarator = ctx.abstractDeclarator();
-    if (abstractDeclarator !== undefined) {
-      return {
-        type: 'ParameterAbstractDeclaratorDeclaration',
-        declarator: this.visitAbstractDeclarator(abstractDeclarator)
-      };
-    }
-    throw new UnreachableCaseError();
+    return {
+      type: 'ParameterAbstractDeclaratorDeclaration',
+      declarator:
+        abstractDeclarator === undefined
+          ? undefined
+          : this.visitAbstractDeclarator(abstractDeclarator)
+    };
   }
 
   visitParameterList(ctx: ParameterListContext): ParameterDeclaration[] {
