@@ -10,7 +10,13 @@ import {
   type EmptyStatement,
   type Expression,
   type Identifier,
-  type StringLiteral
+  type ExpressionlessBracketContent,
+  type ExpressionBracketContent,
+  type StarBracketContent,
+  type StringLiteral,
+  type DeclaratorPattern,
+  type ParameterDeclaratorDeclaration,
+  type StaticStatus
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
@@ -122,3 +128,28 @@ export const constructMainCallExpression = (): CallExpression => {
     arguments: []
   };
 };
+
+export const constructExpressionlessBracketContent =
+  (): ExpressionlessBracketContent => ({
+    type: 'ExpressionlessBracketContent'
+  });
+
+export const constructExpressionBracketContent = (
+  expression: Expression,
+  staticStatus: StaticStatus
+): ExpressionBracketContent => ({
+  type: 'ExpressionBracketContent',
+  expression,
+  staticStatus
+});
+
+export const constructStarBracketContent = (): StarBracketContent => ({
+  type: 'StarBracketContent'
+});
+
+export const constructParameterDeclaratorDeclaration = (
+  declarator: DeclaratorPattern
+): ParameterDeclaratorDeclaration => ({
+  type: 'ParameterDeclaratorDeclaration',
+  declarator
+});

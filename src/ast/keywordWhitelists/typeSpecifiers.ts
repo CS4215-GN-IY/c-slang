@@ -6,7 +6,8 @@ export const TYPE_SPECIFIER_WHITELIST = [
   'float',
   'double',
   'signed',
-  'unsigned'
+  'unsigned',
+  'void'
 ] as const;
 
 export type TypeSpecifier = (typeof TYPE_SPECIFIER_WHITELIST)[number];

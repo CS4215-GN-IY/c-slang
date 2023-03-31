@@ -281,8 +281,8 @@ export interface BaseDeclaration extends BaseStatement {}
 export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
   // TODO: Add declaration specifiers
-  id: Identifier;
-  params: Identifier[];
+  id: DeclaratorPattern;
+  params: ParameterDeclaration[];
   body: BlockOrEmptyStatement;
 }
 
@@ -295,6 +295,94 @@ export interface VariableDeclaration extends BaseDeclaration {
 
 export interface VariableDeclarator extends BaseNode {
   type: 'VariableDeclarator';
-  id: Identifier;
+  pattern: DeclaratorPattern;
   initialValue?: Expression;
+}
+
+export type DeclaratorPattern =
+  | ArrayPattern
+  | FunctionPattern
+  | Identifier
+  | PointerPattern;
+
+export interface PointerPattern extends BaseNode {
+  type: 'PointerPattern';
+  pattern: DeclaratorPattern;
+}
+
+export interface ArrayPattern extends BaseNode {
+  type: 'ArrayPattern';
+  id: DeclaratorPattern;
+  bracketContents: BracketContent[];
+}
+
+export type BracketContent =
+  | ExpressionBracketContent
+  | ExpressionlessBracketContent
+  | StarBracketContent;
+
+export interface ExpressionBracketContent extends BaseNode {
+  type: 'ExpressionBracketContent';
+  // TODO: Add type list when types are supported.
+  expression: Expression;
+  staticStatus: StaticStatus;
+}
+
+export enum StaticStatus {
+  AFTER_TYPES = 'AfterTypes',
+  BEFORE_TYPES = 'BeforeTypes',
+  NONE = 'None'
+}
+
+export interface ExpressionlessBracketContent extends BaseNode {
+  type: 'ExpressionlessBracketContent';
+  // TODO: Add type list when types are supported.
+}
+
+export interface StarBracketContent extends BaseNode {
+  type: 'StarBracketContent';
+  // TODO: Add type list when types are supported.
+}
+
+export interface FunctionPattern extends BaseNode {
+  type: 'FunctionPattern';
+  id: DeclaratorPattern;
+  params: ParameterDeclaration[];
+}
+
+export type ParameterDeclaration =
+  | ParameterDeclaratorDeclaration
+  | ParameterAbstractDeclaratorDeclaration;
+
+export interface ParameterDeclaratorDeclaration {
+  type: 'ParameterDeclaratorDeclaration';
+  // TODO: Support declaration specifiers
+  declarator: DeclaratorPattern;
+}
+
+export interface ParameterAbstractDeclaratorDeclaration {
+  type: 'ParameterAbstractDeclaratorDeclaration';
+  // TODO: Support declaration specifiers
+  declarator?: AbstractDeclaratorPattern;
+}
+
+export type AbstractDeclaratorPattern =
+  | AbstractPointerPattern
+  | AbstractParamPattern
+  | AbstractSequencePattern
+  | BracketContent;
+
+export interface AbstractPointerPattern extends BaseNode {
+  type: 'AbstractPointerPattern';
+  pattern?: AbstractDeclaratorPattern;
+}
+
+export interface AbstractParamPattern extends BaseNode {
+  type: 'AbstractParamPattern';
+  params: ParameterDeclaration[];
+}
+
+export interface AbstractSequencePattern extends BaseNode {
+  type: 'AbstractSequencePattern';
+  declarators: AbstractDeclaratorPattern[];
 }

@@ -26,6 +26,7 @@ import {
 } from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
+import { getNameFromDeclaratorPattern } from './compilerUtils';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -103,7 +104,10 @@ export const addFunctionSymbolTableEntries = (
     });
   }
 
-  const functionEntry = getFunctionSymbolTableEntry(node.id.name, symbolTable);
+  const functionEntry = getFunctionSymbolTableEntry(
+    getNameFromDeclaratorPattern(node.id),
+    symbolTable
+  );
   functionEntry.numOfVariables += offset;
 
   return {
@@ -233,7 +237,7 @@ const constructFunctionDeclarationSymbolTableEntry = (
   offset: number
 ): SymbolTableEntry => {
   return {
-    name: functionDeclaration.id.name,
+    name: getNameFromDeclaratorPattern(functionDeclaration.id),
     nameType: 'Function',
     offset,
     scope,
@@ -252,7 +256,7 @@ const constructVariableDeclarationSymbolTableEntries = (
   const allNames: SymbolTableEntry[] = [];
   variableDeclaration.declarations.forEach((declarator) => {
     allNames.push({
-      name: declarator.id.name,
+      name: getNameFromDeclaratorPattern(declarator.pattern),
       nameType: 'Variable',
       offset,
       scope

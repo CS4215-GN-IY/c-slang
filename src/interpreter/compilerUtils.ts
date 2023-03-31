@@ -1,9 +1,14 @@
-import { type Expression } from '../ast/types';
-import { isIdentifier } from '../ast/typeGuards';
+import { type DeclaratorPattern, type Expression } from '../ast/types';
+import {
+  isArrayPattern,
+  isFunctionPattern,
+  isIdentifier,
+  isPointerPattern
+} from '../ast/typeGuards';
 import { getSymbolTableEntry } from './symbolTable';
 import { type SymbolTable, type SymbolTableEntry } from './types/symbolTable';
 import { constructAssignInstr } from './instructions';
-import { InvalidLValueError } from './errors';
+import { InvalidLValueError, UnsupportedDeclarationError } from './errors';
 import { type AssignInstr } from './types/instructions';
 
 export const constructAssignmentExpressionAssignInstr = (
@@ -24,4 +29,22 @@ export const getSymbolTableEntryOfExpression = (
 
   // TODO: Support other cases if necessary, leftNode must be an lvalue
   throw new InvalidLValueError();
+};
+
+export const getNameFromDeclaratorPattern = (
+  pattern: DeclaratorPattern
+): string => {
+  if (isIdentifier(pattern)) {
+    return pattern.name;
+  }
+
+  if (isPointerPattern(pattern)) {
+    return getNameFromDeclaratorPattern(pattern.pattern);
+  }
+
+  if (isArrayPattern(pattern) || isFunctionPattern(pattern)) {
+    return getNameFromDeclaratorPattern(pattern.id);
+  }
+
+  throw new UnsupportedDeclarationError();
 };
