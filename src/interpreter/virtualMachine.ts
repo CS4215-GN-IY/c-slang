@@ -29,7 +29,8 @@ import {
   type UnaryOperationInstr,
   type LoadAddressInstr,
   type TailCallInstr,
-  type LoadReturnAddressInstr
+  type LoadReturnAddressInstr,
+  type ArrayAccessInstr
 } from './types/instructions';
 import {
   convertToAddress,
@@ -84,6 +85,23 @@ export const interpret = (instructions: Instr[]): Value => {
 };
 
 const virtualMachineEvaluators: VirtualMachineMapping = {
+  ArrayAccess: (instr: ArrayAccessInstr, state: VirtualMachineState) => {
+    const offset = state.stash.pop();
+    const baseAddress = state.stash.pop();
+    if (instr.isAccessingAddress) {
+      state.stash.push(
+        state.memory.getAddressByOffset(baseAddress, offset * instr.multiplier)
+      );
+    } else {
+      state.stash.push(
+        state.memory.getByOffsetFromAddress(
+          baseAddress,
+          offset * instr.multiplier
+        )
+      );
+    }
+    state.memory.moveToNextInstr();
+  },
   Assign: (instr: AssignInstr, state: VirtualMachineState) => {
     // TODO: Add conversion method to convert various stash values to their respective number.
     // Do this when types are supported.

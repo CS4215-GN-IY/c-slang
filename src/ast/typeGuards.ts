@@ -4,6 +4,7 @@ import {
 } from './astBuilderInternalTypes';
 import {
   type AbstractSequencePattern,
+  type ArrayAccessExpression,
   type ArrayPattern,
   type BaseNode,
   BINARY_OPERATORS,
@@ -26,6 +27,12 @@ export const isTypedefNameReturnValue = (
   returnValue: BaseReturnValue
 ): returnValue is TypedefNameReturnValue => {
   return returnValue.type === 'TypedefName';
+};
+
+export const isArrayAccessExpression = (
+  node: BaseNode
+): node is ArrayAccessExpression => {
+  return node.type === 'ArrayAccessExpression';
 };
 
 export const isIdentifier = (node: BaseNode): node is Identifier => {

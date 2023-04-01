@@ -25,13 +25,23 @@ import {
   type LoadAddressInstr,
   type Instr,
   type TailCallInstr,
-  type LoadReturnAddressInstr
+  type LoadReturnAddressInstr,
+  type ArrayAccessInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
 import { type Value } from './types/virtualMachine';
 
 export const PLACEHOLDER_ADDRESS = -1;
+
+export const constructArrayAccessInstr = (
+  multiplier: number,
+  isAccessingAddress: boolean
+): ArrayAccessInstr => ({
+  type: 'ArrayAccess',
+  multiplier,
+  isAccessingAddress
+});
 
 export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   type: 'Assign',

@@ -34,6 +34,7 @@ import {
   type WhileStatement
 } from '../ast/types';
 import {
+  constructArrayAccessInstr,
   constructAssignInstr,
   constructBinaryOperationInstr,
   constructBreakDoneInstr,
@@ -70,6 +71,7 @@ import {
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
+  UnsupportedArrayError,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
@@ -87,10 +89,12 @@ import {
   addBlockSymbolTableEntries,
   addFunctionSymbolTableEntries,
   addProgramSymbolTableEntries,
+  getArraySymbolTableEntry,
   getFunctionSymbolTableEntry,
   getNumOfEntriesInFrame,
   getSymbolTableEntry,
-  getSymbolTableEntryInFrame
+  getSymbolTableEntryInFrame,
+  isArraySymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
 import {
@@ -135,7 +139,31 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
-  ) => {},
+  ) => {
+    compile(node.expression, instructions, symbolTable, labelFrame);
+    // TODO: Handle more types of array symbol table entries.
+    if (!isIdentifier(node.expression)) {
+      throw new UnsupportedArrayError();
+    }
+    const arraySymbolTableEntry = getArraySymbolTableEntry(
+      node.expression.name,
+      symbolTable
+    );
+    const multipliers = arraySymbolTableEntry.multipliers;
+    for (let i = 0; i < node.indexesBeingAccessed.length; i++) {
+      compile(
+        node.indexesBeingAccessed[i],
+        instructions,
+        symbolTable,
+        labelFrame
+      );
+      const arrayAccessInstruction = constructArrayAccessInstr(
+        multipliers[i],
+        i !== arraySymbolTableEntry.numOfDimensions - 1
+      );
+      instructions.push(arrayAccessInstruction);
+    }
+  },
   AssignmentExpression: (
     node: AssignmentExpression,
     instructions: Instr[],
@@ -402,6 +430,12 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
+    const symbolTableEntry = getSymbolTableEntry(node.name, symbolTable);
+    if (isArraySymbolTableEntry(symbolTableEntry)) {
+      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+      instructions.push(loadAddressInstr);
+      return;
+    }
     const loadSymbolInstr = constructLoadSymbolInstr(
       getSymbolTableEntry(node.name, symbolTable)
     );

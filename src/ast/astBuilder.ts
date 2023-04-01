@@ -139,6 +139,7 @@ import {
 } from './astBuilderInternalTypes';
 import {
   isAbstractSequencePattern,
+  isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
   isTypedefNameReturnValue
@@ -1433,11 +1434,14 @@ export class ASTBuilder implements CVisitor<any> {
           const indexBeingAccessed = this.visitExpression(
             arrayAccessIndexExpression
           );
-          expression = {
-            type: 'ArrayAccessExpression',
-            expression,
-            indexBeingAccessed
-          };
+          expression = isArrayAccessExpression(expression)
+            ? expression
+            : {
+                type: 'ArrayAccessExpression',
+                expression,
+                indexesBeingAccessed: []
+              };
+          expression.indexesBeingAccessed.push(indexBeingAccessed);
           // Skip over "'[' expression ']'".
           currChildIdx += 3;
           break;

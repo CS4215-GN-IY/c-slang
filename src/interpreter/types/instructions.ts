@@ -6,6 +6,7 @@ interface BaseInstr {
 }
 
 export type Instr =
+  | ArrayAccessInstr
   | AssignInstr
   | BinaryOperationInstr
   | BreakInstr
@@ -30,6 +31,12 @@ export type Instr =
   | TailCallInstr
   | TeardownInstr
   | UnaryOperationInstr;
+
+export interface ArrayAccessInstr extends BaseInstr {
+  type: 'ArrayAccess';
+  multiplier: number;
+  isAccessingAddress: boolean;
+}
 
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';

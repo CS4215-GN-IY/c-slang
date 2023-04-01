@@ -165,6 +165,15 @@ export class VirtualMemory {
     this.rbp = savedRbp;
   }
 
+  public getByOffsetFromAddress(baseAddress: number, offset: number): number {
+    const address = baseAddress + offset * PageTable.ENTRY_SIZE;
+    return this.get(address);
+  }
+
+  public getAddressByOffset(baseAddress: number, offset: number): number {
+    return baseAddress + offset * PageTable.ENTRY_SIZE;
+  }
+
   /**
    * Gets data from entry at address.
    */

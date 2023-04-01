@@ -6,6 +6,7 @@ export interface SymbolTable {
 
 export type SymbolTableFrame = Record<string, SymbolTableEntry>;
 export type SymbolTableEntry =
+  | ArraySymbolTableEntry
   | FunctionSymbolTableEntry
   | VariableSymbolTableEntry;
 export type SymbolTableEntryScope = 'Block' | 'Function' | 'Global';
@@ -17,6 +18,12 @@ export interface BaseSymbolTableEntry {
   name: string;
   offset: number;
   scope: SymbolTableEntryScope;
+}
+
+export interface ArraySymbolTableEntry extends BaseSymbolTableEntry {
+  nameType: 'Array';
+  multipliers: number[];
+  numOfDimensions: number;
 }
 
 export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {

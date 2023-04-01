@@ -5,6 +5,7 @@ import {
   type VariableDeclaration
 } from '../ast/types';
 import {
+  type ArraySymbolTableEntry,
   type FunctionSymbolTableEntry,
   type SymbolTable,
   type SymbolTableEntry,
@@ -20,6 +21,7 @@ import {
   UnsupportedDeclarationError
 } from './errors';
 import {
+  isArrayPattern,
   isEmptyStatement,
   isForStatement,
   isVariableDeclaration
@@ -27,6 +29,8 @@ import {
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
 import {
+  getArrayPatternDimensionSizes,
+  getArrayPatternMultipliers,
   getFixedNumOfEntriesOfDeclaratorPattern,
   getNameFromDeclaratorPattern
 } from './compilerUtils';
@@ -145,6 +149,17 @@ export const addBlockSymbolTableEntries = (
   };
 };
 
+export const getArraySymbolTableEntry = (
+  name: string,
+  symbolTable: SymbolTable
+): ArraySymbolTableEntry => {
+  const arrayEntry = getSymbolTableEntry(name, symbolTable);
+  if (!isArraySymbolTableEntry(arrayEntry)) {
+    throw new TypeError('array', arrayEntry.nameType, TypeErrorContext.NAME);
+  }
+  return arrayEntry;
+};
+
 export const getFunctionSymbolTableEntry = (
   name: string,
   symbolTable: SymbolTable
@@ -200,6 +215,12 @@ export const getSegmentScope = (scope: SymbolTableEntryScope): Segment => {
   }
 };
 
+export const isArraySymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is ArraySymbolTableEntry => {
+  return entry.nameType === 'Array';
+};
+
 export const isFunctionSymbolTableEntry = (
   entry: SymbolTableEntry
 ): entry is FunctionSymbolTableEntry => {
@@ -250,12 +271,25 @@ const addVariableDeclarationSymbolTableEntries = (
 ): number => {
   let offset = startingOffset;
   variableDeclaration.declarations.forEach((declarator) => {
-    const entry: SymbolTableEntry = {
-      name: getNameFromDeclaratorPattern(declarator.pattern),
-      nameType: 'Variable',
-      offset,
-      scope
-    };
+    let entry: SymbolTableEntry;
+    if (isArrayPattern(declarator.pattern)) {
+      entry = {
+        name: getNameFromDeclaratorPattern(declarator.pattern),
+        nameType: 'Array',
+        offset,
+        scope,
+        multipliers: getArrayPatternMultipliers(declarator.pattern),
+        numOfDimensions: getArrayPatternDimensionSizes(declarator.pattern)
+          .length
+      };
+    } else {
+      entry = {
+        name: getNameFromDeclaratorPattern(declarator.pattern),
+        nameType: 'Variable',
+        offset,
+        scope
+      };
+    }
     offset += getFixedNumOfEntriesOfDeclaratorPattern(declarator.pattern);
     addToFrame(symbolTableFrame, entry);
   });

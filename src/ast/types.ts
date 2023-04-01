@@ -178,7 +178,7 @@ export interface StringLiteral extends BaseExpression {
 export interface ArrayAccessExpression extends BaseExpression {
   type: 'ArrayAccessExpression';
   expression: Expression;
-  indexBeingAccessed: Expression;
+  indexesBeingAccessed: Expression[];
 }
 
 export interface CallExpression extends BaseExpression {
