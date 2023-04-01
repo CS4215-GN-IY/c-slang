@@ -116,7 +116,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     const functionInstrAddress = convertToAddress(state.stash.pop());
     state.memory.stackFunctionCallAllocate(
       args,
-      instr.numOfVars,
+      instr.numOfEntriesForVars,
       returnAddress
     );
     state.memory.moveToInstr(functionInstrAddress);

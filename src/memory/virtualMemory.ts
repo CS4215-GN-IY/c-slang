@@ -117,7 +117,7 @@ export class VirtualMemory {
 
   public stackFunctionCallSetup(
     args: number[],
-    numOfVars: number,
+    numOfEntriesForVars: number,
     returnAddress: number
   ): void {
     /*
@@ -144,7 +144,7 @@ export class VirtualMemory {
     this.stackAllocate(returnAddress);
     this.rbp = this.rsp;
     const placeholderData = 0;
-    for (let i = 0; i < numOfVars; i++) {
+    for (let i = 0; i < numOfEntriesForVars; i++) {
       this.stackAllocate(placeholderData);
     }
   }

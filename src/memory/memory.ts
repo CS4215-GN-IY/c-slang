@@ -68,10 +68,14 @@ export class Memory {
 
   public stackFunctionCallAllocate(
     args: number[],
-    numOfVars: number,
+    numOfEntriesForVars: number,
     returnAddress: number
   ): void {
-    this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
+    this.virtualMemory.stackFunctionCallSetup(
+      args,
+      numOfEntriesForVars,
+      returnAddress
+    );
   }
 
   public getReturnAddress(): number {

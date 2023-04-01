@@ -11,4 +11,13 @@ describe('variable declaration', () => {
     const expectedResult = 5;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles array variable declaration', () => {
+    const code = 'int main() { int arr[5]; int b = 5; return b; }';
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 5;
+    expect(result).toEqual(expectedResult);
+  });
 });

@@ -22,7 +22,7 @@ export interface BaseSymbolTableEntry {
 export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
   nameType: 'Function';
   numOfParams: number;
-  numOfVariables: number;
+  numOfEntriesForVariables: number;
 }
 
 interface VariableSymbolTableEntry extends BaseSymbolTableEntry {

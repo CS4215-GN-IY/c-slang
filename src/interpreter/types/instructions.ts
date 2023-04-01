@@ -53,7 +53,7 @@ export interface BreakDoneInstr extends BaseInstr {
 export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
-  numOfVars: number;
+  numOfEntriesForVars: number;
 }
 
 export interface ContinueInstr extends BaseInstr {

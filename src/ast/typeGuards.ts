@@ -11,11 +11,14 @@ import {
   type CaseStatement,
   type Constant,
   type EmptyStatement,
+  type ExpressionBracketContent,
+  type ExpressionlessBracketContent,
   type ForStatement,
   type FunctionPattern,
   type Identifier,
   type IdentifierStatement,
   type PointerPattern,
+  type StarBracketContent,
   type VariableDeclaration
 } from './types';
 
@@ -73,6 +76,24 @@ export const isAbstractSequencePattern = (
   node: BaseNode
 ): node is AbstractSequencePattern => {
   return node.type === 'AbstractSequencePattern';
+};
+
+export const isExpressionBracketContent = (
+  node: BaseNode
+): node is ExpressionBracketContent => {
+  return node.type === 'ExpressionBracketContent';
+};
+
+export const isExpressionlessBracketContent = (
+  node: BaseNode
+): node is ExpressionlessBracketContent => {
+  return node.type === 'ExpressionlessBracketContent';
+};
+
+export const isStarBracketContent = (
+  node: BaseNode
+): node is StarBracketContent => {
+  return node.type === 'StarBracketContent';
 };
 
 export const isBinaryOperator = (

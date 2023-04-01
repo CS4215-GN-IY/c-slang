@@ -219,7 +219,7 @@ const compilers: CompilerMapping = {
     instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
-      functionEntry.numOfVariables
+      functionEntry.numOfEntriesForVariables
     );
     instructions.push(callInstr);
   },

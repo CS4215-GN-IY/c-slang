@@ -56,11 +56,11 @@ export const constructBreakDoneInstr = (): BreakDoneInstr => ({
 
 export const constructCallInstr = (
   numOfArgs: number,
-  numOfVars: number
+  numOfEntriesForVars: number
 ): CallInstr => ({
   type: 'Call',
   numOfArgs,
-  numOfVars
+  numOfEntriesForVars
 });
 
 export const constructContinueInstr = (): ContinueInstr => ({
