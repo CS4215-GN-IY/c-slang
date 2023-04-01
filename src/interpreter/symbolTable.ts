@@ -29,7 +29,7 @@ import {
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
 import {
-  getArrayPatternDimensionSizes,
+  getArrayMaxNumOfItems,
   getArrayPatternMultipliers,
   getFixedNumOfEntriesOfDeclaratorPattern,
   getNameFromDeclaratorPattern
@@ -279,8 +279,7 @@ const addVariableDeclarationSymbolTableEntries = (
         offset,
         scope,
         multipliers: getArrayPatternMultipliers(declarator.pattern),
-        numOfDimensions: getArrayPatternDimensionSizes(declarator.pattern)
-          .length
+        maxNumOfItems: getArrayMaxNumOfItems(declarator.pattern)
       };
     } else {
       entry = {

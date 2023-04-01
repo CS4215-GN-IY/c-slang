@@ -106,7 +106,13 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   Assign: (instr: AssignInstr, state: VirtualMachineState) => {
     // TODO: Add conversion method to convert various stash values to their respective number.
     // Do this when types are supported.
-    state.memory.setByOffset(instr.scope, instr.offset, state.stash.pop());
+    for (let i = instr.numOfItems - 1; i >= 0; i--) {
+      state.memory.setByOffset(
+        instr.scope,
+        instr.offset + i,
+        state.stash.pop()
+      );
+    }
     state.memory.moveToNextInstr();
   },
   AssignToAddress: (

@@ -43,6 +43,7 @@ export interface AssignInstr extends BaseInstr {
   type: 'Assign';
   scope: Segment;
   offset: number;
+  numOfItems: number;
 }
 
 export interface AssignToAddressInstr extends BaseInstr {

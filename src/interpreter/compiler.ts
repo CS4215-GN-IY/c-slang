@@ -70,13 +70,16 @@ import {
   isBinaryOperator,
   isCaseStatement,
   isEmptyStatement,
-  isIdentifier
+  isIdentifier,
+  isInitializerListExpression
 } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
+  InvalidInitializationError,
   InvalidLValueError,
   UnsupportedArrayError,
+  UnsupportedDeclarationError,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
@@ -163,7 +166,7 @@ const compilers: CompilerMapping = {
         multipliers[i],
         node.isAccessingAddress
           ? true
-          : i !== arraySymbolTableEntry.numOfDimensions - 1
+          : i !== arraySymbolTableEntry.multipliers.length - 1
       );
       instructions.push(arrayAccessInstruction);
     }
@@ -325,7 +328,13 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
-  ) => {},
+  ) => {
+    // TODO: Support designators in future.
+    if (node.designators.length > 0) {
+      throw new UnsupportedDeclarationError();
+    }
+    compile(node.initializer, instructions, symbolTable, labelFrame);
+  },
   DoWhileStatement: (
     node: DoWhileStatement,
     instructions: Instr[],
@@ -419,7 +428,8 @@ const compilers: CompilerMapping = {
     jumpInstr.instrAddress = instructions.length;
 
     const assignInstr = constructAssignInstr(
-      getSymbolTableEntry(getNameFromDeclaratorPattern(node.id), symbolTable)
+      getSymbolTableEntry(getNameFromDeclaratorPattern(node.id), symbolTable),
+      1
     );
     instructions.push(assignInstr);
   },
@@ -486,7 +496,11 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
-  ) => {},
+  ) => {
+    node.items.forEach((item) =>
+      { compile(item, instructions, symbolTable, labelFrame); }
+    );
+  },
   LogicalExpression: (
     node: LogicalExpression,
     instructions: Instr[],
@@ -673,7 +687,16 @@ const compilers: CompilerMapping = {
           getNameFromDeclaratorPattern(declarator.pattern),
           symbolTable.head
         );
-        const assignInstr = constructAssignInstr(entry);
+        if (
+          isInitializerListExpression(initialValue) &&
+          !isArraySymbolTableEntry(entry)
+        ) {
+          throw new InvalidInitializationError();
+        }
+        const numOfItemsToAssign = isInitializerListExpression(initialValue)
+          ? initialValue.items.length
+          : 1;
+        const assignInstr = constructAssignInstr(entry, numOfItemsToAssign);
         instructions.push(assignInstr);
       }
     });

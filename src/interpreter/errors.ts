@@ -2,6 +2,8 @@ export class InterpreterError extends Error {}
 
 export class InvalidCallError extends InterpreterError {}
 
+export class InvalidInitializationError extends InterpreterError {}
+
 export class InvalidLValueError extends InterpreterError {}
 
 export class InvalidScopeError extends InterpreterError {}

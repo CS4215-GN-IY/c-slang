@@ -44,10 +44,14 @@ export const constructArrayAccessInstr = (
   isAccessingAddress
 });
 
-export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
+export const constructAssignInstr = (
+  entry: SymbolTableEntry,
+  numOfItems: number
+): AssignInstr => ({
   type: 'Assign',
   scope: getSegmentScope(entry.scope),
-  offset: entry.offset
+  offset: entry.offset,
+  numOfItems
 });
 
 export const constructAssignToAddressInstr = (): AssignToAddressInstr => ({

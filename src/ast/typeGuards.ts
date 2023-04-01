@@ -18,6 +18,7 @@ import {
   type FunctionPattern,
   type Identifier,
   type IdentifierStatement,
+  type InitializerListExpression,
   type PointerPattern,
   type StarBracketContent,
   type VariableDeclaration
@@ -37,6 +38,12 @@ export const isArrayAccessExpression = (
 
 export const isIdentifier = (node: BaseNode): node is Identifier => {
   return node.type === 'Identifier';
+};
+
+export const isInitializerListExpression = (
+  node: BaseNode
+): node is InitializerListExpression => {
+  return node.type === 'InitializerListExpression';
 };
 
 export const isConstant = (node: BaseNode): node is Constant => {

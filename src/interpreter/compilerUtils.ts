@@ -40,8 +40,7 @@ export const getFixedNumOfEntriesOfDeclaratorPattern = (
   if (isArrayPattern(pattern)) {
     // Allocate 1 entry space to each item in the array for now.
     // Multiply the sizes of each array dimension to get the total array size.
-    const sizes = getArrayPatternDimensionSizes(pattern);
-    return sizes.reduce((product, size) => product * size, 1);
+    return getArrayMaxNumOfItems(pattern);
   }
 
   if (isFunctionPattern(pattern)) {
@@ -70,6 +69,11 @@ export const getArrayPatternDimensionSizes = (
     }
     throw new UnsupportedArrayError('Unsupported array type.');
   });
+};
+
+export const getArrayMaxNumOfItems = (pattern: ArrayPattern): number => {
+  const sizes = getArrayPatternDimensionSizes(pattern);
+  return sizes.reduce((product, size) => product * size, 1);
 };
 
 export const getArrayPatternMultipliers = (pattern: ArrayPattern): number[] => {

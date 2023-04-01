@@ -23,7 +23,7 @@ export interface BaseSymbolTableEntry {
 export interface ArraySymbolTableEntry extends BaseSymbolTableEntry {
   nameType: 'Array';
   multipliers: number[];
-  numOfDimensions: number;
+  maxNumOfItems: number;
 }
 
 export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
