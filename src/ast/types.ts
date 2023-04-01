@@ -150,7 +150,9 @@ export type Expression =
   | CallExpression
   | ConditionalExpression
   | Constant
+  | DesignationWithInitializerExpression
   | Identifier
+  | InitializerListExpression
   | LogicalExpression
   | MemberExpression
   | SequenceExpression
@@ -182,10 +184,21 @@ export interface ArrayAccessExpression extends BaseExpression {
   isAccessingAddress: boolean;
 }
 
+export interface DesignationWithInitializerExpression extends BaseExpression {
+  type: 'DesignationWithInitializerExpression';
+  designators: Expression[];
+  initializer: Expression;
+}
+
 export interface CallExpression extends BaseExpression {
   type: 'CallExpression';
   callee: Expression;
   arguments: Expression[];
+}
+
+export interface InitializerListExpression extends BaseExpression {
+  type: 'InitializerListExpression';
+  items: DesignationWithInitializerExpression[];
 }
 
 export interface MemberExpression extends BaseExpression {

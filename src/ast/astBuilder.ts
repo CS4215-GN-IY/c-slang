@@ -26,7 +26,9 @@ import {
   StaticStatus,
   type UnaryOperator,
   type VariableDeclaration,
-  type VariableDeclarator
+  type VariableDeclarator,
+  type DesignationWithInitializerExpression,
+  type InitializerListExpression
 } from './types';
 import {
   type ErrorNode,
@@ -129,6 +131,7 @@ import {
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
+  type DesignationExpression,
   type ForCondition,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
@@ -556,16 +559,39 @@ export class ASTBuilder implements CVisitor<any> {
         };
   }
 
-  visitDesignation(ctx: DesignationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignation(ctx: DesignationContext): DesignationExpression {
+    return {
+      type: 'DesignationExpression',
+      designators: this.visitDesignatorList(ctx.designatorList())
+    };
   }
 
-  visitDesignator(ctx: DesignatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignator(ctx: DesignatorContext): Expression {
+    const constantExpression = ctx.constantExpression();
+    const identifier = ctx.Identifier();
+    if (constantExpression !== undefined && identifier !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a Designator with both ConstantExpression and Identifier.'
+      );
+    }
+
+    if (constantExpression !== undefined) {
+      return this.visitConstantExpression(constantExpression);
+    }
+
+    if (identifier !== undefined) {
+      return constructIdentifier(identifier);
+    }
+
+    throw new BrokenInvariantError(
+      'Encountered a Designator without both ConstantExpression and Identifier.'
+    );
   }
 
-  visitDesignatorList(ctx: DesignatorListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignatorList(ctx: DesignatorListContext): Expression[] {
+    return ctx
+      .designator()
+      .map((designator) => this.visitDesignator(designator), this);
   }
 
   visitDirectAbstractDeclarator(
@@ -1137,13 +1163,73 @@ export class ASTBuilder implements CVisitor<any> {
       return this.visitAssignmentExpression(assignmentExpression);
     }
 
-    // TODO: Deal with initializer list.
+    const initializerList = ctx.initializerList();
+    if (initializerList !== undefined) {
+      return this.visitInitializerList(initializerList);
+    }
 
     throw new UnreachableCaseError();
   }
 
-  visitInitializerList(ctx: InitializerListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInitializerList(ctx: InitializerListContext): InitializerListExpression {
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an InitializerList with no child nodes.'
+      );
+    }
+
+    let designationExpression: DesignationExpression | undefined;
+    let initializer: Expression | undefined;
+    let designationIdx = 0;
+    let initializerIdx = 0;
+    const items: DesignationWithInitializerExpression[] = [];
+    for (let i = 0; i < children.length; i++) {
+      const childString = children[i].toStringTree();
+      if (childString === ',') {
+        if (initializer === undefined) {
+          throw new BrokenInvariantError(
+            'Encountered a missing Initializer in the InitializerList.'
+          );
+        }
+        items.push({
+          type: 'DesignationWithInitializerExpression',
+          designators:
+            designationExpression === undefined
+              ? []
+              : designationExpression.designators,
+          initializer
+        });
+        designationExpression = undefined;
+        initializer = undefined;
+      } else if (childString.includes('=')) {
+        designationExpression = this.visitDesignation(
+          ctx.designation(designationIdx)
+        );
+        designationIdx += 1;
+      } else {
+        initializer = this.visitInitializer(ctx.initializer(initializerIdx));
+        initializerIdx += 1;
+      }
+    }
+    if (initializer === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a missing Initializer in the InitializerList.'
+      );
+    }
+    items.push({
+      type: 'DesignationWithInitializerExpression',
+      designators:
+        designationExpression === undefined
+          ? []
+          : designationExpression.designators,
+      initializer
+    });
+
+    return {
+      type: 'InitializerListExpression',
+      items
+    };
   }
 
   visitIterationStatement(ctx: IterationStatementContext): IterationStatement {

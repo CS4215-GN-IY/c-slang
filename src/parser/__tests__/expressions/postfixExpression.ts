@@ -558,7 +558,7 @@ describe('postfix expression', () => {
                                 type: 'Constant',
                                 value: 4215
                               }
-                            ],
+                            ]
                           },
                           indexesBeingAccessed: [
                             {

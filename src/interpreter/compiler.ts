@@ -11,6 +11,7 @@ import {
   type Constant,
   type ContinueStatement,
   type DefaultStatement,
+  type DesignationWithInitializerExpression,
   type DoWhileStatement,
   type EmptyStatement,
   type ExpressionStatement,
@@ -20,6 +21,7 @@ import {
   type Identifier,
   type IdentifierStatement,
   type IfStatement,
+  type InitializerListExpression,
   type LogicalExpression,
   type MemberExpression,
   type Node,
@@ -318,6 +320,12 @@ const compilers: CompilerMapping = {
     instructions.push(fallthroughDoneInstr);
     compile(node.body, instructions, symbolTable, labelFrame);
   },
+  DesignationWithInitializerExpression: (
+    node: DesignationWithInitializerExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {},
   DoWhileStatement: (
     node: DoWhileStatement,
     instructions: Instr[],
@@ -473,6 +481,12 @@ const compilers: CompilerMapping = {
     }
     jumpInstr.instrAddress = instructions.length;
   },
+  InitializerListExpression: (
+    node: InitializerListExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {},
   LogicalExpression: (
     node: LogicalExpression,
     instructions: Instr[],
