@@ -36,6 +36,7 @@ import {
 import {
   constructArrayAccessInstr,
   constructAssignInstr,
+  constructAssignToAddressInstr,
   constructBinaryOperationInstr,
   constructBreakDoneInstr,
   constructBreakInstr,
@@ -63,6 +64,7 @@ import {
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
+  isArrayAccessExpression,
   isBinaryOperator,
   isCaseStatement,
   isEmptyStatement,
@@ -71,6 +73,7 @@ import {
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
+  InvalidLValueError,
   UnsupportedArrayError,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
@@ -82,7 +85,8 @@ import {
   constructFalseConstant,
   constructMainCallExpression,
   constructOneConstant,
-  constructTrueConstant
+  constructTrueConstant,
+  constructUnaryAddressExpression
 } from '../ast/constructors';
 import { type LabelFrame, type SymbolTable } from './types/symbolTable';
 import {
@@ -97,11 +101,7 @@ import {
   isArraySymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
-import {
-  constructAssignmentExpressionAssignInstr,
-  getNameFromDeclaratorPattern,
-  getSymbolTableEntryOfExpression
-} from './compilerUtils';
+import { getNameFromDeclaratorPattern } from './compilerUtils';
 import {
   addBlockLabelFrameEntries,
   constructFunctionLabelFrame,
@@ -159,7 +159,9 @@ const compilers: CompilerMapping = {
       );
       const arrayAccessInstruction = constructArrayAccessInstr(
         multipliers[i],
-        i !== arraySymbolTableEntry.numOfDimensions - 1
+        node.isAccessingAddress
+          ? true
+          : i !== arraySymbolTableEntry.numOfDimensions - 1
       );
       instructions.push(arrayAccessInstruction);
     }
@@ -181,11 +183,10 @@ const compilers: CompilerMapping = {
     } else {
       compile(node.right, instructions, symbolTable, labelFrame);
     }
-    const assignInstr = constructAssignmentExpressionAssignInstr(
-      node.left,
-      symbolTable
-    );
-    instructions.push(assignInstr);
+    const unaryAddressExpression = constructUnaryAddressExpression(node.left);
+    compile(unaryAddressExpression, instructions, symbolTable, labelFrame);
+    const assignToAddressInstr = constructAssignToAddressInstr();
+    instructions.push(assignToAddressInstr);
   },
   BinaryExpression: (
     node: BinaryExpression,
@@ -596,13 +597,23 @@ const compilers: CompilerMapping = {
     }
 
     if (node.operator === '&') {
-      const symbolTableEntry = getSymbolTableEntryOfExpression(
-        node.operand,
-        symbolTable
-      );
-      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
-      instructions.push(loadAddressInstr);
-      return;
+      if (isIdentifier(node.operand)) {
+        const symbolTableEntry = getSymbolTableEntry(
+          node.operand.name,
+          symbolTable
+        );
+        const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+        instructions.push(loadAddressInstr);
+        return;
+      }
+
+      if (isArrayAccessExpression(node.operand)) {
+        node.operand.isAccessingAddress = true;
+        compile(node.operand, instructions, symbolTable, labelFrame);
+        return;
+      }
+
+      throw new InvalidLValueError();
     }
 
     // TODO: Support sizeof after variable sizes are supported.

@@ -26,7 +26,8 @@ import {
   type Instr,
   type TailCallInstr,
   type LoadReturnAddressInstr,
-  type ArrayAccessInstr
+  type ArrayAccessInstr,
+  type AssignToAddressInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -47,6 +48,10 @@ export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
   type: 'Assign',
   scope: getSegmentScope(entry.scope),
   offset: entry.offset
+});
+
+export const constructAssignToAddressInstr = (): AssignToAddressInstr => ({
+  type: 'AssignToAddress'
 });
 
 export const constructBinaryOperationInstr = (

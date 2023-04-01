@@ -1439,7 +1439,8 @@ export class ASTBuilder implements CVisitor<any> {
             : {
                 type: 'ArrayAccessExpression',
                 expression,
-                indexesBeingAccessed: []
+                indexesBeingAccessed: [],
+                isAccessingAddress: false
               };
           expression.indexesBeingAccessed.push(indexBeingAccessed);
           // Skip over "'[' expression ']'".

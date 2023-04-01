@@ -75,7 +75,8 @@ describe('postfix expression', () => {
                             }
                           ]
                         }
-                      ]
+                      ],
+                      isAccessingAddress: false
                     }
                   ]
                 }
@@ -171,7 +172,8 @@ describe('postfix expression', () => {
                             }
                           ]
                         }
-                      ]
+                      ],
+                      isAccessingAddress: false
                     }
                   ]
                 }
@@ -556,7 +558,7 @@ describe('postfix expression', () => {
                                 type: 'Constant',
                                 value: 4215
                               }
-                            ]
+                            ],
                           },
                           indexesBeingAccessed: [
                             {
@@ -568,7 +570,8 @@ describe('postfix expression', () => {
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          isAccessingAddress: false
                         },
                         member: {
                           type: 'Identifier',

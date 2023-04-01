@@ -179,6 +179,7 @@ export interface ArrayAccessExpression extends BaseExpression {
   type: 'ArrayAccessExpression';
   expression: Expression;
   indexesBeingAccessed: Expression[];
+  isAccessingAddress: boolean;
 }
 
 export interface CallExpression extends BaseExpression {
