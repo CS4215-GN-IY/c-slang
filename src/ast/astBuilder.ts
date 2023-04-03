@@ -27,7 +27,7 @@ import {
   type UnaryOperator,
   type VariableDeclaration,
   type VariableDeclarator,
-  type DesignationWithInitializerExpression,
+  type InitializerExpression,
   type InitializerListExpression
 } from './types';
 import {
@@ -1159,16 +1159,25 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitInitializer(ctx: InitializerContext): Expression {
     const assignmentExpression = ctx.assignmentExpression();
+    const initializerList = ctx.initializerList();
+
+    if (assignmentExpression !== undefined && initializerList !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an Initializer with both AssignmentExpression and InitializerList.'
+      );
+    }
+
     if (assignmentExpression !== undefined) {
       return this.visitAssignmentExpression(assignmentExpression);
     }
 
-    const initializerList = ctx.initializerList();
     if (initializerList !== undefined) {
       return this.visitInitializerList(initializerList);
     }
 
-    throw new UnreachableCaseError();
+    throw new BrokenInvariantError(
+      'Encountered an Initializer without both AssignmentExpression and InitializerList.'
+    );
   }
 
   visitInitializerList(ctx: InitializerListContext): InitializerListExpression {
@@ -1183,7 +1192,7 @@ export class ASTBuilder implements CVisitor<any> {
     let initializer: Expression | undefined;
     let designationIdx = 0;
     let initializerIdx = 0;
-    const items: DesignationWithInitializerExpression[] = [];
+    const items: InitializerExpression[] = [];
     for (let i = 0; i < children.length; i++) {
       const childString = children[i].toStringTree();
       if (childString === ',') {
@@ -1193,7 +1202,7 @@ export class ASTBuilder implements CVisitor<any> {
           );
         }
         items.push({
-          type: 'DesignationWithInitializerExpression',
+          type: 'InitializerExpression',
           designators:
             designationExpression === undefined
               ? []
@@ -1218,7 +1227,7 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
     items.push({
-      type: 'DesignationWithInitializerExpression',
+      type: 'InitializerExpression',
       designators:
         designationExpression === undefined
           ? []
@@ -1228,7 +1237,7 @@ export class ASTBuilder implements CVisitor<any> {
 
     return {
       type: 'InitializerListExpression',
-      items
+      initializers: items
     };
   }
 

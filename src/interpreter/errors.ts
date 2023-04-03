@@ -2,8 +2,6 @@ export class InterpreterError extends Error {}
 
 export class InvalidCallError extends InterpreterError {}
 
-export class InvalidInitializationError extends InterpreterError {}
-
 export class InvalidLValueError extends InterpreterError {}
 
 export class InvalidScopeError extends InterpreterError {}
@@ -35,6 +33,8 @@ export class UndeclaredNameError extends InterpreterError {}
 export class UnsupportedArrayError extends InterpreterError {}
 
 export class UnsupportedDeclarationError extends InterpreterError {}
+
+export class UnsupportedInitializationError extends InterpreterError {}
 
 export enum UnsupportedOperatorErrorType {
   BINARY = 'binary ',

@@ -11,7 +11,7 @@ import {
   type Constant,
   type ContinueStatement,
   type DefaultStatement,
-  type DesignationWithInitializerExpression,
+  type InitializerExpression,
   type DoWhileStatement,
   type EmptyStatement,
   type ExpressionStatement,
@@ -76,10 +76,9 @@ import {
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
-  InvalidInitializationError,
+  UnsupportedInitializationError,
   InvalidLValueError,
   UnsupportedArrayError,
-  UnsupportedDeclarationError,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
@@ -323,18 +322,6 @@ const compilers: CompilerMapping = {
     instructions.push(fallthroughDoneInstr);
     compile(node.body, instructions, symbolTable, labelFrame);
   },
-  DesignationWithInitializerExpression: (
-    node: DesignationWithInitializerExpression,
-    instructions: Instr[],
-    symbolTable: SymbolTable,
-    labelFrame: LabelFrame
-  ) => {
-    // TODO: Support designators in future.
-    if (node.designators.length > 0) {
-      throw new UnsupportedDeclarationError();
-    }
-    compile(node.initializer, instructions, symbolTable, labelFrame);
-  },
   DoWhileStatement: (
     node: DoWhileStatement,
     instructions: Instr[],
@@ -491,15 +478,27 @@ const compilers: CompilerMapping = {
     }
     jumpInstr.instrAddress = instructions.length;
   },
+  InitializerExpression: (
+    node: InitializerExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    // TODO: Support designators in future.
+    if (node.designators.length > 0) {
+      throw new UnsupportedInitializationError();
+    }
+    compile(node.initializer, instructions, symbolTable, labelFrame);
+  },
   InitializerListExpression: (
     node: InitializerListExpression,
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
-    node.items.forEach((item) =>
-      { compile(item, instructions, symbolTable, labelFrame); }
-    );
+    node.initializers.forEach((item) => {
+      compile(item, instructions, symbolTable, labelFrame);
+    });
   },
   LogicalExpression: (
     node: LogicalExpression,
@@ -691,10 +690,10 @@ const compilers: CompilerMapping = {
           isInitializerListExpression(initialValue) &&
           !isArraySymbolTableEntry(entry)
         ) {
-          throw new InvalidInitializationError();
+          throw new UnsupportedInitializationError();
         }
         const numOfItemsToAssign = isInitializerListExpression(initialValue)
-          ? initialValue.items.length
+          ? initialValue.initializers.length
           : 1;
         const assignInstr = constructAssignInstr(entry, numOfItemsToAssign);
         instructions.push(assignInstr);

@@ -32,9 +32,9 @@ describe('variable declaration', () => {
               },
               initialValue: {
                 type: 'InitializerListExpression',
-                items: [
+                initializers: [
                   {
-                    type: 'DesignationWithInitializerExpression',
+                    type: 'InitializerExpression',
                     designators: [
                       {
                         type: 'Constant',
@@ -47,7 +47,7 @@ describe('variable declaration', () => {
                     }
                   },
                   {
-                    type: 'DesignationWithInitializerExpression',
+                    type: 'InitializerExpression',
                     designators: [],
                     initializer: {
                       type: 'Constant',
@@ -55,7 +55,7 @@ describe('variable declaration', () => {
                     }
                   },
                   {
-                    type: 'DesignationWithInitializerExpression',
+                    type: 'InitializerExpression',
                     designators: [],
                     initializer: {
                       type: 'Constant',
