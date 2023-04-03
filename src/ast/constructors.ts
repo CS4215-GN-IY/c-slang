@@ -16,7 +16,8 @@ import {
   type StringLiteral,
   type DeclaratorPattern,
   type ParameterDeclaratorDeclaration,
-  type StaticStatus
+  type StaticStatus,
+  type UnaryExpression
 } from './types';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
@@ -114,6 +115,16 @@ export const constructStringLiteral = (
   return {
     type: 'StringLiteral',
     value: stringLiteral.toString()
+  };
+};
+
+export const constructUnaryAddressExpression = (
+  operand: Expression
+): UnaryExpression => {
+  return {
+    type: 'UnaryExpression',
+    operator: '&',
+    operand
   };
 };
 

@@ -65,15 +65,18 @@ describe('postfix expression', () => {
                         type: 'Identifier',
                         name: 'arr'
                       },
-                      indexBeingAccessed: {
-                        type: 'SequenceExpression',
-                        expressions: [
-                          {
-                            type: 'Constant',
-                            value: 2
-                          }
-                        ]
-                      }
+                      indexesBeingAccessed: [
+                        {
+                          type: 'SequenceExpression',
+                          expressions: [
+                            {
+                              type: 'Constant',
+                              value: 2
+                            }
+                          ]
+                        }
+                      ],
+                      isAccessingAddress: false
                     }
                   ]
                 }
@@ -110,24 +113,20 @@ describe('postfix expression', () => {
                     {
                       type: 'ArrayAccessExpression',
                       expression: {
-                        type: 'ArrayAccessExpression',
-                        expression: {
-                          type: 'ArrayAccessExpression',
-                          expression: {
-                            type: 'Identifier',
-                            name: 'arr'
-                          },
-                          indexBeingAccessed: {
-                            type: 'SequenceExpression',
-                            expressions: [
-                              {
-                                type: 'Constant',
-                                value: 2
-                              }
-                            ]
-                          }
+                        type: 'Identifier',
+                        name: 'arr'
+                      },
+                      indexesBeingAccessed: [
+                        {
+                          type: 'SequenceExpression',
+                          expressions: [
+                            {
+                              type: 'Constant',
+                              value: 2
+                            }
+                          ]
                         },
-                        indexBeingAccessed: {
+                        {
                           type: 'SequenceExpression',
                           expressions: [
                             {
@@ -143,37 +142,38 @@ describe('postfix expression', () => {
                               }
                             }
                           ]
+                        },
+                        {
+                          type: 'SequenceExpression',
+                          expressions: [
+                            {
+                              type: 'BinaryExpression',
+                              operator: '-',
+                              left: {
+                                type: 'Constant',
+                                value: 9
+                              },
+                              right: {
+                                type: 'Identifier',
+                                name: 'x'
+                              }
+                            },
+                            {
+                              type: 'BinaryExpression',
+                              operator: '+',
+                              left: {
+                                type: 'Constant',
+                                value: 3
+                              },
+                              right: {
+                                type: 'Constant',
+                                value: 4
+                              }
+                            }
+                          ]
                         }
-                      },
-                      indexBeingAccessed: {
-                        type: 'SequenceExpression',
-                        expressions: [
-                          {
-                            type: 'BinaryExpression',
-                            operator: '-',
-                            left: {
-                              type: 'Constant',
-                              value: 9
-                            },
-                            right: {
-                              type: 'Identifier',
-                              name: 'x'
-                            }
-                          },
-                          {
-                            type: 'BinaryExpression',
-                            operator: '+',
-                            left: {
-                              type: 'Constant',
-                              value: 3
-                            },
-                            right: {
-                              type: 'Constant',
-                              value: 4
-                            }
-                          }
-                        ]
-                      }
+                      ],
+                      isAccessingAddress: false
                     }
                   ]
                 }
@@ -560,15 +560,18 @@ describe('postfix expression', () => {
                               }
                             ]
                           },
-                          indexBeingAccessed: {
-                            type: 'SequenceExpression',
-                            expressions: [
-                              {
-                                type: 'Constant',
-                                value: 7
-                              }
-                            ]
-                          }
+                          indexesBeingAccessed: [
+                            {
+                              type: 'SequenceExpression',
+                              expressions: [
+                                {
+                                  type: 'Constant',
+                                  value: 7
+                                }
+                              ]
+                            }
+                          ],
+                          isAccessingAddress: false
                         },
                         member: {
                           type: 'Identifier',

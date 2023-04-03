@@ -42,6 +42,14 @@ export class Memory {
     }
   }
 
+  public getByOffsetFromAddress(address: number, offset: number): number {
+    return this.virtualMemory.getByOffsetFromAddress(address, offset);
+  }
+
+  public getAddressByOffset(address: number, offset: number): number {
+    return this.virtualMemory.getAddressByOffset(address, offset);
+  }
+
   public setByOffset(segment: Segment, offset: number, data: number): void {
     switch (segment) {
       case Segment.DATA:
@@ -68,10 +76,14 @@ export class Memory {
 
   public stackFunctionCallAllocate(
     args: number[],
-    numOfVars: number,
+    numOfEntriesForVars: number,
     returnAddress: number
   ): void {
-    this.virtualMemory.stackFunctionCallSetup(args, numOfVars, returnAddress);
+    this.virtualMemory.stackFunctionCallSetup(
+      args,
+      numOfEntriesForVars,
+      returnAddress
+    );
   }
 
   public getReturnAddress(): number {

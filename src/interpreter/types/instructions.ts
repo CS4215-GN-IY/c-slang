@@ -6,7 +6,9 @@ interface BaseInstr {
 }
 
 export type Instr =
+  | ArrayAccessInstr
   | AssignInstr
+  | AssignToAddressInstr
   | BinaryOperationInstr
   | BreakInstr
   | BreakDoneInstr
@@ -31,10 +33,21 @@ export type Instr =
   | TeardownInstr
   | UnaryOperationInstr;
 
+export interface ArrayAccessInstr extends BaseInstr {
+  type: 'ArrayAccess';
+  multiplier: number;
+  isAccessingAddress: boolean;
+}
+
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
   scope: Segment;
   offset: number;
+  numOfItems: number;
+}
+
+export interface AssignToAddressInstr extends BaseInstr {
+  type: 'AssignToAddress';
 }
 
 export interface BinaryOperationInstr extends BaseInstr {
@@ -53,7 +66,7 @@ export interface BreakDoneInstr extends BaseInstr {
 export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
-  numOfVars: number;
+  numOfEntriesForVars: number;
 }
 
 export interface ContinueInstr extends BaseInstr {

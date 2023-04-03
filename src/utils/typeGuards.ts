@@ -15,3 +15,12 @@ export const isNotNull = <T>(value: T | null): value is T => {
 export const isNotUndefined = <T>(value: T | undefined): value is T => {
   return value !== undefined;
 };
+
+/**
+ * Returns whether the value is a number.
+ *
+ * @param value The value that is possibly of type number.
+ */
+export const isNumber = <T>(value: T | number): value is number => {
+  return typeof value === 'number';
+};

@@ -11,6 +11,7 @@ import {
   type Constant,
   type ContinueStatement,
   type DefaultStatement,
+  type InitializerExpression,
   type DoWhileStatement,
   type EmptyStatement,
   type ExpressionStatement,
@@ -20,6 +21,7 @@ import {
   type Identifier,
   type IdentifierStatement,
   type IfStatement,
+  type InitializerListExpression,
   type LogicalExpression,
   type MemberExpression,
   type Node,
@@ -34,7 +36,9 @@ import {
   type WhileStatement
 } from '../ast/types';
 import {
+  constructArrayAccessInstr,
   constructAssignInstr,
+  constructAssignToAddressInstr,
   constructBinaryOperationInstr,
   constructBreakDoneInstr,
   constructBreakInstr,
@@ -62,14 +66,19 @@ import {
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
+  isArrayAccessExpression,
   isBinaryOperator,
   isCaseStatement,
   isEmptyStatement,
-  isIdentifier
+  isIdentifier,
+  isInitializerListExpression
 } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,
+  UnsupportedInitializationError,
+  InvalidLValueError,
+  UnsupportedArrayError,
   UnsupportedOperatorError,
   UnsupportedOperatorErrorType
 } from './errors';
@@ -80,24 +89,23 @@ import {
   constructFalseConstant,
   constructMainCallExpression,
   constructOneConstant,
-  constructTrueConstant
+  constructTrueConstant,
+  constructUnaryAddressExpression
 } from '../ast/constructors';
 import { type LabelFrame, type SymbolTable } from './types/symbolTable';
 import {
   addBlockSymbolTableEntries,
   addFunctionSymbolTableEntries,
   addProgramSymbolTableEntries,
+  getArraySymbolTableEntry,
   getFunctionSymbolTableEntry,
   getNumOfEntriesInFrame,
   getSymbolTableEntry,
-  getSymbolTableEntryInFrame
+  getSymbolTableEntryInFrame,
+  isArraySymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
-import {
-  constructAssignmentExpressionAssignInstr,
-  getNameFromDeclaratorPattern,
-  getSymbolTableEntryOfExpression
-} from './compilerUtils';
+import { getNameFromDeclaratorPattern } from './compilerUtils';
 import {
   addBlockLabelFrameEntries,
   constructFunctionLabelFrame,
@@ -135,7 +143,33 @@ const compilers: CompilerMapping = {
     instructions: Instr[],
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
-  ) => {},
+  ) => {
+    compile(node.expression, instructions, symbolTable, labelFrame);
+    // TODO: Handle more types of array symbol table entries.
+    if (!isIdentifier(node.expression)) {
+      throw new UnsupportedArrayError();
+    }
+    const arraySymbolTableEntry = getArraySymbolTableEntry(
+      node.expression.name,
+      symbolTable
+    );
+    const multipliers = arraySymbolTableEntry.multipliers;
+    for (let i = 0; i < node.indexesBeingAccessed.length; i++) {
+      compile(
+        node.indexesBeingAccessed[i],
+        instructions,
+        symbolTable,
+        labelFrame
+      );
+      const arrayAccessInstruction = constructArrayAccessInstr(
+        multipliers[i],
+        node.isAccessingAddress
+          ? true
+          : i !== arraySymbolTableEntry.multipliers.length - 1
+      );
+      instructions.push(arrayAccessInstruction);
+    }
+  },
   AssignmentExpression: (
     node: AssignmentExpression,
     instructions: Instr[],
@@ -153,11 +187,10 @@ const compilers: CompilerMapping = {
     } else {
       compile(node.right, instructions, symbolTable, labelFrame);
     }
-    const assignInstr = constructAssignmentExpressionAssignInstr(
-      node.left,
-      symbolTable
-    );
-    instructions.push(assignInstr);
+    const unaryAddressExpression = constructUnaryAddressExpression(node.left);
+    compile(unaryAddressExpression, instructions, symbolTable, labelFrame);
+    const assignToAddressInstr = constructAssignToAddressInstr();
+    instructions.push(assignToAddressInstr);
   },
   BinaryExpression: (
     node: BinaryExpression,
@@ -219,7 +252,7 @@ const compilers: CompilerMapping = {
     instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
-      functionEntry.numOfVariables
+      functionEntry.numOfEntriesForVariables
     );
     instructions.push(callInstr);
   },
@@ -382,7 +415,8 @@ const compilers: CompilerMapping = {
     jumpInstr.instrAddress = instructions.length;
 
     const assignInstr = constructAssignInstr(
-      getSymbolTableEntry(getNameFromDeclaratorPattern(node.id), symbolTable)
+      getSymbolTableEntry(getNameFromDeclaratorPattern(node.id), symbolTable),
+      1
     );
     instructions.push(assignInstr);
   },
@@ -402,6 +436,12 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
+    const symbolTableEntry = getSymbolTableEntry(node.name, symbolTable);
+    if (isArraySymbolTableEntry(symbolTableEntry)) {
+      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+      instructions.push(loadAddressInstr);
+      return;
+    }
     const loadSymbolInstr = constructLoadSymbolInstr(
       getSymbolTableEntry(node.name, symbolTable)
     );
@@ -437,6 +477,28 @@ const compilers: CompilerMapping = {
       compile(node.alternate, instructions, symbolTable, labelFrame);
     }
     jumpInstr.instrAddress = instructions.length;
+  },
+  InitializerExpression: (
+    node: InitializerExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    // TODO: Support designators in future.
+    if (node.designators.length > 0) {
+      throw new UnsupportedInitializationError();
+    }
+    compile(node.initializer, instructions, symbolTable, labelFrame);
+  },
+  InitializerListExpression: (
+    node: InitializerListExpression,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    node.initializers.forEach((item) => {
+      compile(item, instructions, symbolTable, labelFrame);
+    });
   },
   LogicalExpression: (
     node: LogicalExpression,
@@ -562,13 +624,23 @@ const compilers: CompilerMapping = {
     }
 
     if (node.operator === '&') {
-      const symbolTableEntry = getSymbolTableEntryOfExpression(
-        node.operand,
-        symbolTable
-      );
-      const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
-      instructions.push(loadAddressInstr);
-      return;
+      if (isIdentifier(node.operand)) {
+        const symbolTableEntry = getSymbolTableEntry(
+          node.operand.name,
+          symbolTable
+        );
+        const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
+        instructions.push(loadAddressInstr);
+        return;
+      }
+
+      if (isArrayAccessExpression(node.operand)) {
+        node.operand.isAccessingAddress = true;
+        compile(node.operand, instructions, symbolTable, labelFrame);
+        return;
+      }
+
+      throw new InvalidLValueError();
     }
 
     // TODO: Support sizeof after variable sizes are supported.
@@ -614,7 +686,16 @@ const compilers: CompilerMapping = {
           getNameFromDeclaratorPattern(declarator.pattern),
           symbolTable.head
         );
-        const assignInstr = constructAssignInstr(entry);
+        if (
+          isInitializerListExpression(initialValue) &&
+          !isArraySymbolTableEntry(entry)
+        ) {
+          throw new UnsupportedInitializationError();
+        }
+        const numOfItemsToAssign = isInitializerListExpression(initialValue)
+          ? initialValue.initializers.length
+          : 1;
+        const assignInstr = constructAssignInstr(entry, numOfItemsToAssign);
         instructions.push(assignInstr);
       }
     });

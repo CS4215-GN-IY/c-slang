@@ -26,7 +26,9 @@ import {
   StaticStatus,
   type UnaryOperator,
   type VariableDeclaration,
-  type VariableDeclarator
+  type VariableDeclarator,
+  type InitializerExpression,
+  type InitializerListExpression
 } from './types';
 import {
   type ErrorNode,
@@ -129,6 +131,7 @@ import {
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
+  type DesignationExpression,
   type ForCondition,
   type VisitAlignmentSpecifierReturnValue,
   type VisitDeclarationSpecifierReturnValue,
@@ -139,6 +142,7 @@ import {
 } from './astBuilderInternalTypes';
 import {
   isAbstractSequencePattern,
+  isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
   isTypedefNameReturnValue
@@ -555,16 +559,39 @@ export class ASTBuilder implements CVisitor<any> {
         };
   }
 
-  visitDesignation(ctx: DesignationContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignation(ctx: DesignationContext): DesignationExpression {
+    return {
+      type: 'DesignationExpression',
+      designators: this.visitDesignatorList(ctx.designatorList())
+    };
   }
 
-  visitDesignator(ctx: DesignatorContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignator(ctx: DesignatorContext): Expression {
+    const constantExpression = ctx.constantExpression();
+    const identifier = ctx.Identifier();
+    if (constantExpression !== undefined && identifier !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a Designator with both ConstantExpression and Identifier.'
+      );
+    }
+
+    if (constantExpression !== undefined) {
+      return this.visitConstantExpression(constantExpression);
+    }
+
+    if (identifier !== undefined) {
+      return constructIdentifier(identifier);
+    }
+
+    throw new BrokenInvariantError(
+      'Encountered a Designator without both ConstantExpression and Identifier.'
+    );
   }
 
-  visitDesignatorList(ctx: DesignatorListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitDesignatorList(ctx: DesignatorListContext): Expression[] {
+    return ctx
+      .designator()
+      .map((designator) => this.visitDesignator(designator), this);
   }
 
   visitDirectAbstractDeclarator(
@@ -1132,17 +1159,86 @@ export class ASTBuilder implements CVisitor<any> {
 
   visitInitializer(ctx: InitializerContext): Expression {
     const assignmentExpression = ctx.assignmentExpression();
+    const initializerList = ctx.initializerList();
+
+    if (assignmentExpression !== undefined && initializerList !== undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an Initializer with both AssignmentExpression and InitializerList.'
+      );
+    }
+
     if (assignmentExpression !== undefined) {
       return this.visitAssignmentExpression(assignmentExpression);
     }
 
-    // TODO: Deal with initializer list.
+    if (initializerList !== undefined) {
+      return this.visitInitializerList(initializerList);
+    }
 
-    throw new UnreachableCaseError();
+    throw new BrokenInvariantError(
+      'Encountered an Initializer without both AssignmentExpression and InitializerList.'
+    );
   }
 
-  visitInitializerList(ctx: InitializerListContext): BaseNode {
-    throw new Error('Method not implemented.');
+  visitInitializerList(ctx: InitializerListContext): InitializerListExpression {
+    const children = ctx.children;
+    if (children === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered an InitializerList with no child nodes.'
+      );
+    }
+
+    let designationExpression: DesignationExpression | undefined;
+    let initializer: Expression | undefined;
+    let designationIdx = 0;
+    let initializerIdx = 0;
+    const items: InitializerExpression[] = [];
+    for (let i = 0; i < children.length; i++) {
+      const childString = children[i].toStringTree();
+      if (childString === ',') {
+        if (initializer === undefined) {
+          throw new BrokenInvariantError(
+            'Encountered a missing Initializer in the InitializerList.'
+          );
+        }
+        items.push({
+          type: 'InitializerExpression',
+          designators:
+            designationExpression === undefined
+              ? []
+              : designationExpression.designators,
+          initializer
+        });
+        designationExpression = undefined;
+        initializer = undefined;
+      } else if (childString.includes('=')) {
+        designationExpression = this.visitDesignation(
+          ctx.designation(designationIdx)
+        );
+        designationIdx += 1;
+      } else {
+        initializer = this.visitInitializer(ctx.initializer(initializerIdx));
+        initializerIdx += 1;
+      }
+    }
+    if (initializer === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a missing Initializer in the InitializerList.'
+      );
+    }
+    items.push({
+      type: 'InitializerExpression',
+      designators:
+        designationExpression === undefined
+          ? []
+          : designationExpression.designators,
+      initializer
+    });
+
+    return {
+      type: 'InitializerListExpression',
+      initializers: items
+    };
   }
 
   visitIterationStatement(ctx: IterationStatementContext): IterationStatement {
@@ -1433,11 +1529,15 @@ export class ASTBuilder implements CVisitor<any> {
           const indexBeingAccessed = this.visitExpression(
             arrayAccessIndexExpression
           );
-          expression = {
-            type: 'ArrayAccessExpression',
-            expression,
-            indexBeingAccessed
-          };
+          expression = isArrayAccessExpression(expression)
+            ? expression
+            : {
+                type: 'ArrayAccessExpression',
+                expression,
+                indexesBeingAccessed: [],
+                isAccessingAddress: false
+              };
+          expression.indexesBeingAccessed.push(indexBeingAccessed);
           // Skip over "'[' expression ']'".
           currChildIdx += 3;
           break;

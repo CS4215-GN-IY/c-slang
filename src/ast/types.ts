@@ -151,6 +151,8 @@ export type Expression =
   | ConditionalExpression
   | Constant
   | Identifier
+  | InitializerExpression
+  | InitializerListExpression
   | LogicalExpression
   | MemberExpression
   | SequenceExpression
@@ -178,13 +180,25 @@ export interface StringLiteral extends BaseExpression {
 export interface ArrayAccessExpression extends BaseExpression {
   type: 'ArrayAccessExpression';
   expression: Expression;
-  indexBeingAccessed: Expression;
+  indexesBeingAccessed: Expression[];
+  isAccessingAddress: boolean;
 }
 
 export interface CallExpression extends BaseExpression {
   type: 'CallExpression';
   callee: Expression;
   arguments: Expression[];
+}
+
+export interface InitializerExpression extends BaseExpression {
+  type: 'InitializerExpression';
+  designators: Expression[];
+  initializer: Expression;
+}
+
+export interface InitializerListExpression extends BaseExpression {
+  type: 'InitializerListExpression';
+  initializers: InitializerExpression[];
 }
 
 export interface MemberExpression extends BaseExpression {

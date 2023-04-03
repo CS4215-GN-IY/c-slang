@@ -2,7 +2,8 @@ import { type TypeSpecifier } from './keywordWhitelists/typeSpecifiers';
 import {
   type SequenceExpression,
   type Identifier,
-  type VariableDeclaration
+  type VariableDeclaration,
+  type Expression
 } from './types';
 
 export interface BaseReturnValue {
@@ -70,4 +71,9 @@ export interface ForCondition extends BaseReturnValue {
   init?: VariableDeclaration | SequenceExpression;
   predicate?: SequenceExpression;
   update?: SequenceExpression;
+}
+
+export interface DesignationExpression extends BaseReturnValue {
+  type: 'DesignationExpression';
+  designators: Expression[];
 }

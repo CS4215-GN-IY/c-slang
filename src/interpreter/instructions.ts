@@ -25,7 +25,9 @@ import {
   type LoadAddressInstr,
   type Instr,
   type TailCallInstr,
-  type LoadReturnAddressInstr
+  type LoadReturnAddressInstr,
+  type ArrayAccessInstr,
+  type AssignToAddressInstr
 } from './types/instructions';
 import { type SymbolTableEntry } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -33,10 +35,27 @@ import { type Value } from './types/virtualMachine';
 
 export const PLACEHOLDER_ADDRESS = -1;
 
-export const constructAssignInstr = (entry: SymbolTableEntry): AssignInstr => ({
+export const constructArrayAccessInstr = (
+  multiplier: number,
+  isAccessingAddress: boolean
+): ArrayAccessInstr => ({
+  type: 'ArrayAccess',
+  multiplier,
+  isAccessingAddress
+});
+
+export const constructAssignInstr = (
+  entry: SymbolTableEntry,
+  numOfItems: number
+): AssignInstr => ({
   type: 'Assign',
   scope: getSegmentScope(entry.scope),
-  offset: entry.offset
+  offset: entry.offset,
+  numOfItems
+});
+
+export const constructAssignToAddressInstr = (): AssignToAddressInstr => ({
+  type: 'AssignToAddress'
 });
 
 export const constructBinaryOperationInstr = (
@@ -56,11 +75,11 @@ export const constructBreakDoneInstr = (): BreakDoneInstr => ({
 
 export const constructCallInstr = (
   numOfArgs: number,
-  numOfVars: number
+  numOfEntriesForVars: number
 ): CallInstr => ({
   type: 'Call',
   numOfArgs,
-  numOfVars
+  numOfEntriesForVars
 });
 
 export const constructContinueInstr = (): ContinueInstr => ({

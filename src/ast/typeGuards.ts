@@ -4,6 +4,7 @@ import {
 } from './astBuilderInternalTypes';
 import {
   type AbstractSequencePattern,
+  type ArrayAccessExpression,
   type ArrayPattern,
   type BaseNode,
   BINARY_OPERATORS,
@@ -11,11 +12,15 @@ import {
   type CaseStatement,
   type Constant,
   type EmptyStatement,
+  type ExpressionBracketContent,
+  type ExpressionlessBracketContent,
   type ForStatement,
   type FunctionPattern,
   type Identifier,
   type IdentifierStatement,
+  type InitializerListExpression,
   type PointerPattern,
+  type StarBracketContent,
   type VariableDeclaration
 } from './types';
 
@@ -25,8 +30,20 @@ export const isTypedefNameReturnValue = (
   return returnValue.type === 'TypedefName';
 };
 
+export const isArrayAccessExpression = (
+  node: BaseNode
+): node is ArrayAccessExpression => {
+  return node.type === 'ArrayAccessExpression';
+};
+
 export const isIdentifier = (node: BaseNode): node is Identifier => {
   return node.type === 'Identifier';
+};
+
+export const isInitializerListExpression = (
+  node: BaseNode
+): node is InitializerListExpression => {
+  return node.type === 'InitializerListExpression';
 };
 
 export const isConstant = (node: BaseNode): node is Constant => {
@@ -73,6 +90,24 @@ export const isAbstractSequencePattern = (
   node: BaseNode
 ): node is AbstractSequencePattern => {
   return node.type === 'AbstractSequencePattern';
+};
+
+export const isExpressionBracketContent = (
+  node: BaseNode
+): node is ExpressionBracketContent => {
+  return node.type === 'ExpressionBracketContent';
+};
+
+export const isExpressionlessBracketContent = (
+  node: BaseNode
+): node is ExpressionlessBracketContent => {
+  return node.type === 'ExpressionlessBracketContent';
+};
+
+export const isStarBracketContent = (
+  node: BaseNode
+): node is StarBracketContent => {
+  return node.type === 'StarBracketContent';
 };
 
 export const isBinaryOperator = (
