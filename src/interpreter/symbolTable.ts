@@ -76,8 +76,9 @@ export const addFunctionSymbolTableEntries = (
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame: SymbolTableFrame = {};
-  // Params offset from below the rbp, start from -2 to leave a space for return address.
-  let offset = -2;
+  // The parameters of the current stack frame can be found via an offset of -4
+  // from the current rbp. See `stackFunctionCallSetup` for more information.
+  let offset = -4;
   node.params.forEach((param) => {
     offset = addParameterDeclarationSymbolTableEntries(
       param,
