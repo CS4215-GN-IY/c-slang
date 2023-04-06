@@ -227,4 +227,17 @@ describe('function definition', () => {
     };
     expect(ast).toEqual(expectedAst);
   });
+
+  test("throws UnsupportedKeywordError for '...'", () => {
+    const code = `
+      // Note that at least one parameter must precede the ellipsis notation and the
+      // ellipsis notation must be the last token in the parameter list.
+      int main(int a, ...) {
+        return 4215;
+      }
+    `;
+    expect(() => parse(code)).toThrow(
+      "'...' is a valid keyword in C17 but is not (currently) supported."
+    );
+  });
 });
