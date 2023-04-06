@@ -86,4 +86,20 @@ describe('unary expression', () => {
     const expectedResult = 12;
     expect(result).toEqual(expectedResult);
   });
+
+  test('handles pointers to pointers', () => {
+    const code = `
+        int main() {
+            int a = 10;
+            int *address = &a;
+            int **addressOfAddress = &address;
+            return **addressOfAddress + 2;
+        }
+    `;
+    const ast = parse(code);
+    const instructions = compileProgram(ast);
+    const result = interpret(instructions);
+    const expectedResult = 12;
+    expect(result).toEqual(expectedResult);
+  });
 });
