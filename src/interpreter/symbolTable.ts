@@ -1,6 +1,7 @@
 import {
   type BlockStatement,
   type FunctionDeclaration,
+  type ParameterDeclaration,
   type Program,
   type VariableDeclaration
 } from '../ast/types';
@@ -24,6 +25,7 @@ import {
   isArrayPattern,
   isEmptyStatement,
   isForStatement,
+  isParameterDeclaratorDeclaration,
   isVariableDeclaration
 } from '../ast/typeGuards';
 import { Segment } from '../memory/segment';
@@ -70,14 +72,20 @@ export const addProgramSymbolTableEntries = (
 };
 
 export const addFunctionSymbolTableEntries = (
-  paramDeclarations: VariableDeclaration[],
   node: FunctionDeclaration,
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame: SymbolTableFrame = {};
   // Params offset from below the rbp, start from -2 to leave a space for return address.
   let offset = -2;
-  // TODO: Param declarations are handled differently
+  node.params.forEach((param) => {
+    offset = addParameterDeclarationSymbolTableEntries(
+      param,
+      'Function',
+      offset,
+      frame
+    );
+  });
 
   offset = 0;
   if (!isEmptyStatement(node.body)) {
@@ -104,6 +112,7 @@ export const addFunctionSymbolTableEntries = (
     getNameFromDeclaratorPattern(node.id),
     symbolTable
   );
+  functionEntry.numOfParams = node.params.length;
   functionEntry.numOfEntriesForVariables += offset;
 
   return {
@@ -292,5 +301,43 @@ const addVariableDeclarationSymbolTableEntries = (
     offset += getFixedNumOfEntriesOfDeclaratorPattern(declarator.pattern);
     addToFrame(symbolTableFrame, entry);
   });
+  return offset;
+};
+
+const addParameterDeclarationSymbolTableEntries = (
+  parameterDeclaration: ParameterDeclaration,
+  scope: SymbolTableEntryScope,
+  startingOffset: number,
+  symbolTableFrame: SymbolTableFrame
+): number => {
+  let offset = startingOffset;
+  let entry: SymbolTableEntry;
+  if (isParameterDeclaratorDeclaration(parameterDeclaration)) {
+    const declaratorPattern = parameterDeclaration.declarator;
+    if (isArrayPattern(declaratorPattern)) {
+      entry = {
+        name: getNameFromDeclaratorPattern(declaratorPattern),
+        nameType: 'Array',
+        offset,
+        scope,
+        multipliers: getArrayPatternMultipliers(declaratorPattern),
+        maxNumOfItems: getArrayMaxNumOfItems(declaratorPattern)
+      };
+    } else {
+      entry = {
+        name: getNameFromDeclaratorPattern(declaratorPattern),
+        nameType: 'Variable',
+        offset,
+        scope
+      };
+    }
+    offset -= getFixedNumOfEntriesOfDeclaratorPattern(declaratorPattern);
+  } else {
+    // TODO: Handle ParameterAbstractDeclaratorDeclaration.
+    throw new Error(
+      'Handling of ParameterAbstractDeclaratorDeclaration not implemented yet.'
+    );
+  }
+  addToFrame(symbolTableFrame, entry);
   return offset;
 };

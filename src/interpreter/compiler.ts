@@ -397,9 +397,7 @@ const compilers: CompilerMapping = {
 
     loadFunctionInstr.functionInstrAddress = instructions.length;
 
-    // TODO: Replace param declarations when parameter list is supported
     const functionSymbolTable = addFunctionSymbolTableEntries(
-      [],
       node,
       symbolTable
     );

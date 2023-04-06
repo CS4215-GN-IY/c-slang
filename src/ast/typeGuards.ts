@@ -19,6 +19,7 @@ import {
   type Identifier,
   type IdentifierStatement,
   type InitializerListExpression,
+  type ParameterDeclaratorDeclaration,
   type PointerPattern,
   type StarBracketContent,
   type VariableDeclaration
@@ -84,6 +85,12 @@ export const isFunctionPattern = (node: BaseNode): node is FunctionPattern => {
 
 export const isPointerPattern = (node: BaseNode): node is PointerPattern => {
   return node.type === 'PointerPattern';
+};
+
+export const isParameterDeclaratorDeclaration = (
+  node: BaseNode
+): node is ParameterDeclaratorDeclaration => {
+  return node.type === 'ParameterDeclaratorDeclaration';
 };
 
 export const isAbstractSequencePattern = (
