@@ -24,6 +24,7 @@
     "format:fix": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint": "yarn run format && yarn run eslint",
     "lint:fix": "yarn run format:fix && yarn run eslint:fix",
+    "prepare": "yarn run build",
     "typecheck": "tsc --noEmit",
     "test": "jest"
   },
