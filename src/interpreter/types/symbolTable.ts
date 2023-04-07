@@ -6,6 +6,9 @@ export interface SymbolTable {
 
 export type SymbolTableFrame = Record<string, SymbolTableEntry>;
 export type SymbolTableEntry =
+  | SymbolTableEntryWithAddress
+  | BuiltInFunctionSymbolTableEntry;
+export type SymbolTableEntryWithAddress =
   | ArraySymbolTableEntry
   | FunctionSymbolTableEntry
   | VariableSymbolTableEntry;
@@ -16,23 +19,33 @@ export interface BaseSymbolTableEntry {
   // make use of TypeScript's discriminated unions.
   nameType: string;
   name: string;
+}
+
+export interface BaseSymbolTableEntryWithAddress extends BaseSymbolTableEntry {
   offset: number;
   scope: SymbolTableEntryScope;
 }
 
-export interface ArraySymbolTableEntry extends BaseSymbolTableEntry {
+export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
   nameType: 'Array';
   multipliers: number[];
   maxNumOfItems: number;
 }
 
-export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
+export interface FunctionSymbolTableEntry
+  extends BaseSymbolTableEntryWithAddress {
   nameType: 'Function';
   numOfParams: number;
   numOfEntriesForVariables: number;
 }
 
-interface VariableSymbolTableEntry extends BaseSymbolTableEntry {
+export interface BuiltInFunctionSymbolTableEntry extends BaseSymbolTableEntry {
+  nameType: 'BuiltInFunction';
+  numOfParams: number;
+}
+
+export interface VariableSymbolTableEntry
+  extends BaseSymbolTableEntryWithAddress {
   nameType: 'Variable';
 }
 

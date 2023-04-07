@@ -103,7 +103,8 @@ import {
   getNumOfEntriesInFrame,
   getSymbolTableEntry,
   getSymbolTableEntryInFrame,
-  isArraySymbolTableEntry
+  isArraySymbolTableEntry,
+  isBuiltinFunctionSymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
 import { getNameFromDeclaratorPattern } from './compilerUtils';
@@ -114,10 +115,12 @@ import {
   updateLabelEntryInstrAddress
 } from './labelFrame';
 import { isUnaryOperator } from './virtualMachineUtils';
+import { getBuiltInSymbols } from './builtins';
+import { BrokenInvariantError } from '../ast/errors';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
-    head: {},
+    head: getBuiltInSymbols(),
     tail: null,
     parent: null
   };
@@ -255,6 +258,10 @@ const compilers: CompilerMapping = {
     node.arguments.forEach((arg) => {
       compile(arg, instructions, symbolTable, labelFrame);
     });
+    // If the function being called is a built-in function, we simply push the CallBuiltInInstr.
+    if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
+      throw new Error('Not implemented yet');
+    }
     const loadReturnAddressInstr = constructLoadReturnAddressInstr();
     instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
@@ -419,10 +426,16 @@ const compilers: CompilerMapping = {
 
     jumpInstr.instrAddress = instructions.length;
 
-    const assignInstr = constructAssignInstr(
-      getSymbolTableEntry(getNameFromDeclaratorPattern(node.id), symbolTable),
-      1
+    const symbolTableEntry = getSymbolTableEntry(
+      getNameFromDeclaratorPattern(node.id),
+      symbolTable
     );
+    if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
+      throw new BrokenInvariantError(
+        'User-declared functions should always have a scope & offset.'
+      );
+    }
+    const assignInstr = constructAssignInstr(symbolTableEntry, 1);
     instructions.push(assignInstr);
   },
   GotoStatement: (
@@ -447,9 +460,11 @@ const compilers: CompilerMapping = {
       instructions.push(loadAddressInstr);
       return;
     }
-    const loadSymbolInstr = constructLoadSymbolInstr(
-      getSymbolTableEntry(node.name, symbolTable)
-    );
+    if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
+      // TODO: Implement this.
+      return;
+    }
+    const loadSymbolInstr = constructLoadSymbolInstr(symbolTableEntry);
     instructions.push(loadSymbolInstr);
   },
   IdentifierStatement: (
@@ -634,6 +649,9 @@ const compilers: CompilerMapping = {
           node.operand.name,
           symbolTable
         );
+        if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
+          throw new InvalidLValueError('Cannot assign to built-in functions.');
+        }
         const loadAddressInstr = constructLoadAddressInstr(symbolTableEntry);
         instructions.push(loadAddressInstr);
         return;
@@ -696,6 +714,11 @@ const compilers: CompilerMapping = {
           !isArraySymbolTableEntry(entry)
         ) {
           throw new UnsupportedInitializationError();
+        }
+        if (isBuiltinFunctionSymbolTableEntry(entry)) {
+          throw new BrokenInvariantError(
+            'Built-in functions cannot be declared as variables.'
+          );
         }
         const numOfItemsToAssign = isInitializerListExpression(initialValue)
           ? initialValue.initializers.length

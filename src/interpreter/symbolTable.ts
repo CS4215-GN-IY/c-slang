@@ -7,11 +7,13 @@ import {
 } from '../ast/types';
 import {
   type ArraySymbolTableEntry,
+  type BuiltInFunctionSymbolTableEntry,
   type FunctionSymbolTableEntry,
   type SymbolTable,
   type SymbolTableEntry,
   type SymbolTableEntryScope,
-  type SymbolTableFrame
+  type SymbolTableFrame,
+  type VariableSymbolTableEntry
 } from './types/symbolTable';
 import {
   InvalidScopeError,
@@ -36,6 +38,7 @@ import {
   getFixedNumOfEntriesOfDeclaratorPattern,
   getNameFromDeclaratorPattern
 } from './compilerUtils';
+import { BrokenInvariantError } from '../ast/errors';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -113,6 +116,11 @@ export const addFunctionSymbolTableEntries = (
     getNameFromDeclaratorPattern(node.id),
     symbolTable
   );
+  if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
+    throw new BrokenInvariantError(
+      'User-declared functions should always have a scope & offset.'
+    );
+  }
   functionEntry.numOfParams = node.params.length;
   functionEntry.numOfEntriesForVariables += offset;
 
@@ -173,9 +181,14 @@ export const getArraySymbolTableEntry = (
 export const getFunctionSymbolTableEntry = (
   name: string,
   symbolTable: SymbolTable
-): FunctionSymbolTableEntry => {
+): FunctionSymbolTableEntry | BuiltInFunctionSymbolTableEntry => {
   const functionEntry = getSymbolTableEntry(name, symbolTable);
-  if (!isFunctionSymbolTableEntry(functionEntry)) {
+  if (
+    !(
+      isFunctionSymbolTableEntry(functionEntry) ||
+      isBuiltinFunctionSymbolTableEntry(functionEntry)
+    )
+  ) {
     throw new TypeError(
       'function',
       functionEntry.nameType,
@@ -237,6 +250,12 @@ export const isFunctionSymbolTableEntry = (
   return entry.nameType === 'Function';
 };
 
+export const isBuiltinFunctionSymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is BuiltInFunctionSymbolTableEntry => {
+  return entry.nameType === 'BuiltInFunction';
+};
+
 export const getNumOfEntriesInFrame = (frame: SymbolTableFrame): number => {
   return Object.keys(frame).length;
 };
@@ -281,7 +300,7 @@ const addVariableDeclarationSymbolTableEntries = (
 ): number => {
   let offset = startingOffset;
   variableDeclaration.declarations.forEach((declarator) => {
-    let entry: SymbolTableEntry;
+    let entry: ArraySymbolTableEntry | VariableSymbolTableEntry;
     if (isArrayPattern(declarator.pattern)) {
       entry = {
         name: getNameFromDeclaratorPattern(declarator.pattern),
