@@ -106,7 +106,7 @@ import {
   getSymbolTableEntryInFrame,
   isArraySymbolTableEntry,
   isBuiltinFunctionSymbolTableEntry,
-  isFunctionSymbolTableEntry,
+  isUserDeclaredFunctionSymbolTableEntry,
   isVariableSymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
@@ -438,9 +438,9 @@ const compilers: CompilerMapping = {
       getNameFromDeclaratorPattern(node.id),
       symbolTable
     );
-    if (!isFunctionSymbolTableEntry(symbolTableEntry)) {
+    if (!isUserDeclaredFunctionSymbolTableEntry(symbolTableEntry)) {
       throw new BrokenInvariantError(
-        'Symbol table entry should always be for a function here.'
+        'Symbol table entry should always be for a user-declared function here.'
       );
     }
     const assignInstr = constructAssignInstr(symbolTableEntry, 1);

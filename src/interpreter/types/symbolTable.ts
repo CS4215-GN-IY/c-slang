@@ -1,7 +1,7 @@
 export interface SymbolTable {
   head: SymbolTableFrame;
   tail: SymbolTable | null;
-  parent: FunctionSymbolTableEntry | null;
+  parent: UserDeclaredFunctionSymbolTableEntry | null;
 }
 
 export type SymbolTableFrame = Record<string, SymbolTableEntry>;
@@ -10,7 +10,7 @@ export type SymbolTableEntry =
   | BuiltInFunctionSymbolTableEntry;
 export type SymbolTableEntryWithAddress =
   | ArraySymbolTableEntry
-  | FunctionSymbolTableEntry
+  | UserDeclaredFunctionSymbolTableEntry
   | VariableSymbolTableEntry;
 export type SymbolTableEntryScope = 'Block' | 'Function' | 'Global';
 
@@ -32,9 +32,9 @@ export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
   maxNumOfItems: number;
 }
 
-export interface FunctionSymbolTableEntry
+export interface UserDeclaredFunctionSymbolTableEntry
   extends BaseSymbolTableEntryWithAddress {
-  nameType: 'Function';
+  nameType: 'UserDeclaredFunction';
   numOfParams: number;
   numOfEntriesForVariables: number;
 }

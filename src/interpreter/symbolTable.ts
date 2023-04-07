@@ -8,7 +8,7 @@ import {
 import {
   type ArraySymbolTableEntry,
   type BuiltInFunctionSymbolTableEntry,
-  type FunctionSymbolTableEntry,
+  type UserDeclaredFunctionSymbolTableEntry,
   type SymbolTable,
   type SymbolTableEntry,
   type SymbolTableEntryScope,
@@ -116,9 +116,9 @@ export const addFunctionSymbolTableEntries = (
     getNameFromDeclaratorPattern(node.id),
     symbolTable
   );
-  if (!isFunctionSymbolTableEntry(functionEntry)) {
+  if (!isUserDeclaredFunctionSymbolTableEntry(functionEntry)) {
     throw new BrokenInvariantError(
-      'Symbol table entry should always be for a function here.'
+      'Symbol table entry should always be for a user-declared function here.'
     );
   }
   functionEntry.numOfParams = node.params.length;
@@ -181,11 +181,11 @@ export const getArraySymbolTableEntry = (
 export const getFunctionSymbolTableEntry = (
   name: string,
   symbolTable: SymbolTable
-): FunctionSymbolTableEntry | BuiltInFunctionSymbolTableEntry => {
+): UserDeclaredFunctionSymbolTableEntry | BuiltInFunctionSymbolTableEntry => {
   const functionEntry = getSymbolTableEntry(name, symbolTable);
   if (
     !(
-      isFunctionSymbolTableEntry(functionEntry) ||
+      isUserDeclaredFunctionSymbolTableEntry(functionEntry) ||
       isBuiltinFunctionSymbolTableEntry(functionEntry)
     )
   ) {
@@ -244,10 +244,10 @@ export const isArraySymbolTableEntry = (
   return entry.nameType === 'Array';
 };
 
-export const isFunctionSymbolTableEntry = (
+export const isUserDeclaredFunctionSymbolTableEntry = (
   entry: SymbolTableEntry
-): entry is FunctionSymbolTableEntry => {
-  return entry.nameType === 'Function';
+): entry is UserDeclaredFunctionSymbolTableEntry => {
+  return entry.nameType === 'UserDeclaredFunction';
 };
 
 export const isBuiltinFunctionSymbolTableEntry = (
@@ -286,7 +286,7 @@ const addFunctionDeclarationSymbolTableEntry = (
 ): number => {
   const entry: SymbolTableEntry = {
     name: getNameFromDeclaratorPattern(functionDeclaration.id),
-    nameType: 'Function',
+    nameType: 'UserDeclaredFunction',
     offset,
     scope,
     // TODO: Update this when function declaration parameters are supported.
