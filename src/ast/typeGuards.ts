@@ -19,8 +19,10 @@ import {
   type Identifier,
   type IdentifierStatement,
   type InitializerListExpression,
+  type ParameterDeclaratorDeclaration,
   type PointerPattern,
   type StarBracketContent,
+  type UnaryExpression,
   type VariableDeclaration
 } from './types';
 
@@ -38,6 +40,10 @@ export const isArrayAccessExpression = (
 
 export const isIdentifier = (node: BaseNode): node is Identifier => {
   return node.type === 'Identifier';
+};
+
+export const isUnaryExpression = (node: BaseNode): node is UnaryExpression => {
+  return node.type === 'UnaryExpression';
 };
 
 export const isInitializerListExpression = (
@@ -84,6 +90,12 @@ export const isFunctionPattern = (node: BaseNode): node is FunctionPattern => {
 
 export const isPointerPattern = (node: BaseNode): node is PointerPattern => {
   return node.type === 'PointerPattern';
+};
+
+export const isParameterDeclaratorDeclaration = (
+  node: BaseNode
+): node is ParameterDeclaratorDeclaration => {
+  return node.type === 'ParameterDeclaratorDeclaration';
 };
 
 export const isAbstractSequencePattern = (

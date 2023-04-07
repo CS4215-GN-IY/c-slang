@@ -71,7 +71,8 @@ import {
   isCaseStatement,
   isEmptyStatement,
   isIdentifier,
-  isInitializerListExpression
+  isInitializerListExpression,
+  isUnaryExpression
 } from '../ast/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
@@ -187,7 +188,13 @@ const compilers: CompilerMapping = {
     } else {
       compile(node.right, instructions, symbolTable, labelFrame);
     }
-    const unaryAddressExpression = constructUnaryAddressExpression(node.left);
+    let unaryAddressExpression;
+    if (isUnaryExpression(node.left) && node.left.operator === '*') {
+      // If assigning to a pointer, simply remove one layer of indirection.
+      unaryAddressExpression = node.left.operand;
+    } else {
+      unaryAddressExpression = constructUnaryAddressExpression(node.left);
+    }
     compile(unaryAddressExpression, instructions, symbolTable, labelFrame);
     const assignToAddressInstr = constructAssignToAddressInstr();
     instructions.push(assignToAddressInstr);
@@ -397,9 +404,7 @@ const compilers: CompilerMapping = {
 
     loadFunctionInstr.functionInstrAddress = instructions.length;
 
-    // TODO: Replace param declarations when parameter list is supported
     const functionSymbolTable = addFunctionSymbolTableEntries(
-      [],
       node,
       symbolTable
     );

@@ -1490,6 +1490,11 @@ export class ASTBuilder implements CVisitor<any> {
   visitParameterTypeList(
     ctx: ParameterTypeListContext
   ): ParameterDeclaration[] {
+    const ellipsis = ctx.Ellipsis();
+    if (ellipsis !== undefined) {
+      throw new UnsupportedKeywordError('...');
+    }
+
     const parameterList = ctx.parameterList();
     return this.visitParameterList(parameterList);
   }
