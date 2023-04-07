@@ -105,7 +105,9 @@ import {
   getSymbolTableEntry,
   getSymbolTableEntryInFrame,
   isArraySymbolTableEntry,
-  isBuiltinFunctionSymbolTableEntry
+  isBuiltinFunctionSymbolTableEntry,
+  isFunctionSymbolTableEntry,
+  isVariableSymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
 import { getNameFromDeclaratorPattern } from './compilerUtils';
@@ -436,9 +438,9 @@ const compilers: CompilerMapping = {
       getNameFromDeclaratorPattern(node.id),
       symbolTable
     );
-    if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
+    if (!isFunctionSymbolTableEntry(symbolTableEntry)) {
       throw new BrokenInvariantError(
-        'Function must have been user-declared and not a built-in.'
+        'Symbol table entry should always be for a function here.'
       );
     }
     const assignInstr = constructAssignInstr(symbolTableEntry, 1);
@@ -467,7 +469,6 @@ const compilers: CompilerMapping = {
       return;
     }
     if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
-      // TODO: Implement this.
       return;
     }
     const loadSymbolInstr = constructLoadSymbolInstr(symbolTableEntry);
@@ -721,9 +722,12 @@ const compilers: CompilerMapping = {
         ) {
           throw new UnsupportedInitializationError();
         }
-        if (isBuiltinFunctionSymbolTableEntry(entry)) {
+        if (
+          !isVariableSymbolTableEntry(entry) &&
+          !isArraySymbolTableEntry(entry)
+        ) {
           throw new BrokenInvariantError(
-            'Built-in functions cannot be declared as variables.'
+            'Symbol table entry should always be for a variable or array here.'
           );
         }
         const numOfItemsToAssign = isInitializerListExpression(initialValue)

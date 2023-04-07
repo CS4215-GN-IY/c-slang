@@ -116,9 +116,9 @@ export const addFunctionSymbolTableEntries = (
     getNameFromDeclaratorPattern(node.id),
     symbolTable
   );
-  if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
+  if (!isFunctionSymbolTableEntry(functionEntry)) {
     throw new BrokenInvariantError(
-      'Function must have been user-declared and not a built-in.'
+      'Symbol table entry should always be for a function here.'
     );
   }
   functionEntry.numOfParams = node.params.length;
@@ -254,6 +254,12 @@ export const isBuiltinFunctionSymbolTableEntry = (
   entry: SymbolTableEntry
 ): entry is BuiltInFunctionSymbolTableEntry => {
   return entry.nameType === 'BuiltInFunction';
+};
+
+export const isVariableSymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is VariableSymbolTableEntry => {
+  return entry.nameType === 'Variable';
 };
 
 export const getNumOfEntriesInFrame = (frame: SymbolTableFrame): number => {
