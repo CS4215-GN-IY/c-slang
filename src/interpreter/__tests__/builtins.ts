@@ -15,4 +15,20 @@ describe('built-ins', () => {
     const expectedResult = 5;
     expect(result).toEqual(expectedResult);
   });
+
+  test('does not allow redeclaring of built-in functions', () => {
+    const code = `
+        double sqrt(double x) {
+            return x;
+        }
+
+        int main() {
+            return sqrt(25);
+        }
+    `;
+    const ast = parse(code);
+    expect(() => compileProgram(ast)).toThrow(
+      `Tried to redeclare name 'sqrt'`
+    );
+  });
 });

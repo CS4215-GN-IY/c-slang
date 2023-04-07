@@ -266,7 +266,7 @@ const addToFrame = (
 ): void => {
   entries.forEach((entry) => {
     if (entry.name in frame) {
-      throw new RedeclaredNameError(`Tried to redeclare name ${entry.name}`);
+      throw new RedeclaredNameError(`Tried to redeclare name '${entry.name}'`);
     }
     frame[entry.name] = entry;
   });
