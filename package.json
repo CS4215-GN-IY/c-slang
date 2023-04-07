@@ -4,6 +4,7 @@
   "description": "JavaScript-based implementation of C, written in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
   "repository": "git@github.com:CS4215-GN-IY/c-slang.git",
   "author": {
     "name": "CS4215-GN-IY",
