@@ -42,6 +42,7 @@ import {
   constructBinaryOperationInstr,
   constructBreakDoneInstr,
   constructBreakInstr,
+  constructCallBuiltInInstr,
   constructCallInstr,
   constructContinueDoneInstr,
   constructContinueInstr,
@@ -260,7 +261,12 @@ const compilers: CompilerMapping = {
     });
     // If the function being called is a built-in function, we simply push the CallBuiltInInstr.
     if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
-      throw new Error('Not implemented yet');
+      const callBuiltInInstr = constructCallBuiltInInstr(
+        functionEntry.name,
+        node.arguments.length
+      );
+      instructions.push(callBuiltInInstr);
+      return;
     }
     const loadReturnAddressInstr = constructLoadReturnAddressInstr();
     instructions.push(loadReturnAddressInstr);

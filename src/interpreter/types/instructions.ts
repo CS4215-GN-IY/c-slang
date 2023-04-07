@@ -13,6 +13,7 @@ export type Instr =
   | BreakInstr
   | BreakDoneInstr
   | CallInstr
+  | CallBuiltInInstr
   | ContinueInstr
   | ContinueDoneInstr
   | DoneInstr
@@ -67,6 +68,12 @@ export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
   numOfEntriesForVars: number;
+}
+
+export interface CallBuiltInInstr extends BaseInstr {
+  type: 'CallBuiltIn';
+  builtInName: string;
+  numOfArgs: number;
 }
 
 export interface ContinueInstr extends BaseInstr {

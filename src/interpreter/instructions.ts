@@ -27,7 +27,8 @@ import {
   type TailCallInstr,
   type LoadReturnAddressInstr,
   type ArrayAccessInstr,
-  type AssignToAddressInstr
+  type AssignToAddressInstr,
+  type CallBuiltInInstr
 } from './types/instructions';
 import { type SymbolTableEntryWithAddress } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
@@ -80,6 +81,15 @@ export const constructCallInstr = (
   type: 'Call',
   numOfArgs,
   numOfEntriesForVars
+});
+
+export const constructCallBuiltInInstr = (
+  builtInName: string,
+  numOfArgs: number
+): CallBuiltInInstr => ({
+  type: 'CallBuiltIn',
+  builtInName,
+  numOfArgs
 });
 
 export const constructContinueInstr = (): ContinueInstr => ({
