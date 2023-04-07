@@ -27,8 +27,6 @@ describe('built-ins', () => {
         }
     `;
     const ast = parse(code);
-    expect(() => compileProgram(ast)).toThrow(
-      `Tried to redeclare name 'sqrt'`
-    );
+    expect(() => compileProgram(ast)).toThrow(`Tried to redeclare name 'sqrt'`);
   });
 });

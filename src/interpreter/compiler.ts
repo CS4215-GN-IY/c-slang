@@ -438,7 +438,7 @@ const compilers: CompilerMapping = {
     );
     if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
       throw new BrokenInvariantError(
-        'User-declared functions should always have a scope & offset.'
+        'Function must have been user-declared and not a built-in.'
       );
     }
     const assignInstr = constructAssignInstr(symbolTableEntry, 1);

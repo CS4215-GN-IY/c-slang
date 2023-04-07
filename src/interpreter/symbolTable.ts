@@ -118,7 +118,7 @@ export const addFunctionSymbolTableEntries = (
   );
   if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
     throw new BrokenInvariantError(
-      'User-declared functions should always have a scope & offset.'
+      'Function must have been user-declared and not a built-in.'
     );
   }
   functionEntry.numOfParams = node.params.length;
