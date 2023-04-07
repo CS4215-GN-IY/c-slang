@@ -1,7 +1,6 @@
 import {
   type VirtualMachineMapping,
   type VirtualMachineState,
-  type Result,
   type Value
 } from './types/virtualMachine';
 import {
@@ -43,33 +42,8 @@ import {
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
 import { Stack } from '../utils/stack';
-import { type Program } from '../ast/types';
-import { compileProgram } from './compiler';
 import { Memory } from '../memory/memory';
 import { BUILT_INS } from './builtins';
-
-/**
- * Evaluates the abstract syntax tree using a virtual machine evaluator &
- * returns the result of evaluation asynchronously.
- *
- * @param ast The abstract syntax tree to evaluate.
- */
-export const evaluate = async (ast: Program): Promise<Result> => {
-  return await new Promise(
-    (
-      resolve: (value: Result | PromiseLike<Result>) => void,
-      _reject: (reason?: any) => void
-    ) => {
-      try {
-        const instructions = compileProgram(ast);
-        const value = interpret(instructions);
-        resolve({ status: 'finished', value });
-      } catch (err) {
-        resolve({ status: 'error' });
-      }
-    }
-  );
-};
 
 export const interpret = (instructions: Instr[]): Value => {
   const memory = new Memory(instructions, 1000, 1000, 1000);
