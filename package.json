@@ -2,7 +2,8 @@
   "name": "c-slang",
   "version": "0.0.0",
   "description": "JavaScript-based implementation of C, written in TypeScript",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "git@github.com:CS4215-GN-IY/c-slang.git",
   "author": {
     "name": "CS4215-GN-IY",
