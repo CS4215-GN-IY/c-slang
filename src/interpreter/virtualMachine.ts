@@ -31,7 +31,8 @@ import {
   type TailCallInstr,
   type LoadReturnAddressInstr,
   type ArrayAccessInstr,
-  type AssignToAddressInstr
+  type AssignToAddressInstr,
+  type CallBuiltInInstr
 } from './types/instructions';
 import {
   convertToAddress,
@@ -45,6 +46,7 @@ import { Stack } from '../utils/stack';
 import { type Program } from '../ast/types';
 import { compileProgram } from './compiler';
 import { Memory } from '../memory/memory';
+import { BUILT_INS } from './builtins';
 
 /**
  * Evaluates the abstract syntax tree using a virtual machine evaluator &
@@ -154,6 +156,18 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       returnAddress
     );
     state.memory.moveToInstr(functionInstrAddress);
+  },
+  CallBuiltIn: (instr: CallBuiltInInstr, state: VirtualMachineState) => {
+    // First item popped from the stash should be the arg for the first param and so on.
+    const args: Value[] = [];
+    for (let i = 0; i < instr.numOfArgs; i++) {
+      args.push(state.stash.pop());
+    }
+    const result = BUILT_INS[instr.builtInName](...args);
+    if (result !== undefined) {
+      state.stash.push(result);
+    }
+    state.memory.moveToNextInstr();
   },
   Continue: (instr: ContinueInstr, state: VirtualMachineState) => {
     state.memory.moveToNextInstrAfterType('ContinueDone');

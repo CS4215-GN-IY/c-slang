@@ -27,9 +27,10 @@ import {
   type TailCallInstr,
   type LoadReturnAddressInstr,
   type ArrayAccessInstr,
-  type AssignToAddressInstr
+  type AssignToAddressInstr,
+  type CallBuiltInInstr
 } from './types/instructions';
-import { type SymbolTableEntry } from './types/symbolTable';
+import { type SymbolTableEntryWithAddress } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
 import { type Value } from './types/virtualMachine';
 
@@ -45,7 +46,7 @@ export const constructArrayAccessInstr = (
 });
 
 export const constructAssignInstr = (
-  entry: SymbolTableEntry,
+  entry: SymbolTableEntryWithAddress,
   numOfItems: number
 ): AssignInstr => ({
   type: 'Assign',
@@ -80,6 +81,15 @@ export const constructCallInstr = (
   type: 'Call',
   numOfArgs,
   numOfEntriesForVars
+});
+
+export const constructCallBuiltInInstr = (
+  builtInName: string,
+  numOfArgs: number
+): CallBuiltInInstr => ({
+  type: 'CallBuiltIn',
+  builtInName,
+  numOfArgs
 });
 
 export const constructContinueInstr = (): ContinueInstr => ({
@@ -129,7 +139,7 @@ export const constructJumpOnTrueInstr = (
 });
 
 export const constructLoadAddressInstr = (
-  entry: SymbolTableEntry
+  entry: SymbolTableEntryWithAddress
 ): LoadAddressInstr => ({
   type: 'LoadAddress',
   scope: getSegmentScope(entry.scope),
@@ -155,7 +165,7 @@ export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
 });
 
 export const constructLoadSymbolInstr = (
-  entry: SymbolTableEntry
+  entry: SymbolTableEntryWithAddress
 ): LoadSymbolInstr => ({
   type: 'LoadSymbol',
   scope: getSegmentScope(entry.scope),

@@ -1,13 +1,16 @@
 export interface SymbolTable {
   head: SymbolTableFrame;
   tail: SymbolTable | null;
-  parent: FunctionSymbolTableEntry | null;
+  parent: UserDeclaredFunctionSymbolTableEntry | null;
 }
 
 export type SymbolTableFrame = Record<string, SymbolTableEntry>;
 export type SymbolTableEntry =
+  | SymbolTableEntryWithAddress
+  | BuiltInFunctionSymbolTableEntry;
+export type SymbolTableEntryWithAddress =
   | ArraySymbolTableEntry
-  | FunctionSymbolTableEntry
+  | UserDeclaredFunctionSymbolTableEntry
   | VariableSymbolTableEntry;
 export type SymbolTableEntryScope = 'Block' | 'Function' | 'Global';
 
@@ -16,23 +19,33 @@ export interface BaseSymbolTableEntry {
   // make use of TypeScript's discriminated unions.
   nameType: string;
   name: string;
+}
+
+export interface BaseSymbolTableEntryWithAddress extends BaseSymbolTableEntry {
   offset: number;
   scope: SymbolTableEntryScope;
 }
 
-export interface ArraySymbolTableEntry extends BaseSymbolTableEntry {
+export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
   nameType: 'Array';
   multipliers: number[];
   maxNumOfItems: number;
 }
 
-export interface FunctionSymbolTableEntry extends BaseSymbolTableEntry {
-  nameType: 'Function';
+export interface UserDeclaredFunctionSymbolTableEntry
+  extends BaseSymbolTableEntryWithAddress {
+  nameType: 'UserDeclaredFunction';
   numOfParams: number;
   numOfEntriesForVariables: number;
 }
 
-interface VariableSymbolTableEntry extends BaseSymbolTableEntry {
+export interface BuiltInFunctionSymbolTableEntry extends BaseSymbolTableEntry {
+  nameType: 'BuiltInFunction';
+  numOfParams: number;
+}
+
+export interface VariableSymbolTableEntry
+  extends BaseSymbolTableEntryWithAddress {
   nameType: 'Variable';
 }
 

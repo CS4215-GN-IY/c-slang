@@ -7,11 +7,13 @@ import {
 } from '../ast/types';
 import {
   type ArraySymbolTableEntry,
-  type FunctionSymbolTableEntry,
+  type BuiltInFunctionSymbolTableEntry,
+  type UserDeclaredFunctionSymbolTableEntry,
   type SymbolTable,
   type SymbolTableEntry,
   type SymbolTableEntryScope,
-  type SymbolTableFrame
+  type SymbolTableFrame,
+  type VariableSymbolTableEntry
 } from './types/symbolTable';
 import {
   InvalidScopeError,
@@ -36,6 +38,7 @@ import {
   getFixedNumOfEntriesOfDeclaratorPattern,
   getNameFromDeclaratorPattern
 } from './compilerUtils';
+import { BrokenInvariantError } from '../ast/errors';
 
 export const addProgramSymbolTableEntries = (
   program: Program,
@@ -113,6 +116,11 @@ export const addFunctionSymbolTableEntries = (
     getNameFromDeclaratorPattern(node.id),
     symbolTable
   );
+  if (!isUserDeclaredFunctionSymbolTableEntry(functionEntry)) {
+    throw new BrokenInvariantError(
+      'Symbol table entry should always be for a user-declared function here.'
+    );
+  }
   functionEntry.numOfParams = node.params.length;
   functionEntry.numOfEntriesForVariables += offset;
 
@@ -173,9 +181,14 @@ export const getArraySymbolTableEntry = (
 export const getFunctionSymbolTableEntry = (
   name: string,
   symbolTable: SymbolTable
-): FunctionSymbolTableEntry => {
+): UserDeclaredFunctionSymbolTableEntry | BuiltInFunctionSymbolTableEntry => {
   const functionEntry = getSymbolTableEntry(name, symbolTable);
-  if (!isFunctionSymbolTableEntry(functionEntry)) {
+  if (
+    !(
+      isUserDeclaredFunctionSymbolTableEntry(functionEntry) ||
+      isBuiltinFunctionSymbolTableEntry(functionEntry)
+    )
+  ) {
     throw new TypeError(
       'function',
       functionEntry.nameType,
@@ -231,10 +244,22 @@ export const isArraySymbolTableEntry = (
   return entry.nameType === 'Array';
 };
 
-export const isFunctionSymbolTableEntry = (
+export const isUserDeclaredFunctionSymbolTableEntry = (
   entry: SymbolTableEntry
-): entry is FunctionSymbolTableEntry => {
-  return entry.nameType === 'Function';
+): entry is UserDeclaredFunctionSymbolTableEntry => {
+  return entry.nameType === 'UserDeclaredFunction';
+};
+
+export const isBuiltinFunctionSymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is BuiltInFunctionSymbolTableEntry => {
+  return entry.nameType === 'BuiltInFunction';
+};
+
+export const isVariableSymbolTableEntry = (
+  entry: SymbolTableEntry
+): entry is VariableSymbolTableEntry => {
+  return entry.nameType === 'Variable';
 };
 
 export const getNumOfEntriesInFrame = (frame: SymbolTableFrame): number => {
@@ -247,7 +272,7 @@ const addToFrame = (
 ): void => {
   entries.forEach((entry) => {
     if (entry.name in frame) {
-      throw new RedeclaredNameError(`Tried to redeclare name ${entry.name}`);
+      throw new RedeclaredNameError(`Tried to redeclare name '${entry.name}'`);
     }
     frame[entry.name] = entry;
   });
@@ -261,7 +286,7 @@ const addFunctionDeclarationSymbolTableEntry = (
 ): number => {
   const entry: SymbolTableEntry = {
     name: getNameFromDeclaratorPattern(functionDeclaration.id),
-    nameType: 'Function',
+    nameType: 'UserDeclaredFunction',
     offset,
     scope,
     // TODO: Update this when function declaration parameters are supported.
@@ -281,7 +306,7 @@ const addVariableDeclarationSymbolTableEntries = (
 ): number => {
   let offset = startingOffset;
   variableDeclaration.declarations.forEach((declarator) => {
-    let entry: SymbolTableEntry;
+    let entry: ArraySymbolTableEntry | VariableSymbolTableEntry;
     if (isArrayPattern(declarator.pattern)) {
       entry = {
         name: getNameFromDeclaratorPattern(declarator.pattern),
