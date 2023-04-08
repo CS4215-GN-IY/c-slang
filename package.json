@@ -2,7 +2,9 @@
   "name": "c-slang",
   "version": "0.0.0",
   "description": "JavaScript-based implementation of C, written in TypeScript",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "repository": "git@github.com:CS4215-GN-IY/c-slang.git",
   "author": {
     "name": "CS4215-GN-IY",
@@ -22,6 +24,7 @@
     "format:fix": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint": "yarn run format && yarn run eslint",
     "lint:fix": "yarn run format:fix && yarn run eslint:fix",
+    "prepare": "yarn run build",
     "typecheck": "tsc --noEmit",
     "test": "jest"
   },
