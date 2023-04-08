@@ -16,7 +16,7 @@ const startRepl = (): void => {
           callback(null, result);
         })
         .catch((err) => {
-          callback(err, undefined);
+          callback(err.message, undefined);
         });
     }
   });
