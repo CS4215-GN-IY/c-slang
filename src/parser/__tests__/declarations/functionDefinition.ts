@@ -64,6 +64,7 @@ describe('function definition', () => {
           params: [
             {
               type: 'ParameterDeclaratorDeclaration',
+              dataType: INT32,
               declarator: {
                 type: 'Identifier',
                 name: 'a'
@@ -71,6 +72,7 @@ describe('function definition', () => {
             },
             {
               type: 'ParameterDeclaratorDeclaration',
+              dataType: INT32,
               declarator: {
                 type: 'Identifier',
                 name: 'b'
@@ -127,6 +129,7 @@ describe('function definition', () => {
               params: [
                 {
                   type: 'ParameterDeclaratorDeclaration',
+                  dataType: INT32,
                   declarator: {
                     type: 'Identifier',
                     name: 'a'
@@ -134,6 +137,7 @@ describe('function definition', () => {
                 },
                 {
                   type: 'ParameterDeclaratorDeclaration',
+                  dataType: INT32,
                   declarator: {
                     type: 'Identifier',
                     name: 'b'
@@ -190,6 +194,7 @@ describe('function definition', () => {
                   params: [
                     {
                       type: 'ParameterDeclaratorDeclaration',
+                      dataType: INT32,
                       declarator: {
                         type: 'Identifier',
                         name: 'a'
@@ -197,6 +202,7 @@ describe('function definition', () => {
                     },
                     {
                       type: 'ParameterDeclaratorDeclaration',
+                      dataType: INT32,
                       declarator: {
                         type: 'Identifier',
                         name: 'b'

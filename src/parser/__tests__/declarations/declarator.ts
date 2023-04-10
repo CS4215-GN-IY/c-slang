@@ -109,6 +109,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -116,6 +117,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'a'
@@ -153,6 +155,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -160,6 +163,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -205,6 +209,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -212,6 +217,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -257,6 +263,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -264,6 +271,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -347,6 +355,7 @@ describe('declarator', () => {
                     params: [
                       {
                         type: 'ParameterDeclaratorDeclaration',
+                        dataType: INT32,
                         declarator: {
                           type: 'Identifier',
                           name: 'a'
@@ -395,6 +404,7 @@ describe('declarator', () => {
                         params: [
                           {
                             type: 'ParameterDeclaratorDeclaration',
+                            dataType: INT32,
                             declarator: {
                               type: 'Identifier',
                               name: 'a'
