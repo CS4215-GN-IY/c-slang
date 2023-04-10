@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('conditional expression', () => {
   test('handles conditional operator', () => {
@@ -14,6 +15,7 @@ describe('conditional expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -66,6 +68,7 @@ describe('conditional expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

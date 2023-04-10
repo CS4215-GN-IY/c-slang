@@ -25,11 +25,12 @@ describe('selection statement', () => {
       type: 'Program',
       body: [
         {
+          type: 'FunctionDeclaration',
           id: {
             name: 'main',
             type: 'Identifier'
           },
-          type: 'FunctionDeclaration',
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -174,11 +175,12 @@ describe('selection statement', () => {
       type: 'Program',
       body: [
         {
+          type: 'FunctionDeclaration',
           id: {
             name: 'main',
             type: 'Identifier'
           },
-          type: 'FunctionDeclaration',
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

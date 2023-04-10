@@ -1,6 +1,6 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types/ast';
-import { type DataType } from '../../../ast/types/dataTypes';
+import { type DataType, INT32 } from '../../../ast/types/dataTypes';
 import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from '../../../ast/typeSpecifierSequenceToType';
 
 describe('declaration', () => {
@@ -18,6 +18,7 @@ describe('declaration', () => {
               type: 'Identifier',
               name: 'main'
             },
+            returnDataType: INT32,
             params: [],
             body: {
               type: 'BlockStatement',
