@@ -15,9 +15,7 @@ import {
 /**
  * A mapping from valid type specifier sequences to their corresponding type.
  */
-export const TYPE_SPECIFIER_SEQUENCE_TO_TYPE: Partial<
-  Record<string, DataType>
-> = {
+export const TYPE_SPECIFIER_SEQUENCE_TO_TYPE: Record<string, DataType> = {
   char: INT8,
   'signed char': INT8,
   'unsigned char': UINT8,
