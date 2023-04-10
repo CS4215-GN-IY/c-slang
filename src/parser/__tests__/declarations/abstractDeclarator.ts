@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
 import { StaticStatus } from '../../../ast/types/ast';
+import { VOID } from '../../../ast/types/dataTypes';
 
 describe('abstract declarator', () => {
   test('bracket with no expression', () => {
@@ -10,6 +11,7 @@ describe('abstract declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {
@@ -45,6 +47,7 @@ describe('abstract declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {

@@ -9,13 +9,15 @@ import {
   UINT16,
   UINT32,
   UINT64,
-  UINT8
+  UINT8,
+  VOID
 } from './types/dataTypes';
 
 /**
  * A mapping from valid type specifier sequences to their corresponding type.
  */
 export const TYPE_SPECIFIER_SEQUENCE_TO_TYPE: Record<string, DataType> = {
+  void: VOID,
   char: INT8,
   'signed char': INT8,
   'unsigned char': UINT8,

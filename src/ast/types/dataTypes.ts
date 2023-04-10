@@ -1,4 +1,12 @@
-export type DataType = IntegerDataType | FloatingPointDataType;
+export type DataType = IntegerDataType | FloatingPointDataType | VoidDataType;
+
+export interface VoidDataType {
+  type: 'Void';
+}
+
+export const VOID: VoidDataType = {
+  type: 'Void'
+};
 
 export interface IntegerDataType {
   type: 'Integer';

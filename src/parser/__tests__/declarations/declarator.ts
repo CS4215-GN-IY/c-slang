@@ -1,6 +1,6 @@
 import { parse } from '../../parser';
 import { StaticStatus } from '../../../ast/types/ast';
-import { INT32 } from '../../../ast/types/dataTypes';
+import { INT32, VOID } from '../../../ast/types/dataTypes';
 
 describe('declarator', () => {
   test('handles one dimensional array declaration', () => {
@@ -329,6 +329,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {
@@ -372,6 +373,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {
