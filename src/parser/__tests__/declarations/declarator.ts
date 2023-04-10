@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
 import { StaticStatus } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('declarator', () => {
   test('handles one dimensional array declaration', () => {
@@ -10,6 +11,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -47,6 +49,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -92,6 +95,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -135,6 +139,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -186,6 +191,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -237,6 +243,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -293,6 +300,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -414,6 +422,7 @@ describe('declarator', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {

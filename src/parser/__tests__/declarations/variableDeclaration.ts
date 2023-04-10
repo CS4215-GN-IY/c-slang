@@ -1,4 +1,5 @@
 import { parse } from '../../parser';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('variable declaration', () => {
   test('handles initializer list', () => {
@@ -9,6 +10,7 @@ describe('variable declaration', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
