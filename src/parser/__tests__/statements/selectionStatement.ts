@@ -40,7 +40,7 @@ describe('selection statement', () => {
                 isConstant: false,
                 declarations: [
                   {
-                    type: 'VariableDeclarator',
+                    type: 'Declarator',
                     pattern: {
                       name: 'i',
                       type: 'Identifier'
@@ -189,7 +189,7 @@ describe('selection statement', () => {
                 isConstant: false,
                 declarations: [
                   {
-                    type: 'VariableDeclarator',
+                    type: 'Declarator',
                     pattern: {
                       name: 'i',
                       type: 'Identifier'

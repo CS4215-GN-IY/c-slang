@@ -15,7 +15,7 @@ describe('abstract declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -51,7 +51,7 @@ describe('abstract declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {

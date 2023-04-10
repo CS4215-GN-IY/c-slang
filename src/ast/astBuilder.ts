@@ -26,7 +26,7 @@ import {
   StaticStatus,
   type UnaryOperator,
   type Declaration,
-  type VariableDeclarator,
+  type Declarator,
   type InitializerExpression,
   type InitializerListExpression
 } from './types/ast';
@@ -500,7 +500,7 @@ export class ASTBuilder implements CVisitor<any> {
     );
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'Declarator',
         pattern: typedefNameReturnValue.typedefName
       });
     });
@@ -1045,7 +1045,7 @@ export class ASTBuilder implements CVisitor<any> {
     );
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'Declarator',
         pattern: typedefNameReturnValue.typedefName
       });
     });
@@ -1166,7 +1166,7 @@ export class ASTBuilder implements CVisitor<any> {
     return leftExpression;
   }
 
-  visitInitDeclarator(ctx: InitDeclaratorContext): VariableDeclarator {
+  visitInitDeclarator(ctx: InitDeclaratorContext): Declarator {
     const initializer = ctx.initializer();
     const initialValue =
       initializer === undefined
@@ -1174,15 +1174,13 @@ export class ASTBuilder implements CVisitor<any> {
         : this.visitInitializer(initializer);
 
     return {
-      type: 'VariableDeclarator',
+      type: 'Declarator',
       pattern: this.visitDeclarator(ctx.declarator()),
       initialValue
     };
   }
 
-  visitInitDeclaratorList(
-    ctx: InitDeclaratorListContext
-  ): VariableDeclarator[] {
+  visitInitDeclaratorList(ctx: InitDeclaratorListContext): Declarator[] {
     return ctx.initDeclarator().map(this.visitInitDeclarator, this);
   }
 

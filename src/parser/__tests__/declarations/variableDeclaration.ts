@@ -14,7 +14,7 @@ describe('variable declaration', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {

@@ -15,7 +15,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {
@@ -53,7 +53,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {
@@ -99,7 +99,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -143,7 +143,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -195,7 +195,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -247,7 +247,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -304,7 +304,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -333,7 +333,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -377,7 +377,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -428,7 +428,7 @@ describe('declarator', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {

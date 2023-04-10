@@ -15,7 +15,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
@@ -40,21 +40,21 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
               }
             },
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'b'
               }
             },
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'c'
@@ -83,7 +83,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
@@ -97,7 +97,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'b'
@@ -111,7 +111,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'c'
@@ -136,7 +136,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'

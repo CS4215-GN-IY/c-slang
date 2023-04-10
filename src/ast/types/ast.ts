@@ -306,12 +306,12 @@ export interface Declaration extends BaseDeclaration {
   type: 'Declaration';
   dataType: DataType;
   isConstant: boolean;
-  // For multiple variable declarations on the same line that are delimited by comma.
-  declarations: VariableDeclarator[];
+  // For multiple declarations on the same line that are delimited by comma.
+  declarations: Declarator[];
 }
 
-export interface VariableDeclarator extends BaseNode {
-  type: 'VariableDeclarator';
+export interface Declarator extends BaseNode {
+  type: 'Declarator';
   pattern: DeclaratorPattern;
   initialValue?: Expression;
 }
