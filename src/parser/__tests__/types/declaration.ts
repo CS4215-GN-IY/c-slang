@@ -3,7 +3,7 @@ import { type Program } from '../../../ast/types/ast';
 import { type DataType } from '../../../ast/types/dataTypes';
 import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from '../../../ast/typeSpecifierSequenceToType';
 
-describe('variable declaration', () => {
+describe('declaration', () => {
   test.each(Object.entries(TYPE_SPECIFIER_SEQUENCE_TO_TYPE))(
     `Handles '%s'`,
     (typeSpecifierSequence: string, dataType: DataType) => {

@@ -1,7 +1,7 @@
 import { parse } from '../../parser';
 import { INT32 } from '../../../ast/types/dataTypes';
 
-describe('variable declaration', () => {
+describe('declaration', () => {
   test('handles initializer list', () => {
     const code = 'int arr[3] = {[2] = 1, 2, 3};';
     const ast = parse(code);
