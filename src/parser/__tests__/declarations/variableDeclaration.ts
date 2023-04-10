@@ -9,7 +9,7 @@ describe('variable declaration', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [

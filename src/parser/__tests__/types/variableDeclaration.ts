@@ -23,7 +23,7 @@ describe('variable declaration', () => {
               type: 'BlockStatement',
               items: [
                 {
-                  type: 'VariableDeclaration',
+                  type: 'Declaration',
                   dataType,
                   isConstant: false,
                   declarations: [

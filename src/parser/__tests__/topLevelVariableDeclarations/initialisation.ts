@@ -10,7 +10,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -35,7 +35,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -78,7 +78,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -92,7 +92,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           ]
         },
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -106,7 +106,7 @@ describe('Top-level variable declarations (initialisation)', () => {
           ]
         },
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -131,7 +131,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [

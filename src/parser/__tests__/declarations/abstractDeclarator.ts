@@ -10,7 +10,7 @@ describe('abstract declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: VOID,
           isConstant: false,
           declarations: [
@@ -46,7 +46,7 @@ describe('abstract declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: VOID,
           isConstant: false,
           declarations: [

@@ -35,7 +35,7 @@ describe('selection statement', () => {
             type: 'BlockStatement',
             items: [
               {
-                type: 'VariableDeclaration',
+                type: 'Declaration',
                 dataType: INT32,
                 isConstant: false,
                 declarations: [
@@ -184,7 +184,7 @@ describe('selection statement', () => {
             type: 'BlockStatement',
             items: [
               {
-                type: 'VariableDeclaration',
+                type: 'Declaration',
                 dataType: INT32,
                 isConstant: false,
                 declarations: [

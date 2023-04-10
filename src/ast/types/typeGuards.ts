@@ -24,7 +24,7 @@ import {
   type PointerPattern,
   type StarBracketContent,
   type UnaryExpression,
-  type VariableDeclaration
+  type Declaration
 } from './ast';
 
 export const isTypeSpecifierReturnValue = (
@@ -63,10 +63,8 @@ export const isConstant = (node: BaseNode): node is Constant => {
   return node.type === 'Constant';
 };
 
-export const isVariableDeclaration = (
-  node: BaseNode
-): node is VariableDeclaration => {
-  return node.type === 'VariableDeclaration';
+export const isDeclaration = (node: BaseNode): node is Declaration => {
+  return node.type === 'Declaration';
 };
 
 export const isCaseStatement = (node: BaseNode): node is CaseStatement => {

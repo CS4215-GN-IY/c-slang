@@ -32,7 +32,7 @@ import {
   type SwitchStatement,
   type UnaryExpression,
   type UpdateExpression,
-  type VariableDeclaration,
+  type Declaration,
   type WhileStatement
 } from '../ast/types/ast';
 import {
@@ -330,6 +330,44 @@ const compilers: CompilerMapping = {
   ) => {
     const continueInstr = constructContinueInstr();
     instructions.push(continueInstr);
+  },
+  Declaration: (
+    node: Declaration,
+    instructions: Instr[],
+    symbolTable: SymbolTable,
+    labelFrame: LabelFrame
+  ) => {
+    node.declarations.forEach((declarator) => {
+      const initialValue = declarator.initialValue;
+      if (isNotUndefined(initialValue)) {
+        compile(initialValue, instructions, symbolTable, labelFrame);
+        // Declaration names should have been added to the symbol table by the parent scope.
+        // Should only need to assign for declaration in last frame.
+        const entry = getSymbolTableEntryInFrame(
+          getNameFromDeclaratorPattern(declarator.pattern),
+          symbolTable.head
+        );
+        if (
+          isInitializerListExpression(initialValue) &&
+          !isArraySymbolTableEntry(entry)
+        ) {
+          throw new UnsupportedInitializationError();
+        }
+        if (
+          !isVariableSymbolTableEntry(entry) &&
+          !isArraySymbolTableEntry(entry)
+        ) {
+          throw new BrokenInvariantError(
+            'Symbol table entry should always be for a variable or array here.'
+          );
+        }
+        const numOfItemsToAssign = isInitializerListExpression(initialValue)
+          ? initialValue.initializers.length
+          : 1;
+        const assignInstr = constructAssignInstr(entry, numOfItemsToAssign);
+        instructions.push(assignInstr);
+      }
+    });
   },
   DefaultStatement: (
     node: DefaultStatement,
@@ -699,44 +737,6 @@ const compilers: CompilerMapping = {
     if (node.isPrefix) {
       compile(node.operand, instructions, symbolTable, labelFrame);
     }
-  },
-  VariableDeclaration: (
-    node: VariableDeclaration,
-    instructions: Instr[],
-    symbolTable: SymbolTable,
-    labelFrame: LabelFrame
-  ) => {
-    node.declarations.forEach((declarator) => {
-      const initialValue = declarator.initialValue;
-      if (isNotUndefined(initialValue)) {
-        compile(initialValue, instructions, symbolTable, labelFrame);
-        // Declaration names should have been added to the symbol table by the parent scope.
-        // Should only need to assign for declaration in last frame.
-        const entry = getSymbolTableEntryInFrame(
-          getNameFromDeclaratorPattern(declarator.pattern),
-          symbolTable.head
-        );
-        if (
-          isInitializerListExpression(initialValue) &&
-          !isArraySymbolTableEntry(entry)
-        ) {
-          throw new UnsupportedInitializationError();
-        }
-        if (
-          !isVariableSymbolTableEntry(entry) &&
-          !isArraySymbolTableEntry(entry)
-        ) {
-          throw new BrokenInvariantError(
-            'Symbol table entry should always be for a variable or array here.'
-          );
-        }
-        const numOfItemsToAssign = isInitializerListExpression(initialValue)
-          ? initialValue.initializers.length
-          : 1;
-        const assignInstr = constructAssignInstr(entry, numOfItemsToAssign);
-        instructions.push(assignInstr);
-      }
-    });
   },
   WhileStatement: (
     node: WhileStatement,

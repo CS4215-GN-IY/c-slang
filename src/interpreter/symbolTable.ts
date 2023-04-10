@@ -3,7 +3,7 @@ import {
   type FunctionDeclaration,
   type ParameterDeclaration,
   type Program,
-  type VariableDeclaration
+  type Declaration
 } from '../ast/types/ast';
 import {
   type ArraySymbolTableEntry,
@@ -28,7 +28,7 @@ import {
   isEmptyStatement,
   isForStatement,
   isParameterDeclaratorDeclaration,
-  isVariableDeclaration
+  isDeclaration
 } from '../ast/types/typeGuards';
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
@@ -57,8 +57,8 @@ export const addProgramSymbolTableEntries = (
         );
         break;
       }
-      case 'VariableDeclaration': {
-        offset = addVariableDeclarationSymbolTableEntries(
+      case 'Declaration': {
+        offset = addDeclarationSymbolTableEntries(
           declaration,
           'Global',
           offset,
@@ -94,15 +94,15 @@ export const addFunctionSymbolTableEntries = (
   offset = 0;
   if (!isEmptyStatement(node.body)) {
     node.body.items.forEach((item) => {
-      const declaration = isVariableDeclaration(item)
+      const declaration = isDeclaration(item)
         ? item
         : isForStatement(item) &&
           isNotUndefined(item.init) &&
-          isVariableDeclaration(item.init)
+          isDeclaration(item.init)
         ? item.init
         : undefined;
       if (isNotUndefined(declaration)) {
-        offset = addVariableDeclarationSymbolTableEntries(
+        offset = addDeclarationSymbolTableEntries(
           declaration,
           'Function',
           offset,
@@ -141,15 +141,15 @@ export const addBlockSymbolTableEntries = (
   }
   let offset = symbolTable.parent.numOfEntriesForVariables;
   block.items.forEach((item) => {
-    const declaration = isVariableDeclaration(item)
+    const declaration = isDeclaration(item)
       ? item
       : isForStatement(item) &&
         isNotUndefined(item.init) &&
-        isVariableDeclaration(item.init)
+        isDeclaration(item.init)
       ? item.init
       : undefined;
     if (isNotUndefined(declaration)) {
-      offset = addVariableDeclarationSymbolTableEntries(
+      offset = addDeclarationSymbolTableEntries(
         declaration,
         'Block',
         offset,
@@ -298,14 +298,14 @@ const addFunctionDeclarationSymbolTableEntry = (
   return offset;
 };
 
-const addVariableDeclarationSymbolTableEntries = (
-  variableDeclaration: VariableDeclaration,
+const addDeclarationSymbolTableEntries = (
+  declaration: Declaration,
   scope: SymbolTableEntryScope,
   startingOffset: number,
   symbolTableFrame: SymbolTableFrame
 ): number => {
   let offset = startingOffset;
-  variableDeclaration.declarations.forEach((declarator) => {
+  declaration.declarations.forEach((declarator) => {
     let entry: ArraySymbolTableEntry | VariableSymbolTableEntry;
     if (isArrayPattern(declarator.pattern)) {
       entry = {

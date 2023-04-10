@@ -10,7 +10,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -48,7 +48,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -94,7 +94,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -138,7 +138,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -190,7 +190,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -242,7 +242,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -299,7 +299,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [
@@ -328,7 +328,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: VOID,
           isConstant: false,
           declarations: [
@@ -372,7 +372,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: VOID,
           isConstant: false,
           declarations: [
@@ -423,7 +423,7 @@ describe('declarator', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
           dataType: INT32,
           isConstant: false,
           declarations: [

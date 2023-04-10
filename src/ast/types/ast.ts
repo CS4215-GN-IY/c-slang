@@ -8,11 +8,11 @@ export interface BaseNode {
 }
 
 export interface NodeMap {
+  Declaration: Declaration;
   Expression: Expression;
   FunctionDeclaration: FunctionDeclaration;
   Program: Program;
   Statement: Statement;
-  VariableDeclaration: VariableDeclaration;
 }
 
 export type Node = NodeMap[keyof NodeMap];
@@ -22,7 +22,7 @@ export interface Program extends BaseNode {
   body: ExternalDeclaration[];
 }
 
-export type ExternalDeclaration = FunctionDeclaration | VariableDeclaration;
+export type ExternalDeclaration = FunctionDeclaration | Declaration;
 
 export type Statement =
   | LabeledStatement
@@ -63,7 +63,7 @@ export interface BlockStatement extends BaseStatement {
   items: BlockItem[];
 }
 
-export type BlockItem = VariableDeclaration | Statement;
+export type BlockItem = Declaration | Statement;
 
 export type ExpressionOrEmptyStatement = EmptyStatement | ExpressionStatement;
 
@@ -104,7 +104,7 @@ export interface DoWhileStatement extends BaseStatement {
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement';
-  init?: VariableDeclaration | SequenceExpression;
+  init?: Declaration | SequenceExpression;
   predicate?: SequenceExpression;
   update?: SequenceExpression;
   body: Statement;
@@ -302,8 +302,8 @@ export interface FunctionDeclaration extends BaseDeclaration {
   body: BlockOrEmptyStatement;
 }
 
-export interface VariableDeclaration extends BaseDeclaration {
-  type: 'VariableDeclaration';
+export interface Declaration extends BaseDeclaration {
+  type: 'Declaration';
   dataType: DataType;
   isConstant: boolean;
   // For multiple variable declarations on the same line that are delimited by comma.

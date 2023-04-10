@@ -25,7 +25,7 @@ import {
   type Statement,
   StaticStatus,
   type UnaryOperator,
-  type VariableDeclaration,
+  type Declaration,
   type VariableDeclarator,
   type InitializerExpression,
   type InitializerListExpression
@@ -467,7 +467,7 @@ export class ASTBuilder implements CVisitor<any> {
     return this.visitConditionalExpression(ctx.conditionalExpression());
   }
 
-  visitDeclaration(ctx: DeclarationContext): VariableDeclaration {
+  visitDeclaration(ctx: DeclarationContext): Declaration {
     const initDeclaratorList = ctx.initDeclaratorList();
     const declarations =
       initDeclaratorList === undefined
@@ -506,7 +506,7 @@ export class ASTBuilder implements CVisitor<any> {
     });
 
     return {
-      type: 'VariableDeclaration',
+      type: 'Declaration',
       dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
@@ -1012,7 +1012,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForDeclaration(ctx: ForDeclarationContext): VariableDeclaration {
+  visitForDeclaration(ctx: ForDeclarationContext): Declaration {
     const initDeclaratorList = ctx.initDeclaratorList();
     const declarations =
       initDeclaratorList === undefined
@@ -1051,7 +1051,7 @@ export class ASTBuilder implements CVisitor<any> {
     });
 
     return {
-      type: 'VariableDeclaration',
+      type: 'Declaration',
       dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
