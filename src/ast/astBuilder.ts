@@ -145,7 +145,8 @@ import {
   isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
-  isTypedefNameReturnValue
+  isTypedefNameReturnValue,
+  isTypeSpecifierReturnValue
 } from './types/typeGuards';
 import {
   constructExpressionBracketContent,
@@ -157,6 +158,8 @@ import {
   constructParameterDeclaratorDeclaration,
   constructStringLiteral
 } from './constructors';
+import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from './typeSpecifierSequenceToType';
+import { InvalidTypeError } from '../typeChecker/errors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -480,6 +483,18 @@ export class ASTBuilder implements CVisitor<any> {
     const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
       declarationSpecifiers
     );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.type)
+      .join(' ');
+    const type = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (type === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
+    }
+
     const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
       isTypedefNameReturnValue
     );

@@ -1,6 +1,7 @@
 import {
   type BaseReturnValue,
-  type TypedefNameReturnValue
+  type TypedefNameReturnValue,
+  type TypeSpecifierReturnValue
 } from './astBuilder';
 import {
   type AbstractSequencePattern,
@@ -25,6 +26,12 @@ import {
   type UnaryExpression,
   type VariableDeclaration
 } from './ast';
+
+export const isTypeSpecifierReturnValue = (
+  returnValue: BaseReturnValue
+): returnValue is TypeSpecifierReturnValue => {
+  return returnValue.type === 'TypeSpecifier';
+};
 
 export const isTypedefNameReturnValue = (
   returnValue: BaseReturnValue
