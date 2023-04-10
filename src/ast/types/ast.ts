@@ -374,7 +374,7 @@ export type ParameterDeclaration =
 
 export interface ParameterDeclaratorDeclaration {
   type: 'ParameterDeclaratorDeclaration';
-  // TODO: Support declaration specifiers
+  dataType: DataType;
   declarator: DeclaratorPattern;
 }
 

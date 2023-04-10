@@ -126,7 +126,8 @@ import {
 import {
   BrokenInvariantError,
   UnreachableCaseError,
-  UnsupportedKeywordError
+  UnsupportedKeywordError,
+  UnsupportedSyntaxError
 } from './errors';
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
@@ -155,7 +156,6 @@ import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
-  constructParameterDeclaratorDeclaration,
   constructStringLiteral
 } from './constructors';
 import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from './typeSpecifierSequenceToType';
@@ -828,13 +828,14 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       const parameterTypeList = ctx.parameterTypeList();
       const identifierList = ctx.identifierList();
+      if (identifierList !== undefined) {
+        throw new UnsupportedSyntaxError(
+          'Old-style function declarations are not supported.'
+        );
+      }
       const params: ParameterDeclaration[] =
         parameterTypeList !== undefined
           ? this.visitParameterTypeList(parameterTypeList)
-          : identifierList !== undefined
-          ? this.visitIdentifierList(identifierList).map((identifier) =>
-              constructParameterDeclaratorDeclaration(identifier)
-            )
           : [];
       const pattern = this.visitDirectDeclarator(directDeclarator);
       if (isFunctionPattern(pattern)) {
@@ -1513,13 +1514,59 @@ export class ASTBuilder implements CVisitor<any> {
   visitParameterDeclaration(
     ctx: ParameterDeclarationContext
   ): ParameterDeclaration {
-    // TODO: Handle declaration specifiers.
+    const declarationSpecifiers = ctx.declarationSpecifiers();
     const declarator = ctx.declarator();
     if (declarator !== undefined) {
+      if (declarationSpecifiers === undefined) {
+        throw new BrokenInvariantError(
+          'Encountered a ParameterDeclaration with a Declarator but not DeclarationSpecifiers.'
+        );
+      }
+
+      const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+        declarationSpecifiers
+      );
+
+      const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+        isTypeSpecifierReturnValue
+      );
+      const typeSpecifierSequence = typeSpecifierReturnValues
+        .map(
+          (typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier
+        )
+        .join(' ');
+      const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+      if (dataType === undefined) {
+        throw new InvalidTypeError(typeSpecifierSequence);
+      }
+
       return {
         type: 'ParameterDeclaratorDeclaration',
+        dataType,
         declarator: this.visitDeclarator(declarator)
       };
+    }
+
+    const declarationSpecifiers2 = ctx.declarationSpecifiers2();
+    if (declarationSpecifiers2 === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ParameterDeclaration with an AbstractDeclarator but not DeclarationSpecifiers2.'
+      );
+    }
+
+    const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+      declarationSpecifiers2
+    );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
+      .join(' ');
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
     }
 
     const abstractDeclarator = ctx.abstractDeclarator();
