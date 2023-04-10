@@ -1105,9 +1105,32 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
 
+    // If the return type of a function definition is omitted, we default to 'int'.
+    let returnDataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE.int;
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers !== undefined) {
+      const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+        declarationSpecifiers
+      );
+
+      const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+        isTypeSpecifierReturnValue
+      );
+      const typeSpecifierSequence = typeSpecifierReturnValues
+        .map(
+          (typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier
+        )
+        .join(' ');
+      returnDataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+      if (returnDataType === undefined) {
+        throw new InvalidTypeError(typeSpecifierSequence);
+      }
+    }
+
     return {
       type: 'FunctionDeclaration',
       id: processedDeclarator.id,
+      returnDataType,
       params: processedDeclarator.params,
       body: this.visitCompoundStatement(compoundStatement)
     };

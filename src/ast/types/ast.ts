@@ -298,6 +298,7 @@ export interface FunctionDeclaration extends BaseDeclaration {
   type: 'FunctionDeclaration';
   // TODO: Add declaration specifiers
   id: DeclaratorPattern;
+  returnDataType: DataType;
   params: ParameterDeclaration[];
   body: BlockOrEmptyStatement;
 }
