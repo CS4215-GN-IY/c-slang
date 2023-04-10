@@ -1,12 +1,12 @@
 import { parse } from '../../parser';
-import { StaticStatus } from '../../../ast/types/ast';
+import { type Program, StaticStatus } from '../../../ast/types/ast';
 import { VOID } from '../../../ast/types/dataTypes';
 
 describe('abstract declarator', () => {
   test('bracket with no expression', () => {
     const code = 'void f(int []);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
@@ -42,7 +42,7 @@ describe('abstract declarator', () => {
   test('bracket with expression', () => {
     const code = 'void f(int [i]);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {

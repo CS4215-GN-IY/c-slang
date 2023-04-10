@@ -1,11 +1,12 @@
 import { parse } from '../../parser';
 import { INT32 } from '../../../ast/types/dataTypes';
+import { type Program, StaticStatus } from '../../../ast/types/ast';
 
 describe('declaration', () => {
   test('handles initializer list', () => {
     const code = 'int arr[3] = {[2] = 1, 2, 3};';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
@@ -27,7 +28,7 @@ describe('declaration', () => {
                       type: 'Constant',
                       value: 3
                     },
-                    staticStatus: 'None',
+                    staticStatus: StaticStatus.NONE,
                     type: 'ExpressionBracketContent'
                   }
                 ]
