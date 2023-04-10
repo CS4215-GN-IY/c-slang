@@ -488,10 +488,10 @@ export class ASTBuilder implements CVisitor<any> {
       isTypeSpecifierReturnValue
     );
     const typeSpecifierSequence = typeSpecifierReturnValues
-      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.type)
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
       .join(' ');
-    const type = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
-    if (type === undefined) {
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
       throw new InvalidTypeError(typeSpecifierSequence);
     }
 
@@ -507,6 +507,7 @@ export class ASTBuilder implements CVisitor<any> {
 
     return {
       type: 'VariableDeclaration',
+      dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
       declarations
@@ -1027,6 +1028,18 @@ export class ASTBuilder implements CVisitor<any> {
     const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
       declarationSpecifiers
     );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
+      .join(' ');
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
+    }
+
     const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
       isTypedefNameReturnValue
     );
@@ -1039,6 +1052,7 @@ export class ASTBuilder implements CVisitor<any> {
 
     return {
       type: 'VariableDeclaration',
+      dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
       declarations

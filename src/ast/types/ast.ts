@@ -1,3 +1,5 @@
+import { type DataType } from './dataTypes';
+
 export interface BaseNode {
   // Every leaf interface that extends BaseNode must specify
   // a string literal as a type property. This allows us to
@@ -302,6 +304,7 @@ export interface FunctionDeclaration extends BaseDeclaration {
 
 export interface VariableDeclaration extends BaseDeclaration {
   type: 'VariableDeclaration';
+  dataType: DataType;
   isConstant: boolean;
   // For multiple variable declarations on the same line that are delimited by comma.
   declarations: VariableDeclarator[];

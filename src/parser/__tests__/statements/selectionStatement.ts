@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('selection statement', () => {
   it('handles switch statement', () => {
@@ -35,6 +36,7 @@ describe('selection statement', () => {
             items: [
               {
                 type: 'VariableDeclaration',
+                dataType: INT32,
                 isConstant: false,
                 declarations: [
                   {
@@ -183,6 +185,7 @@ describe('selection statement', () => {
             items: [
               {
                 type: 'VariableDeclaration',
+                dataType: INT32,
                 isConstant: false,
                 declarations: [
                   {

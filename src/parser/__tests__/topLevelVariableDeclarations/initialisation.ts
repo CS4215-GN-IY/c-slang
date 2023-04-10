@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
 import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('Top-level variable declarations (initialisation)', () => {
   it('handles uninitialised variable declarations', () => {
@@ -10,6 +11,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -34,6 +36,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -76,6 +79,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -89,6 +93,7 @@ describe('Top-level variable declarations (initialisation)', () => {
         },
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -102,6 +107,7 @@ describe('Top-level variable declarations (initialisation)', () => {
         },
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
@@ -126,6 +132,7 @@ describe('Top-level variable declarations (initialisation)', () => {
       body: [
         {
           type: 'VariableDeclaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
