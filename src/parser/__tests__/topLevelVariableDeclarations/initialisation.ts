@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
 
 describe('Top-level variable declarations (initialisation)', () => {
   it('handles uninitialised variable declarations', () => {

@@ -1,5 +1,5 @@
 import { parse } from '../parser';
-import { type Program } from '../../ast/types';
+import { type Program } from '../../ast/types/ast';
 
 describe('Top-level edge cases', () => {
   it('returns an empty Program for the empty string', () => {

@@ -18,7 +18,7 @@ import {
   type ParameterDeclaratorDeclaration,
   type StaticStatus,
   type UnaryExpression
-} from './types';
+} from './types/ast';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
 export const constructAssignmentExpression = (

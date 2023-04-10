@@ -34,7 +34,7 @@ import {
   type UpdateExpression,
   type VariableDeclaration,
   type WhileStatement
-} from '../ast/types';
+} from '../ast/types/ast';
 import {
   constructArrayAccessInstr,
   constructAssignInstr,
@@ -74,7 +74,7 @@ import {
   isIdentifier,
   isInitializerListExpression,
   isUnaryExpression
-} from '../ast/typeGuards';
+} from '../ast/types/typeGuards';
 import { isNotUndefined } from '../utils/typeGuards';
 import {
   InvalidCallError,

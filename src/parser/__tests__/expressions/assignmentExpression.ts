@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
 
 describe('assignment expression', () => {
   test('handles simple assignment operator', () => {

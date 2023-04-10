@@ -29,7 +29,7 @@ import {
   type VariableDeclarator,
   type InitializerExpression,
   type InitializerListExpression
-} from './types';
+} from './types/ast';
 import {
   type ErrorNode,
   type ParseTree,
@@ -139,14 +139,14 @@ import {
   type VisitStorageClassSpecifierReturnValue,
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
-} from './astBuilderInternalTypes';
+} from './types/astBuilder';
 import {
   isAbstractSequencePattern,
   isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
   isTypedefNameReturnValue
-} from './typeGuards';
+} from './types/typeGuards';
 import {
   constructExpressionBracketContent,
   constructExpressionlessBracketContent,

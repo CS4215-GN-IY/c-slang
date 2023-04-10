@@ -1,4 +1,4 @@
-import { type ArrayPattern, type DeclaratorPattern } from '../ast/types';
+import { type ArrayPattern, type DeclaratorPattern } from '../ast/types/ast';
 import {
   isArrayPattern,
   isConstant,
@@ -6,7 +6,7 @@ import {
   isFunctionPattern,
   isIdentifier,
   isPointerPattern
-} from '../ast/typeGuards';
+} from '../ast/types/typeGuards';
 import { UnsupportedArrayError, UnsupportedDeclarationError } from './errors';
 import { isNumber } from '../utils/typeGuards';
 

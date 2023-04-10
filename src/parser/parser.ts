@@ -2,7 +2,7 @@ import { CharStreams, CommonTokenStream } from 'antlr4ts';
 import { CLexer } from '../lang/CLexer';
 import { CParser } from '../lang/CParser';
 import { ASTBuilder } from '../ast/astBuilder';
-import { type Program } from '../ast/types';
+import { type Program } from '../ast/types/ast';
 import { ThrowingErrorListener } from './throwingErrorListener';
 import { type Token } from 'antlr4ts/Token';
 

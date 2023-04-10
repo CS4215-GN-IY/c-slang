@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
 
 describe('logical and expression', () => {
   test('handles logical AND', () => {

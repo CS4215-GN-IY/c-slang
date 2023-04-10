@@ -1,7 +1,7 @@
 import {
   type BaseReturnValue,
   type TypedefNameReturnValue
-} from './astBuilderInternalTypes';
+} from './astBuilder';
 import {
   type AbstractSequencePattern,
   type ArrayAccessExpression,
@@ -24,7 +24,7 @@ import {
   type StarBracketContent,
   type UnaryExpression,
   type VariableDeclaration
-} from './types';
+} from './ast';
 
 export const isTypedefNameReturnValue = (
   returnValue: BaseReturnValue

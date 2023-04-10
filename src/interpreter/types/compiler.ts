@@ -1,4 +1,4 @@
-import { type Node } from '../../ast/types';
+import { type Node } from '../../ast/types/ast';
 import { type LabelFrame, type SymbolTable } from './symbolTable';
 import { type Instr } from './instructions';
 

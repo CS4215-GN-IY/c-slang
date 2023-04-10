@@ -1,10 +1,10 @@
-import { type TypeSpecifier } from './keywordWhitelists/typeSpecifiers';
+import { type TypeSpecifier } from '../keywordWhitelists/typeSpecifiers';
 import {
   type SequenceExpression,
   type Identifier,
   type VariableDeclaration,
   type Expression
-} from './types';
+} from './ast';
 
 export interface BaseReturnValue {
   type: string;

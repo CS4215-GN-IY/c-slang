@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
 
 describe('selection statement', () => {
   it('handles switch statement', () => {

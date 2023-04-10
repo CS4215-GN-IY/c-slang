@@ -1,6 +1,12 @@
-import { type BlockStatement, type FunctionDeclaration } from '../ast/types';
+import {
+  type BlockStatement,
+  type FunctionDeclaration
+} from '../ast/types/ast';
 import { type LabelEntry, type LabelFrame } from './types/symbolTable';
-import { isEmptyStatement, isIdentifierStatement } from '../ast/typeGuards';
+import {
+  isEmptyStatement,
+  isIdentifierStatement
+} from '../ast/types/typeGuards';
 import { RedeclaredNameError, UndeclaredNameError } from './errors';
 import { PLACEHOLDER_ADDRESS } from './instructions';
 

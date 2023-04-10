@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
 
 describe('shift expression', () => {
   test('handles left shift', () => {

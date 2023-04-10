@@ -1,5 +1,5 @@
 import { parse } from '../../parser';
-import { StaticStatus } from '../../../ast/types';
+import { StaticStatus } from '../../../ast/types/ast';
 
 describe('declarator', () => {
   test('handles one dimensional array declaration', () => {

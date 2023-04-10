@@ -4,7 +4,7 @@ import {
   type ParameterDeclaration,
   type Program,
   type VariableDeclaration
-} from '../ast/types';
+} from '../ast/types/ast';
 import {
   type ArraySymbolTableEntry,
   type BuiltInFunctionSymbolTableEntry,
@@ -29,7 +29,7 @@ import {
   isForStatement,
   isParameterDeclaratorDeclaration,
   isVariableDeclaration
-} from '../ast/typeGuards';
+} from '../ast/types/typeGuards';
 import { Segment } from '../memory/segment';
 import { isNotNull, isNotUndefined } from '../utils/typeGuards';
 import {
