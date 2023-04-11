@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('Top-level variable declarations (initialisation)', () => {
   it('handles uninitialised variable declarations', () => {
@@ -9,11 +10,12 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
@@ -33,25 +35,26 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
               }
             },
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'b'
               }
             },
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'c'
@@ -75,11 +78,12 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'
@@ -88,11 +92,12 @@ describe('Top-level variable declarations (initialisation)', () => {
           ]
         },
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'b'
@@ -101,11 +106,12 @@ describe('Top-level variable declarations (initialisation)', () => {
           ]
         },
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'c'
@@ -125,11 +131,12 @@ describe('Top-level variable declarations (initialisation)', () => {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'Identifier',
                 name: 'a'

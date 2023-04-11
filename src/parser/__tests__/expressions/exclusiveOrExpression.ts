@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('exclusive or expression', () => {
   test('handles bitwise XOR', () => {
@@ -14,6 +15,7 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -58,6 +60,7 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -110,6 +113,7 @@ describe('exclusive or expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

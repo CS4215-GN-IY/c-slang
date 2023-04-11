@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('relational expression', () => {
   test('handles less than', () => {
@@ -14,6 +15,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -58,6 +60,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -102,6 +105,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -146,6 +150,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -190,6 +195,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -290,6 +296,7 @@ describe('relational expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

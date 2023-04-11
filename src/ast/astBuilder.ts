@@ -25,11 +25,11 @@ import {
   type Statement,
   StaticStatus,
   type UnaryOperator,
-  type VariableDeclaration,
-  type VariableDeclarator,
+  type Declaration,
+  type Declarator,
   type InitializerExpression,
   type InitializerListExpression
-} from './types';
+} from './types/ast';
 import {
   type ErrorNode,
   type ParseTree,
@@ -126,7 +126,8 @@ import {
 import {
   BrokenInvariantError,
   UnreachableCaseError,
-  UnsupportedKeywordError
+  UnsupportedKeywordError,
+  UnsupportedSyntaxError
 } from './errors';
 import { isNotNull } from '../utils/typeGuards';
 import { isValidTypeSpecifier } from './keywordWhitelists/typeSpecifiers';
@@ -139,14 +140,15 @@ import {
   type VisitStorageClassSpecifierReturnValue,
   type VisitTypeQualifierReturnValue,
   type VisitTypeSpecifierReturnValue
-} from './astBuilderInternalTypes';
+} from './types/astBuilder';
 import {
   isAbstractSequencePattern,
   isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
-  isTypedefNameReturnValue
-} from './typeGuards';
+  isTypedefNameReturnValue,
+  isTypeSpecifierReturnValue
+} from './types/typeGuards';
 import {
   constructExpressionBracketContent,
   constructExpressionlessBracketContent,
@@ -154,9 +156,10 @@ import {
   constructConstant,
   constructEmptyStatement,
   constructIdentifier,
-  constructParameterDeclaratorDeclaration,
   constructStringLiteral
 } from './constructors';
+import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from './typeSpecifierSequenceToType';
+import { InvalidTypeError } from '../typeChecker/errors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -464,7 +467,7 @@ export class ASTBuilder implements CVisitor<any> {
     return this.visitConditionalExpression(ctx.conditionalExpression());
   }
 
-  visitDeclaration(ctx: DeclarationContext): VariableDeclaration {
+  visitDeclaration(ctx: DeclarationContext): Declaration {
     const initDeclaratorList = ctx.initDeclaratorList();
     const declarations =
       initDeclaratorList === undefined
@@ -480,18 +483,31 @@ export class ASTBuilder implements CVisitor<any> {
     const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
       declarationSpecifiers
     );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
+      .join(' ');
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
+    }
+
     const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
       isTypedefNameReturnValue
     );
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'Declarator',
         pattern: typedefNameReturnValue.typedefName
       });
     });
 
     return {
-      type: 'VariableDeclaration',
+      type: 'Declaration',
+      dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
       declarations
@@ -812,13 +828,14 @@ export class ASTBuilder implements CVisitor<any> {
     ) {
       const parameterTypeList = ctx.parameterTypeList();
       const identifierList = ctx.identifierList();
+      if (identifierList !== undefined) {
+        throw new UnsupportedSyntaxError(
+          'Old-style function declarations are not supported.'
+        );
+      }
       const params: ParameterDeclaration[] =
         parameterTypeList !== undefined
           ? this.visitParameterTypeList(parameterTypeList)
-          : identifierList !== undefined
-          ? this.visitIdentifierList(identifierList).map((identifier) =>
-              constructParameterDeclaratorDeclaration(identifier)
-            )
           : [];
       const pattern = this.visitDirectDeclarator(directDeclarator);
       if (isFunctionPattern(pattern)) {
@@ -996,7 +1013,7 @@ export class ASTBuilder implements CVisitor<any> {
     };
   }
 
-  visitForDeclaration(ctx: ForDeclarationContext): VariableDeclaration {
+  visitForDeclaration(ctx: ForDeclarationContext): Declaration {
     const initDeclaratorList = ctx.initDeclaratorList();
     const declarations =
       initDeclaratorList === undefined
@@ -1012,18 +1029,31 @@ export class ASTBuilder implements CVisitor<any> {
     const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
       declarationSpecifiers
     );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
+      .join(' ');
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
+    }
+
     const typedefNameReturnValues = processedDeclarationSpecifiers.filter(
       isTypedefNameReturnValue
     );
     typedefNameReturnValues.forEach((typedefNameReturnValue) => {
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'Declarator',
         pattern: typedefNameReturnValue.typedefName
       });
     });
 
     return {
-      type: 'VariableDeclaration',
+      type: 'Declaration',
+      dataType,
       // TODO: Implement this based off whether the 'const' keyword is used.
       isConstant: false,
       declarations
@@ -1076,9 +1106,32 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
 
+    // If the return type of a function definition is omitted, we default to 'int'.
+    let returnDataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE.int;
+    const declarationSpecifiers = ctx.declarationSpecifiers();
+    if (declarationSpecifiers !== undefined) {
+      const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+        declarationSpecifiers
+      );
+
+      const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+        isTypeSpecifierReturnValue
+      );
+      const typeSpecifierSequence = typeSpecifierReturnValues
+        .map(
+          (typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier
+        )
+        .join(' ');
+      returnDataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+      if (returnDataType === undefined) {
+        throw new InvalidTypeError(typeSpecifierSequence);
+      }
+    }
+
     return {
       type: 'FunctionDeclaration',
       id: processedDeclarator.id,
+      returnDataType,
       params: processedDeclarator.params,
       body: this.visitCompoundStatement(compoundStatement)
     };
@@ -1137,7 +1190,7 @@ export class ASTBuilder implements CVisitor<any> {
     return leftExpression;
   }
 
-  visitInitDeclarator(ctx: InitDeclaratorContext): VariableDeclarator {
+  visitInitDeclarator(ctx: InitDeclaratorContext): Declarator {
     const initializer = ctx.initializer();
     const initialValue =
       initializer === undefined
@@ -1145,15 +1198,13 @@ export class ASTBuilder implements CVisitor<any> {
         : this.visitInitializer(initializer);
 
     return {
-      type: 'VariableDeclarator',
+      type: 'Declarator',
       pattern: this.visitDeclarator(ctx.declarator()),
       initialValue
     };
   }
 
-  visitInitDeclaratorList(
-    ctx: InitDeclaratorListContext
-  ): VariableDeclarator[] {
+  visitInitDeclaratorList(ctx: InitDeclaratorListContext): Declarator[] {
     return ctx.initDeclarator().map(this.visitInitDeclarator, this);
   }
 
@@ -1463,13 +1514,59 @@ export class ASTBuilder implements CVisitor<any> {
   visitParameterDeclaration(
     ctx: ParameterDeclarationContext
   ): ParameterDeclaration {
-    // TODO: Handle declaration specifiers.
+    const declarationSpecifiers = ctx.declarationSpecifiers();
     const declarator = ctx.declarator();
     if (declarator !== undefined) {
+      if (declarationSpecifiers === undefined) {
+        throw new BrokenInvariantError(
+          'Encountered a ParameterDeclaration with a Declarator but not DeclarationSpecifiers.'
+        );
+      }
+
+      const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+        declarationSpecifiers
+      );
+
+      const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+        isTypeSpecifierReturnValue
+      );
+      const typeSpecifierSequence = typeSpecifierReturnValues
+        .map(
+          (typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier
+        )
+        .join(' ');
+      const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+      if (dataType === undefined) {
+        throw new InvalidTypeError(typeSpecifierSequence);
+      }
+
       return {
         type: 'ParameterDeclaratorDeclaration',
+        dataType,
         declarator: this.visitDeclarator(declarator)
       };
+    }
+
+    const declarationSpecifiers2 = ctx.declarationSpecifiers2();
+    if (declarationSpecifiers2 === undefined) {
+      throw new BrokenInvariantError(
+        'Encountered a ParameterDeclaration with an AbstractDeclarator but not DeclarationSpecifiers2.'
+      );
+    }
+
+    const processedDeclarationSpecifiers = this.visitDeclarationSpecifiers(
+      declarationSpecifiers2
+    );
+
+    const typeSpecifierReturnValues = processedDeclarationSpecifiers.filter(
+      isTypeSpecifierReturnValue
+    );
+    const typeSpecifierSequence = typeSpecifierReturnValues
+      .map((typeSpecifierReturnValue) => typeSpecifierReturnValue.typeSpecifier)
+      .join(' ');
+    const dataType = TYPE_SPECIFIER_SEQUENCE_TO_TYPE[typeSpecifierSequence];
+    if (dataType === undefined) {
+      throw new InvalidTypeError(typeSpecifierSequence);
     }
 
     const abstractDeclarator = ctx.abstractDeclarator();

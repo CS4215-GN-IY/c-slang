@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('function definition', () => {
   test('handles function definitions without parameters', () => {
@@ -14,6 +15,7 @@ describe('function definition', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -58,9 +60,11 @@ describe('function definition', () => {
             type: 'Identifier',
             name: 'sum'
           },
+          returnDataType: INT32,
           params: [
             {
               type: 'ParameterDeclaratorDeclaration',
+              dataType: INT32,
               declarator: {
                 type: 'Identifier',
                 name: 'a'
@@ -68,6 +72,7 @@ describe('function definition', () => {
             },
             {
               type: 'ParameterDeclaratorDeclaration',
+              dataType: INT32,
               declarator: {
                 type: 'Identifier',
                 name: 'b'
@@ -124,6 +129,7 @@ describe('function definition', () => {
               params: [
                 {
                   type: 'ParameterDeclaratorDeclaration',
+                  dataType: INT32,
                   declarator: {
                     type: 'Identifier',
                     name: 'a'
@@ -131,6 +137,7 @@ describe('function definition', () => {
                 },
                 {
                   type: 'ParameterDeclaratorDeclaration',
+                  dataType: INT32,
                   declarator: {
                     type: 'Identifier',
                     name: 'b'
@@ -139,6 +146,7 @@ describe('function definition', () => {
               ]
             }
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -186,6 +194,7 @@ describe('function definition', () => {
                   params: [
                     {
                       type: 'ParameterDeclaratorDeclaration',
+                      dataType: INT32,
                       declarator: {
                         type: 'Identifier',
                         name: 'a'
@@ -193,6 +202,7 @@ describe('function definition', () => {
                     },
                     {
                       type: 'ParameterDeclaratorDeclaration',
+                      dataType: INT32,
                       declarator: {
                         type: 'Identifier',
                         name: 'b'
@@ -204,6 +214,7 @@ describe('function definition', () => {
               params: []
             }
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

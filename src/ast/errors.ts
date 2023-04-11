@@ -17,3 +17,5 @@ export class UnsupportedKeywordError extends ASTConversionError {
     );
   }
 }
+
+export class UnsupportedSyntaxError extends ASTConversionError {}

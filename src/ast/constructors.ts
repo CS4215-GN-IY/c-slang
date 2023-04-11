@@ -14,11 +14,9 @@ import {
   type ExpressionBracketContent,
   type StarBracketContent,
   type StringLiteral,
-  type DeclaratorPattern,
-  type ParameterDeclaratorDeclaration,
   type StaticStatus,
   type UnaryExpression
-} from './types';
+} from './types/ast';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
 
 export const constructAssignmentExpression = (
@@ -156,11 +154,4 @@ export const constructExpressionBracketContent = (
 
 export const constructStarBracketContent = (): StarBracketContent => ({
   type: 'StarBracketContent'
-});
-
-export const constructParameterDeclaratorDeclaration = (
-  declarator: DeclaratorPattern
-): ParameterDeclaratorDeclaration => ({
-  type: 'ParameterDeclaratorDeclaration',
-  declarator
 });

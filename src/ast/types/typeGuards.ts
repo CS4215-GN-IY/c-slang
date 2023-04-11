@@ -1,7 +1,8 @@
 import {
   type BaseReturnValue,
-  type TypedefNameReturnValue
-} from './astBuilderInternalTypes';
+  type TypedefNameReturnValue,
+  type TypeSpecifierReturnValue
+} from './astBuilder';
 import {
   type AbstractSequencePattern,
   type ArrayAccessExpression,
@@ -23,8 +24,14 @@ import {
   type PointerPattern,
   type StarBracketContent,
   type UnaryExpression,
-  type VariableDeclaration
-} from './types';
+  type Declaration
+} from './ast';
+
+export const isTypeSpecifierReturnValue = (
+  returnValue: BaseReturnValue
+): returnValue is TypeSpecifierReturnValue => {
+  return returnValue.type === 'TypeSpecifier';
+};
 
 export const isTypedefNameReturnValue = (
   returnValue: BaseReturnValue
@@ -56,10 +63,8 @@ export const isConstant = (node: BaseNode): node is Constant => {
   return node.type === 'Constant';
 };
 
-export const isVariableDeclaration = (
-  node: BaseNode
-): node is VariableDeclaration => {
-  return node.type === 'VariableDeclaration';
+export const isDeclaration = (node: BaseNode): node is Declaration => {
+  return node.type === 'Declaration';
 };
 
 export const isCaseStatement = (node: BaseNode): node is CaseStatement => {

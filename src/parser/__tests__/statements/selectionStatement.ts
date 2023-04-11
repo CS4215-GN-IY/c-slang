@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('selection statement', () => {
   it('handles switch statement', () => {
@@ -24,21 +25,23 @@ describe('selection statement', () => {
       type: 'Program',
       body: [
         {
+          type: 'FunctionDeclaration',
           id: {
             name: 'main',
             type: 'Identifier'
           },
-          type: 'FunctionDeclaration',
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
             items: [
               {
-                type: 'VariableDeclaration',
+                type: 'Declaration',
+                dataType: INT32,
                 isConstant: false,
                 declarations: [
                   {
-                    type: 'VariableDeclarator',
+                    type: 'Declarator',
                     pattern: {
                       name: 'i',
                       type: 'Identifier'
@@ -172,21 +175,23 @@ describe('selection statement', () => {
       type: 'Program',
       body: [
         {
+          type: 'FunctionDeclaration',
           id: {
             name: 'main',
             type: 'Identifier'
           },
-          type: 'FunctionDeclaration',
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
             items: [
               {
-                type: 'VariableDeclaration',
+                type: 'Declaration',
+                dataType: INT32,
                 isConstant: false,
                 declarations: [
                   {
-                    type: 'VariableDeclarator',
+                    type: 'Declarator',
                     pattern: {
                       name: 'i',
                       type: 'Identifier'

@@ -1,5 +1,6 @@
 import { parse } from '../../parser';
-import { type Program } from '../../../ast/types';
+import { type Program } from '../../../ast/types/ast';
+import { INT32 } from '../../../ast/types/dataTypes';
 
 describe('postfix expression', () => {
   test('handles primary expressions', () => {
@@ -14,6 +15,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -50,6 +52,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -101,6 +104,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -198,6 +202,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -238,6 +243,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -299,6 +305,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -361,6 +368,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -405,6 +413,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -449,6 +458,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -490,6 +500,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',
@@ -531,6 +542,7 @@ describe('postfix expression', () => {
             type: 'Identifier',
             name: 'main'
           },
+          returnDataType: INT32,
           params: [],
           body: {
             type: 'BlockStatement',

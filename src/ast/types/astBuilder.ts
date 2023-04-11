@@ -1,10 +1,10 @@
-import { type TypeSpecifier } from './keywordWhitelists/typeSpecifiers';
+import { type TypeSpecifier } from '../keywordWhitelists/typeSpecifiers';
 import {
   type SequenceExpression,
   type Identifier,
-  type VariableDeclaration,
+  type Declaration,
   type Expression
-} from './types';
+} from './ast';
 
 export interface BaseReturnValue {
   type: string;
@@ -68,7 +68,7 @@ export interface AlignmentSpecifierReturnValue extends BaseReturnValue {
 
 export interface ForCondition extends BaseReturnValue {
   type: 'ForCondition';
-  init?: VariableDeclaration | SequenceExpression;
+  init?: Declaration | SequenceExpression;
   predicate?: SequenceExpression;
   update?: SequenceExpression;
 }

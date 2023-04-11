@@ -1,19 +1,21 @@
 import { parse } from '../../parser';
-import { StaticStatus } from '../../../ast/types';
+import { type Program, StaticStatus } from '../../../ast/types/ast';
+import { INT32, VOID } from '../../../ast/types/dataTypes';
 
 describe('declarator', () => {
   test('handles one dimensional array declaration', () => {
     const code = 'int arr[2];';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {
@@ -42,15 +44,16 @@ describe('declarator', () => {
   test('handles two dimensional array declaration', () => {
     const code = 'int arr[2][5];';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {
@@ -87,15 +90,16 @@ describe('declarator', () => {
   test('handles function declaration', () => {
     const code = 'int f(int i, int a);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -105,6 +109,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -112,6 +117,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'a'
@@ -130,15 +136,16 @@ describe('declarator', () => {
   test('handles function declaration with array param', () => {
     const code = 'int f(int i, int a[]);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -148,6 +155,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -155,6 +163,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -181,15 +190,16 @@ describe('declarator', () => {
   test('handles function declaration with array param with *', () => {
     const code = 'int f(int i, int a[*]);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -199,6 +209,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -206,6 +217,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -232,15 +244,16 @@ describe('declarator', () => {
   test('handles function declaration with array param with expression', () => {
     const code = 'int f(int i, int a[i]);';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -250,6 +263,7 @@ describe('declarator', () => {
                 params: [
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'Identifier',
                       name: 'i'
@@ -257,6 +271,7 @@ describe('declarator', () => {
                   },
                   {
                     type: 'ParameterDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ArrayPattern',
                       id: {
@@ -288,15 +303,16 @@ describe('declarator', () => {
   test('handles function declaration with no param', () => {
     const code = 'int main();';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -316,15 +332,16 @@ describe('declarator', () => {
   test('handles function declaration pointer', () => {
     const code = 'void (*g(int a))();';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -338,6 +355,7 @@ describe('declarator', () => {
                     params: [
                       {
                         type: 'ParameterDeclaratorDeclaration',
+                        dataType: INT32,
                         declarator: {
                           type: 'Identifier',
                           name: 'a'
@@ -359,15 +377,16 @@ describe('declarator', () => {
   test('handles more function declaration pointer', () => {
     const code = 'void (*(*h(int a))())();';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: VOID,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'FunctionPattern',
                 id: {
@@ -385,6 +404,7 @@ describe('declarator', () => {
                         params: [
                           {
                             type: 'ParameterDeclaratorDeclaration',
+                            dataType: INT32,
                             declarator: {
                               type: 'Identifier',
                               name: 'a'
@@ -409,15 +429,16 @@ describe('declarator', () => {
   test('handles pointer to array', () => {
     const code = 'int (*ptr)[10];';
     const ast = parse(code);
-    const expectedAst = {
+    const expectedAst: Program = {
       type: 'Program',
       body: [
         {
-          type: 'VariableDeclaration',
+          type: 'Declaration',
+          dataType: INT32,
           isConstant: false,
           declarations: [
             {
-              type: 'VariableDeclarator',
+              type: 'Declarator',
               pattern: {
                 type: 'ArrayPattern',
                 id: {
