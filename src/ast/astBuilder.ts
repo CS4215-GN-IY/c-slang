@@ -159,7 +159,7 @@ import {
   constructStringLiteral
 } from './constructors';
 import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from './typeSpecifierSequenceToType';
-import { InvalidTypeError } from '../typeChecker/errors';
+import { InvalidTypeError } from '../interpreter/typeErrors';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
