@@ -121,7 +121,6 @@ export const addFunctionSymbolTableEntries = (
       'Symbol table entry should always be for a user-declared function here.'
     );
   }
-  functionEntry.numOfParams = node.params.length;
   functionEntry.numOfEntriesForVariables += offset;
 
   return {
@@ -284,14 +283,13 @@ const addFunctionDeclarationSymbolTableEntry = (
   offset: number,
   symbolTableFrame: SymbolTableFrame
 ): number => {
-  const entry: SymbolTableEntry = {
-    name: getNameFromDeclaratorPattern(functionDeclaration.id),
+  const entry: UserDeclaredFunctionSymbolTableEntry = {
     nameType: 'UserDeclaredFunction',
+    name: getNameFromDeclaratorPattern(functionDeclaration.id),
     returnDataType: functionDeclaration.returnDataType,
     offset,
     scope,
-    // TODO: Update this when function declaration parameters are supported.
-    numOfParams: 0,
+    numOfParams: functionDeclaration.params.length,
     numOfEntriesForVariables: 0
   };
   offset += getFixedNumOfEntriesOfDeclaratorPattern(functionDeclaration.id);
