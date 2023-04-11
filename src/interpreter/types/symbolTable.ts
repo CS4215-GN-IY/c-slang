@@ -1,3 +1,5 @@
+import { type DataType } from '../../ast/types/dataTypes';
+
 export interface SymbolTable {
   head: SymbolTableFrame;
   tail: SymbolTable | null;
@@ -28,6 +30,7 @@ export interface BaseSymbolTableEntryWithAddress extends BaseSymbolTableEntry {
 
 export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
   nameType: 'Array';
+  dataType: DataType;
   multipliers: number[];
   maxNumOfItems: number;
 }
@@ -35,6 +38,7 @@ export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
 export interface UserDeclaredFunctionSymbolTableEntry
   extends BaseSymbolTableEntryWithAddress {
   nameType: 'UserDeclaredFunction';
+  returnDataType: DataType;
   numOfParams: number;
   numOfEntriesForVariables: number;
 }
@@ -47,6 +51,7 @@ export interface BuiltInFunctionSymbolTableEntry extends BaseSymbolTableEntry {
 export interface VariableSymbolTableEntry
   extends BaseSymbolTableEntryWithAddress {
   nameType: 'Variable';
+  dataType: DataType;
 }
 
 export type LabelFrame = Record<string, LabelEntry>;

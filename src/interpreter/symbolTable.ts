@@ -287,6 +287,7 @@ const addFunctionDeclarationSymbolTableEntry = (
   const entry: SymbolTableEntry = {
     name: getNameFromDeclaratorPattern(functionDeclaration.id),
     nameType: 'UserDeclaredFunction',
+    returnDataType: functionDeclaration.returnDataType,
     offset,
     scope,
     // TODO: Update this when function declaration parameters are supported.
@@ -311,6 +312,7 @@ const addDeclarationSymbolTableEntries = (
       entry = {
         name: getNameFromDeclaratorPattern(declarator.pattern),
         nameType: 'Array',
+        dataType: declaration.dataType,
         offset,
         scope,
         multipliers: getArrayPatternMultipliers(declarator.pattern),
@@ -320,6 +322,7 @@ const addDeclarationSymbolTableEntries = (
       entry = {
         name: getNameFromDeclaratorPattern(declarator.pattern),
         nameType: 'Variable',
+        dataType: declaration.dataType,
         offset,
         scope
       };
@@ -344,6 +347,7 @@ const addParameterDeclarationSymbolTableEntries = (
       entry = {
         name: getNameFromDeclaratorPattern(declaratorPattern),
         nameType: 'Array',
+        dataType: parameterDeclaration.dataType,
         offset,
         scope,
         multipliers: getArrayPatternMultipliers(declaratorPattern),
@@ -353,6 +357,7 @@ const addParameterDeclarationSymbolTableEntries = (
       entry = {
         name: getNameFromDeclaratorPattern(declaratorPattern),
         nameType: 'Variable',
+        dataType: parameterDeclaration.dataType,
         offset,
         scope
       };
