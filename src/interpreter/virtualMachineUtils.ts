@@ -12,7 +12,7 @@ import {
   UNARY_OPERATORS,
   type UnaryOperator
 } from './types/instructions';
-import { type Memory } from '../memory/memory';
+import { type VirtualMemory } from '../memory/virtualMemory';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
@@ -149,7 +149,7 @@ export function evaluateBinaryExpression(
 export const evaluateUnaryOperation = (
   operator: UnaryOperator,
   operand: Value,
-  memory: Memory
+  memory: VirtualMemory
 ): Value => {
   if (!isNumber(operand)) {
     throw new TypeError('number', typeOf(operand), TypeErrorContext.NA);
@@ -164,7 +164,8 @@ export const evaluateUnaryOperation = (
     case '~':
       return ~operand;
     case '*':
-      return memory.get(operand);
+      // TODO: Handle variable sizes.
+      return memory.getFloat64(operand);
     default:
       throw new UnsupportedOperatorError(
         operator,
