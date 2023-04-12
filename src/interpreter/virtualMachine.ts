@@ -180,8 +180,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     // Push saved rsp onto the stack.
     state.memory.setFloat64(state.registers.rsp, savedRsp);
     state.registers.rsp += 8;
-    // TODO: Check if we can simply store rip here.
-    // Push saved rip onto the stack.
+    // Push return address onto the stack.
+    // Note that we cannot push rip here because of tail calls.
     state.memory.setFloat64(state.registers.rsp, returnAddress);
     state.registers.rsp += 8;
     // Advance rbp.
