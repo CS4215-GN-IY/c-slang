@@ -3,41 +3,41 @@ import { OverlappingMemoryRegionsError, SegmentationFault } from './errors';
 import { type Segments } from './types';
 import { type Instr } from '../interpreter/types/instructions';
 
+export interface VirtualMemoryConfig {
+  instructions: Instr[];
+  dataSizeInBytes: number;
+  stackSizeInBytes: number;
+  heapSizeInBytes: number;
+  textBaseAddress: number;
+  dataBaseAddress: number;
+  stackBaseAddress: number;
+  heapBaseAddress: number;
+}
+
 export class VirtualMemory {
   private readonly segments: Segments;
 
-  constructor(
-    instructions: Instr[],
-    dataSizeInBytes: number,
-    stackSizeInBytes: number,
-    heapSizeInBytes: number
-  ) {
-    // TODO: Use more realistic addresses.
-    const textBaseAddress = 0;
-    const dataBaseAddress = 100000;
-    const stackBaseAddress = 200000;
-    const heapBaseAddress = 300000;
-
+  constructor(config: VirtualMemoryConfig) {
     this.segments = {
       text: new MappedMemoryRegion({
         type: 'Text',
-        baseAddress: textBaseAddress,
-        instructions
+        baseAddress: config.textBaseAddress,
+        instructions: config.instructions
       }),
       data: new MappedMemoryRegion({
         type: 'DataView',
-        baseAddress: dataBaseAddress,
-        sizeInBytes: dataSizeInBytes
+        baseAddress: config.dataBaseAddress,
+        sizeInBytes: config.dataSizeInBytes
       }),
       stack: new MappedMemoryRegion({
         type: 'DataView',
-        baseAddress: stackBaseAddress,
-        sizeInBytes: stackSizeInBytes
+        baseAddress: config.stackBaseAddress,
+        sizeInBytes: config.stackSizeInBytes
       }),
       heap: new MappedMemoryRegion({
         type: 'DataView',
-        baseAddress: heapBaseAddress,
-        sizeInBytes: heapSizeInBytes
+        baseAddress: config.heapBaseAddress,
+        sizeInBytes: config.heapSizeInBytes
       })
     };
 

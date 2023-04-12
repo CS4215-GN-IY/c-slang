@@ -43,16 +43,34 @@ import {
 } from './virtualMachineUtils';
 import { Stack } from '../utils/stack';
 import { BUILT_INS } from './builtins';
-import { VirtualMemory } from '../memory/virtualMemory';
+import {
+  VirtualMemory,
+  type VirtualMemoryConfig
+} from '../memory/virtualMemory';
 import { Registers } from '../memory/registers';
 import { decodeInstruction } from '../encoding/instructions';
 import { Segment } from '../memory/segment';
 import { InvalidSegmentError } from '../memory/errors';
 import { TextMemoryRegion } from '../memory/textMemoryRegion';
 
+const TEXT_BASE_ADDRESS = 0;
+const DATA_BASE_ADDRESS = 100000;
+const STACK_BASE_ADDRESS = 200000;
+const HEAP_BASE_ADDRESS = 300000;
+
 export const interpret = (instructions: Instr[]): Value => {
-  const memory = new VirtualMemory(instructions, 8000, 8000, 8000);
-  const registers = new Registers();
+  const memoryConfig: VirtualMemoryConfig = {
+    instructions,
+    dataSizeInBytes: 50000,
+    stackSizeInBytes: 50000,
+    heapSizeInBytes: 50000,
+    textBaseAddress: TEXT_BASE_ADDRESS,
+    dataBaseAddress: DATA_BASE_ADDRESS,
+    stackBaseAddress: STACK_BASE_ADDRESS,
+    heapBaseAddress: HEAP_BASE_ADDRESS
+  };
+  const memory = new VirtualMemory(memoryConfig);
+  const registers = new Registers(TEXT_BASE_ADDRESS, STACK_BASE_ADDRESS);
   const stash = new Stack<Value>();
   const state: VirtualMachineState = {
     memory,
@@ -92,9 +110,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       const data = state.stash.pop();
       switch (instr.scope) {
         case Segment.DATA: {
-          // TODO: Link to base address of data memory region.
           // TODO: Realign offsets to use 1 byte instead of 8.
-          const address = 100000 + (instr.offset + i) * 8;
+          const address = DATA_BASE_ADDRESS + (instr.offset + i) * 8;
           state.memory.setFloat64(address, data);
           break;
         }
@@ -190,8 +207,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     // Advance rsp by the number of entries for variables.
     state.registers.rsp += instr.numOfEntriesForVars * 8;
 
-    // TODO: Link to base address of text memory region.
     state.registers.rip =
+      TEXT_BASE_ADDRESS +
       functionInstrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
   },
   CallBuiltIn: (instr: CallBuiltInInstr, state: VirtualMachineState) => {
@@ -236,8 +253,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.moveToNextInstruction();
   },
   Jump: (instr: JumpInstr, state: VirtualMachineState) => {
-    // TODO: Link to base address of text memory region.
     state.registers.rip =
+      TEXT_BASE_ADDRESS +
       instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
   },
   JumpOnFalse: (instr: JumpOnFalseInstr, state: VirtualMachineState) => {
@@ -245,16 +262,16 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     if (isTrue(predicate)) {
       state.registers.moveToNextInstruction();
     } else {
-      // TODO: Link to base address of text memory region.
       state.registers.rip =
+        TEXT_BASE_ADDRESS +
         instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     }
   },
   JumpOnTrue: (instr: JumpOnTrueInstr, state: VirtualMachineState) => {
     const predicate = convertToPredicate(state.stash.pop());
     if (isTrue(predicate)) {
-      // TODO: Link to base address of text memory region.
       state.registers.rip =
+        TEXT_BASE_ADDRESS +
         instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     } else {
       state.registers.moveToNextInstruction();
@@ -264,9 +281,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     let address: number;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Link to base address of data memory region.
         // TODO: Realign offsets to use 1 byte instead of 8.
-        address = 100000 + instr.offset * 8;
+        address = DATA_BASE_ADDRESS + instr.offset * 8;
         break;
       }
       case Segment.STACK: {
@@ -303,9 +319,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     let value: number;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Link to base address of data memory region.
         // TODO: Realign offsets to use 1 byte instead of 8.
-        const address = 100000 + instr.offset * 8;
+        const address = DATA_BASE_ADDRESS + instr.offset * 8;
         value = state.memory.getFloat64(address);
         break;
       }

@@ -8,12 +8,10 @@ export class Registers {
   // Stack pointer - points to the top of the stack
   public rsp: number;
 
-  public constructor() {
-    // TODO: Link to base address of text memory region.
-    this.rip = 0;
-    // TODO: Link to base address of stack memory region.
-    this.rbp = 200000;
-    this.rsp = 200000;
+  public constructor(textBaseAddress: number, stackBaseAddress: number) {
+    this.rip = textBaseAddress;
+    this.rbp = stackBaseAddress;
+    this.rsp = stackBaseAddress;
   }
 
   public moveToNextInstruction(): void {
