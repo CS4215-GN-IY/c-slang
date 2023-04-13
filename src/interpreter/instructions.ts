@@ -33,6 +33,10 @@ import {
 import { type SymbolTableEntryWithAddress } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
 import { type Value } from './types/virtualMachine';
+import {
+  constructAddressDataType,
+  type DataType
+} from '../ast/types/dataTypes';
 
 export const PLACEHOLDER_ADDRESS = -1;
 
@@ -52,7 +56,8 @@ export const constructAssignInstr = (
   type: 'Assign',
   scope: getSegmentScope(entry.scope),
   offset: entry.offset,
-  numOfItems
+  numOfItems,
+  dataTypeOfEachItem: entry.dataType
 });
 
 export const constructAssignToAddressInstr = (): AssignToAddressInstr => ({
@@ -76,11 +81,13 @@ export const constructBreakDoneInstr = (): BreakDoneInstr => ({
 
 export const constructCallInstr = (
   numOfArgs: number,
-  numOfEntriesForVars: number
+  paramDataTypes: DataType[],
+  totalSizeOfVariablesInBytes: number
 ): CallInstr => ({
   type: 'Call',
   numOfArgs,
-  numOfEntriesForVars
+  paramDataTypes,
+  totalSizeOfVariablesInBytes
 });
 
 export const constructCallBuiltInInstr = (
@@ -105,10 +112,10 @@ export const constructDoneInstr = (): DoneInstr => ({
 });
 
 export const constructEnterProgramInstr = (
-  numOfDeclarations: number
+  sizeOfDeclarationsInBytes: number
 ): EnterProgramInstr => ({
   type: 'EnterProgram',
-  numOfDeclarations
+  sizeOfDeclarationsInBytes
 });
 
 export const constructFallthroughInstr = (): FallthroughInstr => ({
@@ -143,7 +150,8 @@ export const constructLoadAddressInstr = (
 ): LoadAddressInstr => ({
   type: 'LoadAddress',
   scope: getSegmentScope(entry.scope),
-  offset: entry.offset
+  offset: entry.offset,
+  dataType: constructAddressDataType(entry.dataType)
 });
 
 export const constructLoadConstantInstr = (
@@ -165,11 +173,15 @@ export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
 });
 
 export const constructLoadSymbolInstr = (
-  entry: SymbolTableEntryWithAddress
+  entry: SymbolTableEntryWithAddress,
+  forAddress: boolean
 ): LoadSymbolInstr => ({
   type: 'LoadSymbol',
   scope: getSegmentScope(entry.scope),
-  offset: entry.offset
+  offset: entry.offset,
+  dataType: forAddress
+    ? constructAddressDataType(entry.dataType)
+    : entry.dataType
 });
 
 export const constructMatchCaseInstr = (): MatchCaseInstr => ({

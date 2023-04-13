@@ -141,6 +141,16 @@ export class VirtualMemory {
     }
   }
 
+  public setAddress(sizeInBytes: number, address: number, value: number): void {
+    switch (sizeInBytes) {
+      case 8:
+        this.setFloat64(address, value);
+        break;
+      default:
+        throw new TypeError(`Encountered invalid address size: ${sizeInBytes}`);
+    }
+  }
+
   public set(dataType: DataType, address: number, value: number): void {
     switch (dataType.type) {
       case 'Integer':
@@ -152,6 +162,9 @@ export class VirtualMemory {
         break;
       case 'FloatingPoint':
         this.setFloat(dataType.sizeInBytes, address, value);
+        break;
+      case 'Address':
+        this.setAddress(dataType.sizeInBytes, address, value);
         break;
       default:
         throw new TypeError(`Encountered unknown type: ${dataType.type}`);
@@ -209,6 +222,15 @@ export class VirtualMemory {
     }
   }
 
+  public getAddress(sizeInBytes: number, address: number): number {
+    switch (sizeInBytes) {
+      case 8:
+        return this.getFloat64(address);
+      default:
+        throw new TypeError(`Encountered invalid address size: ${sizeInBytes}`);
+    }
+  }
+
   public get(dataType: DataType, address: number): number {
     switch (dataType.type) {
       case 'Integer':
@@ -219,6 +241,8 @@ export class VirtualMemory {
         }
       case 'FloatingPoint':
         return this.getFloat(dataType.sizeInBytes, address);
+      case 'Address':
+        return this.getAddress(dataType.sizeInBytes, address);
       default:
         throw new TypeError(`Encountered unknown type: ${dataType.type}`);
     }

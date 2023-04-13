@@ -1,6 +1,6 @@
 import { parse } from '../../parser';
 import { type Program, StaticStatus } from '../../../ast/types/ast';
-import { VOID } from '../../../ast/types/dataTypes';
+import { INT32, VOID } from '../../../ast/types/dataTypes';
 
 describe('abstract declarator', () => {
   test('bracket with no expression', () => {
@@ -25,6 +25,7 @@ describe('abstract declarator', () => {
                 params: [
                   {
                     type: 'ParameterAbstractDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ExpressionlessBracketContent'
                     }
@@ -61,6 +62,7 @@ describe('abstract declarator', () => {
                 params: [
                   {
                     type: 'ParameterAbstractDeclaratorDeclaration',
+                    dataType: INT32,
                     declarator: {
                       type: 'ExpressionBracketContent',
                       expression: {

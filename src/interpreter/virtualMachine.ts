@@ -1,5 +1,6 @@
 import {
   type Value,
+  type ValueWithDataType,
   type VirtualMachineMapping,
   type VirtualMachineState
 } from './types/virtualMachine';
@@ -34,11 +35,14 @@ import {
   type UnaryOperationInstr
 } from './types/instructions';
 import {
+  constructValueWithDataType,
   convertToAddress,
   convertToPredicate,
+  convertToValueWithDataType,
   evaluateBinaryExpression,
   evaluateUnaryOperation,
   isTrue,
+  isValueWithDataType,
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
 import { Stack } from '../utils/stack';
@@ -52,6 +56,13 @@ import { decodeInstruction } from '../encoding/instructions';
 import { Segment } from '../memory/segment';
 import { InvalidSegmentError } from '../memory/errors';
 import { TextMemoryRegion } from '../memory/textMemoryRegion';
+import { TypeError, TypeErrorContext } from './errors';
+import {
+  ADDRESS_SIZE_IN_BYTES,
+  constructAddressDataType,
+  FLOAT64,
+  isAddressDataType
+} from '../ast/types/dataTypes';
 
 const TEXT_BASE_ADDRESS = 0;
 const DATA_BASE_ADDRESS = 100000;
@@ -93,32 +104,53 @@ export const interpret = (instructions: Instr[]): Value => {
 const virtualMachineEvaluators: VirtualMachineMapping = {
   ArrayAccess: (instr: ArrayAccessInstr, state: VirtualMachineState) => {
     const offset = state.stash.pop();
-    const baseAddress = state.stash.pop();
-    // TODO: Realign offsets to use 1 byte instead of 8.
-    const address = parseInt(baseAddress) + offset * instr.multiplier * 8;
+    const baseStashAddress = convertToValueWithDataType(state.stash.pop());
+    if (!isAddressDataType(baseStashAddress.dataType)) {
+      throw new TypeError(
+        'Address DataType',
+        baseStashAddress.dataType.type,
+        TypeErrorContext.NA
+      );
+    }
+    const address =
+      parseInt(baseStashAddress.value) +
+      offset *
+        instr.multiplier *
+        baseStashAddress.dataType.valueDataType.sizeInBytes;
     if (instr.isAccessingAddress) {
-      state.stash.push(address);
+      const stashAddress = constructValueWithDataType(
+        address,
+        constructAddressDataType(baseStashAddress.dataType.valueDataType)
+      );
+      state.stash.push(stashAddress);
     } else {
-      state.stash.push(state.memory.getFloat64(address));
+      state.stash.push(
+        state.memory.get(baseStashAddress.dataType.valueDataType, address)
+      );
     }
     state.registers.moveToNextInstruction();
   },
   Assign: (instr: AssignInstr, state: VirtualMachineState) => {
-    // TODO: Add conversion method to convert various stash values to their respective number.
-    // Do this when types are supported.
     for (let i = instr.numOfItems - 1; i >= 0; i--) {
-      const data = state.stash.pop();
+      let stashValue = state.stash.pop();
+      if (isValueWithDataType(stashValue)) {
+        stashValue = stashValue.value;
+      }
       switch (instr.scope) {
         case Segment.DATA: {
-          // TODO: Realign offsets to use 1 byte instead of 8.
-          const address = DATA_BASE_ADDRESS + (instr.offset + i) * 8;
-          state.memory.setFloat64(address, data);
+          const address =
+            DATA_BASE_ADDRESS +
+            instr.offset +
+            i * instr.dataTypeOfEachItem.sizeInBytes;
+          state.memory.set(instr.dataTypeOfEachItem, address, stashValue);
           break;
         }
         case Segment.STACK: {
-          // TODO: Realign offsets to use 1 byte instead of 8.
-          const address = state.registers.rbp + (instr.offset + i) * 8;
-          state.memory.setFloat64(address, data);
+          const address =
+            state.registers.rbp +
+            instr.offset +
+            i * instr.dataTypeOfEachItem.sizeInBytes;
+          state.memory.set(instr.dataTypeOfEachItem, address, stashValue);
           break;
         }
         default:
@@ -133,9 +165,20 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     instr: AssignToAddressInstr,
     state: VirtualMachineState
   ) => {
-    const address = state.stash.pop();
+    const stashAddress = convertToValueWithDataType(state.stash.pop());
+    if (!isAddressDataType(stashAddress.dataType)) {
+      throw new TypeError(
+        'Address DataType',
+        stashAddress.dataType.type,
+        TypeErrorContext.NA
+      );
+    }
     const data = state.stash.pop();
-    state.memory.setFloat64(address, data);
+    state.memory.set(
+      stashAddress.dataType.valueDataType,
+      stashAddress.value,
+      data
+    );
     state.registers.moveToNextInstruction();
   },
   BinaryOperation: (
@@ -160,13 +203,19 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.moveToNextInstruction();
   },
   Call: (instr: CallInstr, state: VirtualMachineState) => {
-    const returnAddress = state.stash.pop();
+    const stashReturnAddress = convertToValueWithDataType(state.stash.pop());
+    const returnAddress = convertToAddress(stashReturnAddress.value);
     // First item popped from the stash should be the arg for the first param and so on.
-    const args: Value[] = [];
+    const args: ValueWithDataType[] = [];
     for (let i = 0; i < instr.numOfArgs; i++) {
-      args.push(state.stash.pop());
+      let value = state.stash.pop();
+      if (!isValueWithDataType(value)) {
+        value = constructValueWithDataType(value, instr.paramDataTypes[i]);
+      }
+      args.push(value);
     }
-    const functionInstrAddress = convertToAddress(state.stash.pop());
+    const stashFunctionAddress = convertToValueWithDataType(state.stash.pop());
+    const functionInstrAddress = convertToAddress(stashFunctionAddress.value);
 
     // Set up stack frame.
     /*
@@ -186,26 +235,37 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     */
     const savedRsp = state.registers.rsp;
     // Push arguments to function onto the stack.
-    args.forEach((arg) => {
-      // TODO: Handle variable sizes.
-      state.memory.setFloat64(state.registers.rsp, arg);
-      state.registers.rsp += 8;
+    args.reverse().forEach((arg) => {
+      state.memory.set(arg.dataType, state.registers.rsp, arg.value);
+      state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     });
     // Push saved rbp onto the stack.
-    state.memory.setFloat64(state.registers.rsp, state.registers.rbp);
-    state.registers.rsp += 8;
+    state.memory.set(
+      constructAddressDataType(FLOAT64),
+      state.registers.rsp,
+      state.registers.rbp
+    );
+    state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     // Push saved rsp onto the stack.
-    state.memory.setFloat64(state.registers.rsp, savedRsp);
-    state.registers.rsp += 8;
+    state.memory.set(
+      constructAddressDataType(FLOAT64),
+      state.registers.rsp,
+      savedRsp
+    );
+    state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     // Push return address onto the stack.
     // Note that we cannot push rip here because of tail calls.
-    state.memory.setFloat64(state.registers.rsp, returnAddress);
-    state.registers.rsp += 8;
+    state.memory.set(
+      constructAddressDataType(FLOAT64),
+      state.registers.rsp,
+      returnAddress
+    );
+    state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     // Advance rbp.
     state.registers.rbp = state.registers.rsp;
     // TODO: Handle variable sizes.
-    // Advance rsp by the number of entries for variables.
-    state.registers.rsp += instr.numOfEntriesForVars * 8;
+    // Advance rsp by the total size of variables.
+    state.registers.rsp += instr.totalSizeOfVariablesInBytes;
 
     state.registers.rip =
       TEXT_BASE_ADDRESS +
@@ -281,13 +341,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     let address: number;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        address = DATA_BASE_ADDRESS + instr.offset * 8;
+        address = DATA_BASE_ADDRESS + instr.offset;
         break;
       }
       case Segment.STACK: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        address = state.registers.rbp + instr.offset * 8;
+        address = state.registers.rbp + instr.offset;
         break;
       }
       default:
@@ -295,7 +353,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
           `Cannot load address in the ${instr.scope} segment.`
         );
     }
-    state.stash.push(address);
+    const stashAddress = constructValueWithDataType(address, instr.dataType);
+    state.stash.push(stashAddress);
     state.registers.moveToNextInstruction();
   },
   LoadConstant: (instr: LoadConstantInstr, state: VirtualMachineState) => {
@@ -310,30 +369,33 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     instr: LoadReturnAddressInstr,
     state: VirtualMachineState
   ) => {
-    state.stash.push(
-      state.registers.rip + 2 * TextMemoryRegion.BYTES_PER_INSTRUCTION
+    const stashReturnAddress = constructValueWithDataType(
+      state.registers.rip + 2 * TextMemoryRegion.BYTES_PER_INSTRUCTION,
+      constructAddressDataType(FLOAT64)
     );
+    state.stash.push(stashReturnAddress);
     state.registers.moveToNextInstruction();
   },
   LoadSymbol: (instr: LoadSymbolInstr, state: VirtualMachineState) => {
-    let value: number;
+    let value;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        const address = DATA_BASE_ADDRESS + instr.offset * 8;
-        value = state.memory.getFloat64(address);
+        const address = DATA_BASE_ADDRESS + instr.offset;
+        value = state.memory.get(instr.dataType, address);
         break;
       }
       case Segment.STACK: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        const address = state.registers.rbp + instr.offset * 8;
-        value = state.memory.getFloat64(address);
+        const address = state.registers.rbp + instr.offset;
+        value = state.memory.get(instr.dataType, address);
         break;
       }
       default:
         throw new InvalidSegmentError(
           `Cannot load symbol from the ${instr.scope} segment.`
         );
+    }
+    if (isAddressDataType(instr.dataType)) {
+      value = constructValueWithDataType(value, instr.dataType.valueDataType);
     }
     state.stash.push(value);
     state.registers.moveToNextInstruction();
@@ -375,23 +437,45 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.moveToNextInstruction();
   },
   TailCall: (instr: TailCallInstr, state: VirtualMachineState) => {
-    const returnAddress = state.memory.getFloat64(state.registers.rbp - 8);
-    state.stash.push(returnAddress);
+    const returnAddress = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - ADDRESS_SIZE_IN_BYTES
+    );
+    const stashReturnAddress = constructValueWithDataType(
+      returnAddress,
+      constructAddressDataType(FLOAT64)
+    );
+    state.stash.push(stashReturnAddress);
 
     // Tear down stack frame.
-    const savedRbp = state.memory.getFloat64(state.registers.rbp - 3 * 8);
-    const savedRsp = state.memory.getFloat64(state.registers.rbp - 2 * 8);
+    const savedRbp = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - 3 * ADDRESS_SIZE_IN_BYTES
+    );
+    const savedRsp = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - 2 * ADDRESS_SIZE_IN_BYTES
+    );
     state.registers.rbp = savedRbp;
     state.registers.rsp = savedRsp;
 
     state.registers.moveToNextInstruction();
   },
   Teardown: (instr: TeardownInstr, state: VirtualMachineState) => {
-    const returnAddress = state.memory.getFloat64(state.registers.rbp - 8);
+    const returnAddress = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - ADDRESS_SIZE_IN_BYTES
+    );
 
     // Tear down stack frame.
-    const savedRbp = state.memory.getFloat64(state.registers.rbp - 3 * 8);
-    const savedRsp = state.memory.getFloat64(state.registers.rbp - 2 * 8);
+    const savedRbp = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - 3 * ADDRESS_SIZE_IN_BYTES
+    );
+    const savedRsp = state.memory.get(
+      constructAddressDataType(FLOAT64),
+      state.registers.rbp - 2 * ADDRESS_SIZE_IN_BYTES
+    );
     state.registers.rbp = savedRbp;
     state.registers.rsp = savedRsp;
 

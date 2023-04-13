@@ -1572,6 +1572,7 @@ export class ASTBuilder implements CVisitor<any> {
     const abstractDeclarator = ctx.abstractDeclarator();
     return {
       type: 'ParameterAbstractDeclaratorDeclaration',
+      dataType,
       declarator:
         abstractDeclarator === undefined
           ? undefined

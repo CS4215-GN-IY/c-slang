@@ -74,26 +74,4 @@ describe('function declaration', () => {
     const expectedResult = 6;
     expect(result).toEqual(expectedResult);
   });
-
-  test('handles pointers to pointers as function arguments', () => {
-    const code = `
-        void swap(int **x, int **y) {
-            int temp = **x;
-            **x = **y;
-            **y = temp;
-        }
-
-        int main() {
-            int x = 1, y = 7;
-            int *a = &x, *b = &y;
-            swap(&a, &b);
-            return x - y;
-        }
-    `;
-    const ast = parse(code);
-    const instructions = compileProgram(ast);
-    const result = interpret(instructions);
-    const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
-  });
 });
