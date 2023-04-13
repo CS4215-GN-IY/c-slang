@@ -291,6 +291,7 @@ const addFunctionDeclarationSymbolTableEntry = (
     offset,
     scope,
     paramDataTypes: [],
+    returnDataType: functionDeclaration.returnDataType,
     totalSizeOfVariablesInBytes: 0,
     dataType: constructAddressDataType(FLOAT64)
   };

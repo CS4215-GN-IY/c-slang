@@ -212,3 +212,7 @@ export const isLoadReturnAddressInstr = (
 ): instr is LoadReturnAddressInstr => {
   return instr.type === 'LoadReturnAddress';
 };
+
+export const isLoadSymbolInstr = (instr: Instr): instr is LoadSymbolInstr => {
+  return instr.type === 'LoadSymbol';
+};

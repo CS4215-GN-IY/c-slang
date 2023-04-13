@@ -39,6 +39,7 @@ export interface UserDeclaredFunctionSymbolTableEntry
   extends BaseSymbolTableEntryWithAddress {
   nameType: 'UserDeclaredFunction';
   paramDataTypes: DataType[];
+  returnDataType: DataType;
   totalSizeOfVariablesInBytes: number;
 }
 

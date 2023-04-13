@@ -64,6 +64,7 @@ import {
   constructTeardownInstr,
   constructUnaryOperationInstr,
   isLoadReturnAddressInstr,
+  isLoadSymbolInstr,
   PLACEHOLDER_ADDRESS
 } from './instructions';
 import {
@@ -651,6 +652,16 @@ const compilers: CompilerMapping = {
   ) => {
     if (isNotUndefined(node.argument)) {
       compile(node.argument, instructions, symbolTable, labelFrame);
+      // If returning a symbol, set its type to the function's return type.
+      const lastInstr = instructions[instructions.length - 1];
+      if (isLoadSymbolInstr(lastInstr)) {
+        if (symbolTable.parent === null) {
+          throw new BrokenInvariantError(
+            'Return statements must be inside a function.'
+          );
+        }
+        lastInstr.dataType = symbolTable.parent.returnDataType;
+      }
     }
     // Perform a tail call if the last instruction is a CallInstr.
     // A CallInstr should be preceded by a LoadReturnAddressInstr,
