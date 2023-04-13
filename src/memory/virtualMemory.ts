@@ -3,6 +3,8 @@ import { OverlappingMemoryRegionsError, SegmentationFault } from './errors';
 import { type Segments } from './types';
 import { type Instr } from '../interpreter/types/instructions';
 import { type DataType } from '../ast/types/dataTypes';
+import { TextMemoryRegion } from './textMemoryRegion';
+import { DataViewMemoryRegion } from './dataViewMemoryRegion';
 
 export interface VirtualMemoryConfig {
   instructions: Instr[];
@@ -19,27 +21,32 @@ export class VirtualMemory {
   private readonly segments: Segments;
 
   constructor(config: VirtualMemoryConfig) {
+    const textMemoryRegion = new TextMemoryRegion(config.instructions);
+    const dataMemoryRegion = new DataViewMemoryRegion(config.dataSizeInBytes);
+    const stackMemoryRegion = new DataViewMemoryRegion(config.stackSizeInBytes);
+    const heapMemoryRegion = new DataViewMemoryRegion(config.heapSizeInBytes);
+
     this.segments = {
-      text: new MappedMemoryRegion({
-        type: 'Text',
-        baseAddress: config.textBaseAddress,
-        instructions: config.instructions
-      }),
-      data: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.dataBaseAddress,
-        sizeInBytes: config.dataSizeInBytes
-      }),
-      stack: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.stackBaseAddress,
-        sizeInBytes: config.stackSizeInBytes
-      }),
-      heap: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.heapBaseAddress,
-        sizeInBytes: config.heapSizeInBytes
-      })
+      text: new MappedMemoryRegion(
+        textMemoryRegion,
+        config.textBaseAddress,
+        textMemoryRegion.sizeInBytes
+      ),
+      data: new MappedMemoryRegion(
+        dataMemoryRegion,
+        config.dataBaseAddress,
+        config.dataSizeInBytes
+      ),
+      stack: new MappedMemoryRegion(
+        stackMemoryRegion,
+        config.stackBaseAddress,
+        config.stackSizeInBytes
+      ),
+      heap: new MappedMemoryRegion(
+        heapMemoryRegion,
+        config.heapBaseAddress,
+        config.heapSizeInBytes
+      )
     };
 
     this.checkMemoryRegionsDoNotOverlap();

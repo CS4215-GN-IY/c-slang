@@ -1,41 +1,18 @@
-import { DataViewMemoryRegion } from './dataViewMemoryRegion';
 import { type MemoryRegion } from './memoryRegion';
-import { TextMemoryRegion } from './textMemoryRegion';
-import { type Instr } from '../interpreter/types/instructions';
-
-export type MemoryRegionInformation = {
-  baseAddress: number;
-} & (
-  | {
-      type: 'DataView';
-      sizeInBytes: number;
-    }
-  | {
-      type: 'Text';
-      instructions: Instr[];
-    }
-);
 
 export class MappedMemoryRegion {
   private readonly memoryRegion: MemoryRegion;
   public readonly baseAddress: number;
   public readonly sizeInBytes: number;
 
-  constructor(info: MemoryRegionInformation) {
-    this.baseAddress = info.baseAddress;
-    switch (info.type) {
-      case 'DataView': {
-        this.memoryRegion = new DataViewMemoryRegion(info.sizeInBytes);
-        this.sizeInBytes = info.sizeInBytes;
-        break;
-      }
-      case 'Text': {
-        const textMemoryRegion = new TextMemoryRegion(info.instructions);
-        this.memoryRegion = textMemoryRegion;
-        this.sizeInBytes = textMemoryRegion.sizeInBytes;
-        break;
-      }
-    }
+  constructor(
+    memoryRegion: MemoryRegion,
+    baseAddress: number,
+    sizeInBytes: number
+  ) {
+    this.memoryRegion = memoryRegion;
+    this.baseAddress = baseAddress;
+    this.sizeInBytes = sizeInBytes;
   }
 
   /**
