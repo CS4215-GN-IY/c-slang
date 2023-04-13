@@ -2,10 +2,7 @@ import { PageTable } from './pageTable';
 import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
-import {
-  type Value,
-  type ValueWithDataType
-} from '../interpreter/types/virtualMachine';
+import { type ValueWithDataType } from '../interpreter/types/virtualMachine';
 import {
   ADDRESS_SIZE_IN_BYTES,
   constructAddressDataType,
@@ -203,7 +200,7 @@ export class VirtualMemory {
     return baseAddress + offset;
   }
 
-  public get(address: number, dataType: DataType): Value {
+  public get(address: number, dataType: DataType): number {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
     const offset = addressIndex.l5Idx;
@@ -218,7 +215,8 @@ export class VirtualMemory {
             case 4:
               return l5PageTable.getInt32(offset);
             case 8:
-              return l5PageTable.getInt64(offset);
+              // FIXME: Only up to 53-bit integers are supported.
+              return Number(l5PageTable.getInt64(offset));
             default:
               throw new TypeError(
                 `Tried to get an invalid Int size in the memory: ${dataType.sizeInBytes}`
@@ -233,7 +231,8 @@ export class VirtualMemory {
             case 4:
               return l5PageTable.getUint32(offset);
             case 8:
-              return l5PageTable.getUint64(offset);
+              // FIXME: Only up to 53-bit integers are supported.
+              return Number(l5PageTable.getUint64(offset));
             default:
               throw new TypeError(
                 `Tried to get an invalid Uint size in the memory: ${dataType.sizeInBytes}`
@@ -273,7 +272,7 @@ export class VirtualMemory {
     l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
   }
 
-  public set(address: number, value: Value, dataType: DataType): void {
+  public set(address: number, value: number, dataType: DataType): void {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
     const offset = addressIndex.l5Idx;
@@ -291,7 +290,7 @@ export class VirtualMemory {
               l5PageTable.setInt32(offset, value);
               break;
             case 8:
-              l5PageTable.setInt64(offset, value);
+              l5PageTable.setInt64(offset, BigInt(value));
               break;
             default:
               throw new TypeError(
@@ -310,7 +309,7 @@ export class VirtualMemory {
               l5PageTable.setUint32(offset, value);
               break;
             case 8:
-              l5PageTable.setUint64(offset, value);
+              l5PageTable.setUint64(offset, BigInt(value));
               break;
             default:
               throw new TypeError(
