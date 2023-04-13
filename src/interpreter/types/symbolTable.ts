@@ -24,7 +24,7 @@ export interface BaseSymbolTableEntry {
 }
 
 export interface BaseSymbolTableEntryWithAddress extends BaseSymbolTableEntry {
-  offset: number;
+  offsetInBytes: number;
   scope: SymbolTableEntryScope;
 }
 
@@ -40,7 +40,7 @@ export interface UserDeclaredFunctionSymbolTableEntry
   nameType: 'UserDeclaredFunction';
   returnDataType: DataType;
   numOfParams: number;
-  numOfEntriesForVariables: number;
+  sizeOfEntriesInBytes: number;
 }
 
 export interface BuiltInFunctionSymbolTableEntry extends BaseSymbolTableEntry {
@@ -58,5 +58,5 @@ export type LabelFrame = Record<string, LabelEntry>;
 
 export interface LabelEntry {
   name: string;
-  instrAddress: number;
+  instrAddressOffset: number;
 }

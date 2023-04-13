@@ -1,5 +1,6 @@
 import { type Segment } from '../../memory/segment';
 import { type Value } from './virtualMachine';
+import { type DataType } from '../../ast/types/dataTypes';
 
 interface BaseInstr {
   type: string;
@@ -43,8 +44,9 @@ export interface ArrayAccessInstr extends BaseInstr {
 export interface AssignInstr extends BaseInstr {
   type: 'Assign';
   scope: Segment;
-  offset: number;
+  offsetInBytes: number;
   numOfItems: number;
+  dataType: DataType;
 }
 
 export interface AssignToAddressInstr extends BaseInstr {
@@ -67,7 +69,7 @@ export interface BreakDoneInstr extends BaseInstr {
 export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
-  numOfEntriesForVars: number;
+  sizeOfEntriesInBytes: number;
 }
 
 export interface CallBuiltInInstr extends BaseInstr {
@@ -103,23 +105,23 @@ export interface FallthroughDoneInstr extends BaseInstr {
 
 export interface JumpInstr extends BaseInstr {
   type: 'Jump';
-  instrAddress: number;
+  instrAddressOffset: number;
 }
 
 export interface JumpOnFalseInstr extends BaseInstr {
   type: 'JumpOnFalse';
-  instrAddress: number;
+  instrAddressOffset: number;
 }
 
 export interface JumpOnTrueInstr extends BaseInstr {
   type: 'JumpOnTrue';
-  instrAddress: number;
+  instrAddressOffset: number;
 }
 
 export interface LoadAddressInstr extends BaseInstr {
   type: 'LoadAddress';
   scope: Segment;
-  offset: number;
+  offsetInBytes: number;
 }
 
 export interface LoadConstantInstr extends BaseInstr {
@@ -129,7 +131,7 @@ export interface LoadConstantInstr extends BaseInstr {
 
 export interface LoadFunctionInstr extends BaseInstr {
   type: 'LoadFunction';
-  functionInstrAddress: number;
+  functionInstrAddressOffset: number;
 }
 
 export interface LoadReturnAddressInstr extends BaseInstr {
@@ -139,7 +141,8 @@ export interface LoadReturnAddressInstr extends BaseInstr {
 export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
   scope: Segment;
-  offset: number;
+  offsetInBytes: number;
+  dataType: DataType;
 }
 
 export interface MatchCaseInstr extends BaseInstr {

@@ -94,11 +94,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   ArrayAccess: (instr: ArrayAccessInstr, state: VirtualMachineState) => {
     const offset = state.stash.pop();
     const baseAddress = state.stash.pop();
-    // TODO: Realign offsets to use 1 byte instead of 8.
-    const address = parseInt(baseAddress) + offset * instr.multiplier * 8;
+    const address = parseInt(baseAddress) + offset * instr.multiplier;
     if (instr.isAccessingAddress) {
       state.stash.push(address);
     } else {
+      // TODO: Handle variable sizes.
       state.stash.push(state.memory.getFloat64(address));
     }
     state.registers.moveToNextInstruction();
@@ -110,15 +110,17 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       const data = state.stash.pop();
       switch (instr.scope) {
         case Segment.DATA: {
-          // TODO: Realign offsets to use 1 byte instead of 8.
-          const address = DATA_BASE_ADDRESS + (instr.offset + i) * 8;
-          state.memory.setFloat64(address, data);
+          const address =
+            DATA_BASE_ADDRESS +
+            (instr.offsetInBytes + i * instr.dataType.sizeInBytes);
+          state.memory.set(instr.dataType, address, data);
           break;
         }
         case Segment.STACK: {
-          // TODO: Realign offsets to use 1 byte instead of 8.
-          const address = state.registers.rbp + (instr.offset + i) * 8;
-          state.memory.setFloat64(address, data);
+          const address =
+            state.registers.rbp +
+            (instr.offsetInBytes + i * instr.dataType.sizeInBytes);
+          state.memory.set(instr.dataType, address, data);
           break;
         }
         default:
@@ -135,6 +137,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   ) => {
     const address = state.stash.pop();
     const data = state.stash.pop();
+    // TODO: Handle variable sizes.
     state.memory.setFloat64(address, data);
     state.registers.moveToNextInstruction();
   },
@@ -166,7 +169,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     for (let i = 0; i < instr.numOfArgs; i++) {
       args.push(state.stash.pop());
     }
-    const functionInstrAddress = convertToAddress(state.stash.pop());
+    const functionInstrAddressOffset = convertToAddress(state.stash.pop());
 
     // Set up stack frame.
     /*
@@ -203,13 +206,10 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.rsp += 8;
     // Advance rbp.
     state.registers.rbp = state.registers.rsp;
-    // TODO: Handle variable sizes.
-    // Advance rsp by the number of entries for variables.
-    state.registers.rsp += instr.numOfEntriesForVars * 8;
+    // Advance rsp by the size of all variables within the function.
+    state.registers.rsp += instr.sizeOfEntriesInBytes;
 
-    state.registers.rip =
-      TEXT_BASE_ADDRESS +
-      functionInstrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
+    state.registers.rip = TEXT_BASE_ADDRESS + functionInstrAddressOffset;
   },
   CallBuiltIn: (instr: CallBuiltInInstr, state: VirtualMachineState) => {
     // First item popped from the stash should be the arg for the first param and so on.
@@ -253,26 +253,20 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.moveToNextInstruction();
   },
   Jump: (instr: JumpInstr, state: VirtualMachineState) => {
-    state.registers.rip =
-      TEXT_BASE_ADDRESS +
-      instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
+    state.registers.rip = TEXT_BASE_ADDRESS + instr.instrAddressOffset;
   },
   JumpOnFalse: (instr: JumpOnFalseInstr, state: VirtualMachineState) => {
     const predicate = convertToPredicate(state.stash.pop());
     if (isTrue(predicate)) {
       state.registers.moveToNextInstruction();
     } else {
-      state.registers.rip =
-        TEXT_BASE_ADDRESS +
-        instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
+      state.registers.rip = TEXT_BASE_ADDRESS + instr.instrAddressOffset;
     }
   },
   JumpOnTrue: (instr: JumpOnTrueInstr, state: VirtualMachineState) => {
     const predicate = convertToPredicate(state.stash.pop());
     if (isTrue(predicate)) {
-      state.registers.rip =
-        TEXT_BASE_ADDRESS +
-        instr.instrAddress * TextMemoryRegion.BYTES_PER_INSTRUCTION;
+      state.registers.rip = TEXT_BASE_ADDRESS + instr.instrAddressOffset;
     } else {
       state.registers.moveToNextInstruction();
     }
@@ -281,13 +275,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     let address: number;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        address = DATA_BASE_ADDRESS + instr.offset * 8;
+        address = DATA_BASE_ADDRESS + instr.offsetInBytes;
         break;
       }
       case Segment.STACK: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        address = state.registers.rbp + instr.offset * 8;
+        address = state.registers.rbp + instr.offsetInBytes;
         break;
       }
       default:
@@ -303,7 +295,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.moveToNextInstruction();
   },
   LoadFunction: (instr: LoadFunctionInstr, state: VirtualMachineState) => {
-    state.stash.push(instr.functionInstrAddress);
+    state.stash.push(instr.functionInstrAddressOffset);
     state.registers.moveToNextInstruction();
   },
   LoadReturnAddress: (
@@ -319,15 +311,13 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     let value: number;
     switch (instr.scope) {
       case Segment.DATA: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        const address = DATA_BASE_ADDRESS + instr.offset * 8;
-        value = state.memory.getFloat64(address);
+        const address = DATA_BASE_ADDRESS + instr.offsetInBytes;
+        value = state.memory.get(instr.dataType, address);
         break;
       }
       case Segment.STACK: {
-        // TODO: Realign offsets to use 1 byte instead of 8.
-        const address = state.registers.rbp + instr.offset * 8;
-        value = state.memory.getFloat64(address);
+        const address = state.registers.rbp + instr.offsetInBytes;
+        value = state.memory.get(instr.dataType, address);
         break;
       }
       default:

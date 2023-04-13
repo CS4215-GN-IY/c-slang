@@ -101,7 +101,7 @@ import {
   addProgramSymbolTableEntries,
   getArraySymbolTableEntry,
   getFunctionSymbolTableEntry,
-  getNumOfEntriesInFrame,
+  getFrameSize,
   getSymbolTableEntry,
   getSymbolTableEntryInFrame,
   isArraySymbolTableEntry,
@@ -120,6 +120,7 @@ import {
 import { isUnaryOperator } from './virtualMachineUtils';
 import { getBuiltInSymbols } from './builtins';
 import { BrokenInvariantError } from '../ast/errors';
+import { TextMemoryRegion } from '../memory/textMemoryRegion';
 
 export const compileProgram = (ast: Program): Instr[] => {
   const symbolTable: SymbolTable = {
@@ -274,7 +275,7 @@ const compilers: CompilerMapping = {
     instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
-      functionEntry.numOfEntriesForVariables
+      functionEntry.sizeOfEntriesInBytes
     );
     instructions.push(callInstr);
   },
@@ -309,9 +310,11 @@ const compilers: CompilerMapping = {
     compile(node.consequent, instructions, symbolTable, labelFrame);
     const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpInstr);
-    jumpOnFalseInstr.instrAddress = instructions.length;
+    jumpOnFalseInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     compile(node.alternate, instructions, symbolTable, labelFrame);
-    jumpInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
   },
   Constant: (
     node: Constant,
@@ -388,7 +391,8 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
-    const loopStart = instructions.length;
+    const loopStart =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     compile(node.body, instructions, symbolTable, labelFrame);
     const continueDoneInstr = constructContinueDoneInstr();
     instructions.push(continueDoneInstr);
@@ -423,7 +427,8 @@ const compilers: CompilerMapping = {
     if (isNotUndefined(node.init)) {
       compile(node.init, instructions, symbolTable, labelFrame);
     }
-    const loopStart = instructions.length;
+    const loopStart =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     let jumpOnFalseInstr: JumpOnFalseInstr | undefined;
     if (isNotUndefined(node.predicate)) {
       compile(node.predicate, instructions, symbolTable, labelFrame);
@@ -441,7 +446,8 @@ const compilers: CompilerMapping = {
     const breakDoneInstr = constructBreakDoneInstr();
     instructions.push(breakDoneInstr);
     if (isNotUndefined(jumpOnFalseInstr)) {
-      jumpOnFalseInstr.instrAddress = instructions.length;
+      jumpOnFalseInstr.instrAddressOffset =
+        instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     }
   },
   FunctionDeclaration: (
@@ -455,7 +461,8 @@ const compilers: CompilerMapping = {
     const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpInstr);
 
-    loadFunctionInstr.functionInstrAddress = instructions.length;
+    loadFunctionInstr.functionInstrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
 
     const functionSymbolTable = addFunctionSymbolTableEntries(
       node,
@@ -470,7 +477,8 @@ const compilers: CompilerMapping = {
     const teardownInstr = constructTeardownInstr();
     instructions.push(teardownInstr);
 
-    jumpInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
 
     const symbolTableEntry = getSymbolTableEntry(
       getNameFromDeclaratorPattern(node.id),
@@ -491,7 +499,7 @@ const compilers: CompilerMapping = {
     labelFrame: LabelFrame
   ) => {
     const labelEntry = getLabelEntry(node.argument.name, labelFrame);
-    const jumpInstr = constructJumpInstr(labelEntry.instrAddress);
+    const jumpInstr = constructJumpInstr(labelEntry.instrAddressOffset);
     instructions.push(jumpInstr);
   },
   Identifier: (
@@ -520,7 +528,7 @@ const compilers: CompilerMapping = {
   ) => {
     updateLabelEntryInstrAddress(
       node.label.name,
-      instructions.length,
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION,
       labelFrame
     );
     compile(node.body, instructions, symbolTable, labelFrame);
@@ -537,11 +545,13 @@ const compilers: CompilerMapping = {
     compile(node.consequent, instructions, symbolTable, labelFrame);
     const jumpInstr = constructJumpInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpInstr);
-    jumpOnFalseInstr.instrAddress = instructions.length;
+    jumpOnFalseInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     if (isNotUndefined(node.alternate)) {
       compile(node.alternate, instructions, symbolTable, labelFrame);
     }
-    jumpInstr.instrAddress = instructions.length;
+    jumpInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
   },
   InitializerExpression: (
     node: InitializerExpression,
@@ -608,7 +618,7 @@ const compilers: CompilerMapping = {
   ) => {
     const programSymbolTable = addProgramSymbolTableEntries(node, symbolTable);
     const enterProgramInstr = constructEnterProgramInstr(
-      getNumOfEntriesInFrame(programSymbolTable.head)
+      getFrameSize(programSymbolTable.head)
     );
     instructions.push(enterProgramInstr);
     node.body.forEach((item) => {
@@ -744,7 +754,8 @@ const compilers: CompilerMapping = {
     symbolTable: SymbolTable,
     labelFrame: LabelFrame
   ) => {
-    const loopStart = instructions.length;
+    const loopStart =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
     compile(node.predicate, instructions, symbolTable, labelFrame);
     const jumpOnFalseInstr = constructJumpOnFalseInstr(PLACEHOLDER_ADDRESS);
     instructions.push(jumpOnFalseInstr);
@@ -755,6 +766,7 @@ const compilers: CompilerMapping = {
     instructions.push(jumpInstr);
     const breakDoneInstr = constructBreakDoneInstr();
     instructions.push(breakDoneInstr);
-    jumpOnFalseInstr.instrAddress = instructions.length;
+    jumpOnFalseInstr.instrAddressOffset =
+      instructions.length * TextMemoryRegion.BYTES_PER_INSTRUCTION;
   }
 };

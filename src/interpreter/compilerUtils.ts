@@ -9,6 +9,7 @@ import {
 } from '../ast/types/typeGuards';
 import { UnsupportedArrayError, UnsupportedDeclarationError } from './errors';
 import { isNumber } from '../utils/typeGuards';
+import { type DataType } from '../ast/types/dataTypes';
 
 export const getNameFromDeclaratorPattern = (
   pattern: DeclaratorPattern
@@ -30,27 +31,26 @@ export const getNameFromDeclaratorPattern = (
 
 // TODO: This method may be modified once types are introduced.
 export const getFixedNumOfEntriesOfDeclaratorPattern = (
+  dataType: DataType,
   pattern: DeclaratorPattern
 ): number => {
   if (isIdentifier(pattern)) {
-    // Allocate 1 entry space to each identifier for now.
-    return 1;
+    return dataType.sizeInBytes;
   }
 
   if (isArrayPattern(pattern)) {
-    // Allocate 1 entry space to each item in the array for now.
     // Multiply the sizes of each array dimension to get the total array size.
-    return getArrayMaxNumOfItems(pattern);
+    return getArrayMaxNumOfItems(pattern) * dataType.sizeInBytes;
   }
 
   if (isFunctionPattern(pattern)) {
-    // Function should point to an address. An address takes 1 entry space.
-    return 1;
+    // Function should point to an address. An address takes 8 bytes.
+    return 8;
   }
 
   if (isPointerPattern(pattern)) {
-    // Pointer should point to an address. An address takes 1 entry space.
-    return 1;
+    // Pointer should point to an address. An address takes 8 bytes.
+    return 8;
   }
 
   throw new UnsupportedDeclarationError();

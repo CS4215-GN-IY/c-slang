@@ -2,10 +2,12 @@ export type DataType = IntegerDataType | FloatingPointDataType | VoidDataType;
 
 export interface VoidDataType {
   type: 'Void';
+  sizeInBytes: 0;
 }
 
 export const VOID: VoidDataType = {
-  type: 'Void'
+  type: 'Void',
+  sizeInBytes: 0
 };
 
 export interface IntegerDataType {

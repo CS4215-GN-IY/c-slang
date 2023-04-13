@@ -33,6 +33,7 @@ import {
 import { type SymbolTableEntryWithAddress } from './types/symbolTable';
 import { getSegmentScope } from './symbolTable';
 import { type Value } from './types/virtualMachine';
+import { UINT64 } from '../ast/types/dataTypes';
 
 export const PLACEHOLDER_ADDRESS = -1;
 
@@ -48,12 +49,17 @@ export const constructArrayAccessInstr = (
 export const constructAssignInstr = (
   entry: SymbolTableEntryWithAddress,
   numOfItems: number
-): AssignInstr => ({
-  type: 'Assign',
-  scope: getSegmentScope(entry.scope),
-  offset: entry.offset,
-  numOfItems
-});
+): AssignInstr => {
+  const dataType =
+    entry.nameType === 'UserDeclaredFunction' ? UINT64 : entry.dataType;
+  return {
+    type: 'Assign',
+    scope: getSegmentScope(entry.scope),
+    offsetInBytes: entry.offsetInBytes,
+    numOfItems,
+    dataType
+  };
+};
 
 export const constructAssignToAddressInstr = (): AssignToAddressInstr => ({
   type: 'AssignToAddress'
@@ -76,11 +82,11 @@ export const constructBreakDoneInstr = (): BreakDoneInstr => ({
 
 export const constructCallInstr = (
   numOfArgs: number,
-  numOfEntriesForVars: number
+  sizeOfEntriesInBytes: number
 ): CallInstr => ({
   type: 'Call',
   numOfArgs,
-  numOfEntriesForVars
+  sizeOfEntriesInBytes
 });
 
 export const constructCallBuiltInInstr = (
@@ -119,23 +125,23 @@ export const constructFallthroughDoneInstr = (): FallthroughDoneInstr => ({
   type: 'FallthroughDone'
 });
 
-export const constructJumpInstr = (instrAddress: number): JumpInstr => ({
+export const constructJumpInstr = (instrAddressOffset: number): JumpInstr => ({
   type: 'Jump',
-  instrAddress
+  instrAddressOffset
 });
 
 export const constructJumpOnFalseInstr = (
-  instrAddress: number
+  instrAddressOffset: number
 ): JumpOnFalseInstr => ({
   type: 'JumpOnFalse',
-  instrAddress
+  instrAddressOffset
 });
 
 export const constructJumpOnTrueInstr = (
-  instrAddress: number
+  instrAddressOffset: number
 ): JumpOnTrueInstr => ({
   type: 'JumpOnTrue',
-  instrAddress
+  instrAddressOffset
 });
 
 export const constructLoadAddressInstr = (
@@ -143,7 +149,7 @@ export const constructLoadAddressInstr = (
 ): LoadAddressInstr => ({
   type: 'LoadAddress',
   scope: getSegmentScope(entry.scope),
-  offset: entry.offset
+  offsetInBytes: entry.offsetInBytes
 });
 
 export const constructLoadConstantInstr = (
@@ -154,10 +160,10 @@ export const constructLoadConstantInstr = (
 });
 
 export const constructLoadFunctionInstr = (
-  functionInstrAddress: number
+  functionInstrAddressOffset: number
 ): LoadFunctionInstr => ({
   type: 'LoadFunction',
-  functionInstrAddress
+  functionInstrAddressOffset
 });
 
 export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
@@ -166,11 +172,16 @@ export const constructLoadReturnAddressInstr = (): LoadReturnAddressInstr => ({
 
 export const constructLoadSymbolInstr = (
   entry: SymbolTableEntryWithAddress
-): LoadSymbolInstr => ({
-  type: 'LoadSymbol',
-  scope: getSegmentScope(entry.scope),
-  offset: entry.offset
-});
+): LoadSymbolInstr => {
+  const dataType =
+    entry.nameType === 'UserDeclaredFunction' ? UINT64 : entry.dataType;
+  return {
+    type: 'LoadSymbol',
+    scope: getSegmentScope(entry.scope),
+    offsetInBytes: entry.offsetInBytes,
+    dataType
+  };
+};
 
 export const constructMatchCaseInstr = (): MatchCaseInstr => ({
   type: 'MatchCase'

@@ -21,7 +21,7 @@ export const constructFunctionLabelFrame = (
     if (isIdentifierStatement(item)) {
       const entry: LabelEntry = {
         name: item.label.name,
-        instrAddress: PLACEHOLDER_ADDRESS
+        instrAddressOffset: PLACEHOLDER_ADDRESS
       };
       addToFrame(frame, entry);
     }
@@ -37,7 +37,7 @@ export const addBlockLabelFrameEntries = (
     if (isIdentifierStatement(item)) {
       const entry: LabelEntry = {
         name: item.label.name,
-        instrAddress: PLACEHOLDER_ADDRESS
+        instrAddressOffset: PLACEHOLDER_ADDRESS
       };
       addToFrame(frame, entry);
     }
@@ -55,11 +55,11 @@ export const getLabelEntry = (name: string, frame: LabelFrame): LabelEntry => {
 
 export const updateLabelEntryInstrAddress = (
   name: string,
-  instrAddress: number,
+  instrAddressOffset: number,
   frame: LabelFrame
 ): void => {
   if (name in frame) {
-    frame[name].instrAddress = instrAddress;
+    frame[name].instrAddressOffset = instrAddressOffset;
     return;
   }
   throw new UndeclaredNameError(

@@ -45,23 +45,23 @@ export const addProgramSymbolTableEntries = (
   symbolTable: SymbolTable
 ): SymbolTable => {
   const frame = symbolTable.head;
-  let offset = getNumOfEntriesInFrame(frame);
+  let offsetInBytes = getFrameSize(frame);
   program.body.forEach((declaration) => {
     switch (declaration.type) {
       case 'FunctionDeclaration': {
-        offset = addFunctionDeclarationSymbolTableEntry(
+        offsetInBytes = addFunctionDeclarationSymbolTableEntry(
           declaration,
           'Global',
-          offset,
+          offsetInBytes,
           frame
         );
         break;
       }
       case 'Declaration': {
-        offset = addDeclarationSymbolTableEntries(
+        offsetInBytes = addDeclarationSymbolTableEntries(
           declaration,
           'Global',
-          offset,
+          offsetInBytes,
           frame
         );
         break;
@@ -81,17 +81,17 @@ export const addFunctionSymbolTableEntries = (
   const frame: SymbolTableFrame = {};
   // The parameters of the current stack frame can be found via an offset of -4
   // from the current rbp. See `stackFunctionCallSetup` for more information.
-  let offset = -4;
+  let offsetInBytes = -4;
   node.params.forEach((param) => {
-    offset = addParameterDeclarationSymbolTableEntries(
+    offsetInBytes = addParameterDeclarationSymbolTableEntries(
       param,
       'Function',
-      offset,
+      offsetInBytes,
       frame
     );
   });
 
-  offset = 0;
+  offsetInBytes = 0;
   if (!isEmptyStatement(node.body)) {
     node.body.items.forEach((item) => {
       const declaration = isDeclaration(item)
@@ -102,10 +102,10 @@ export const addFunctionSymbolTableEntries = (
         ? item.init
         : undefined;
       if (isNotUndefined(declaration)) {
-        offset = addDeclarationSymbolTableEntries(
+        offsetInBytes = addDeclarationSymbolTableEntries(
           declaration,
           'Function',
-          offset,
+          offsetInBytes,
           frame
         );
       }
@@ -121,7 +121,7 @@ export const addFunctionSymbolTableEntries = (
       'Symbol table entry should always be for a user-declared function here.'
     );
   }
-  functionEntry.numOfEntriesForVariables += offset;
+  functionEntry.sizeOfEntriesInBytes += offsetInBytes;
 
   return {
     head: frame,
@@ -138,7 +138,7 @@ export const addBlockSymbolTableEntries = (
   if (!isNotNull(symbolTable.parent)) {
     throw new InvalidScopeError('Block is not inside a function.');
   }
-  let offset = symbolTable.parent.numOfEntriesForVariables;
+  let offsetInBytes = symbolTable.parent.sizeOfEntriesInBytes;
   block.items.forEach((item) => {
     const declaration = isDeclaration(item)
       ? item
@@ -148,16 +148,16 @@ export const addBlockSymbolTableEntries = (
       ? item.init
       : undefined;
     if (isNotUndefined(declaration)) {
-      offset = addDeclarationSymbolTableEntries(
+      offsetInBytes = addDeclarationSymbolTableEntries(
         declaration,
         'Block',
-        offset,
+        offsetInBytes,
         frame
       );
     }
   });
 
-  symbolTable.parent.numOfEntriesForVariables = offset;
+  symbolTable.parent.sizeOfEntriesInBytes = offsetInBytes;
 
   return {
     head: frame,
@@ -261,8 +261,19 @@ export const isVariableSymbolTableEntry = (
   return entry.nameType === 'Variable';
 };
 
-export const getNumOfEntriesInFrame = (frame: SymbolTableFrame): number => {
-  return Object.keys(frame).length;
+export const getFrameSize = (frame: SymbolTableFrame): number => {
+  let sizeInBytes = 0;
+  for (const entry of Object.values(frame)) {
+    if (isBuiltinFunctionSymbolTableEntry(entry)) {
+      continue;
+    }
+    if (isUserDeclaredFunctionSymbolTableEntry(entry)) {
+      sizeInBytes += entry.sizeOfEntriesInBytes;
+      continue;
+    }
+    sizeInBytes += entry.dataType.sizeInBytes;
+  }
+  return sizeInBytes;
 };
 
 const addToFrame = (
@@ -280,30 +291,33 @@ const addToFrame = (
 const addFunctionDeclarationSymbolTableEntry = (
   functionDeclaration: FunctionDeclaration,
   scope: SymbolTableEntryScope,
-  offset: number,
+  offsetInBytes: number,
   symbolTableFrame: SymbolTableFrame
 ): number => {
   const entry: UserDeclaredFunctionSymbolTableEntry = {
     nameType: 'UserDeclaredFunction',
     name: getNameFromDeclaratorPattern(functionDeclaration.id),
     returnDataType: functionDeclaration.returnDataType,
-    offset,
+    offsetInBytes,
     scope,
     numOfParams: functionDeclaration.params.length,
-    numOfEntriesForVariables: 0
+    sizeOfEntriesInBytes: 0
   };
-  offset += getFixedNumOfEntriesOfDeclaratorPattern(functionDeclaration.id);
+  offsetInBytes += getFixedNumOfEntriesOfDeclaratorPattern(
+    functionDeclaration.returnDataType,
+    functionDeclaration.id
+  );
   addToFrame(symbolTableFrame, entry);
-  return offset;
+  return offsetInBytes;
 };
 
 const addDeclarationSymbolTableEntries = (
   declaration: Declaration,
   scope: SymbolTableEntryScope,
-  startingOffset: number,
+  startingOffsetInBytes: number,
   symbolTableFrame: SymbolTableFrame
 ): number => {
-  let offset = startingOffset;
+  let offsetInBytes = startingOffsetInBytes;
   declaration.declarations.forEach((declarator) => {
     let entry: ArraySymbolTableEntry | VariableSymbolTableEntry;
     if (isArrayPattern(declarator.pattern)) {
@@ -311,7 +325,7 @@ const addDeclarationSymbolTableEntries = (
         name: getNameFromDeclaratorPattern(declarator.pattern),
         nameType: 'Array',
         dataType: declaration.dataType,
-        offset,
+        offsetInBytes,
         scope,
         multipliers: getArrayPatternMultipliers(declarator.pattern),
         maxNumOfItems: getArrayMaxNumOfItems(declarator.pattern)
@@ -321,23 +335,26 @@ const addDeclarationSymbolTableEntries = (
         name: getNameFromDeclaratorPattern(declarator.pattern),
         nameType: 'Variable',
         dataType: declaration.dataType,
-        offset,
+        offsetInBytes,
         scope
       };
     }
-    offset += getFixedNumOfEntriesOfDeclaratorPattern(declarator.pattern);
+    offsetInBytes += getFixedNumOfEntriesOfDeclaratorPattern(
+      declaration.dataType,
+      declarator.pattern
+    );
     addToFrame(symbolTableFrame, entry);
   });
-  return offset;
+  return offsetInBytes;
 };
 
 const addParameterDeclarationSymbolTableEntries = (
   parameterDeclaration: ParameterDeclaration,
   scope: SymbolTableEntryScope,
-  startingOffset: number,
+  startingOffsetInBytes: number,
   symbolTableFrame: SymbolTableFrame
 ): number => {
-  let offset = startingOffset;
+  let offsetInBytes = startingOffsetInBytes;
   let entry: SymbolTableEntry;
   if (isParameterDeclaratorDeclaration(parameterDeclaration)) {
     const declaratorPattern = parameterDeclaration.declarator;
@@ -346,7 +363,7 @@ const addParameterDeclarationSymbolTableEntries = (
         name: getNameFromDeclaratorPattern(declaratorPattern),
         nameType: 'Array',
         dataType: parameterDeclaration.dataType,
-        offset,
+        offsetInBytes,
         scope,
         multipliers: getArrayPatternMultipliers(declaratorPattern),
         maxNumOfItems: getArrayMaxNumOfItems(declaratorPattern)
@@ -356,11 +373,14 @@ const addParameterDeclarationSymbolTableEntries = (
         name: getNameFromDeclaratorPattern(declaratorPattern),
         nameType: 'Variable',
         dataType: parameterDeclaration.dataType,
-        offset,
+        offsetInBytes,
         scope
       };
     }
-    offset -= getFixedNumOfEntriesOfDeclaratorPattern(declaratorPattern);
+    offsetInBytes -= getFixedNumOfEntriesOfDeclaratorPattern(
+      parameterDeclaration.dataType,
+      declaratorPattern
+    );
   } else {
     // TODO: Handle ParameterAbstractDeclaratorDeclaration.
     throw new Error(
@@ -368,5 +388,5 @@ const addParameterDeclarationSymbolTableEntries = (
     );
   }
   addToFrame(symbolTableFrame, entry);
-  return offset;
+  return offsetInBytes;
 };
