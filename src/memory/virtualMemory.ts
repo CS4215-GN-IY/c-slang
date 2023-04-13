@@ -2,7 +2,16 @@ import { PageTable } from './pageTable';
 import { AddressIndex } from './addressIndex';
 import { Segment } from './segment';
 import { SegmentAddress } from './segmentAddress';
-import { MemoryError, MemoryErrorType } from './memoryError';
+import {
+  type Value,
+  type ValueWithDataType
+} from '../interpreter/types/virtualMachine';
+import {
+  ADDRESS_SIZE_IN_BYTES,
+  constructAddressDataType,
+  type DataType,
+  FLOAT64
+} from '../ast/types/dataTypes';
 
 export class VirtualMemory {
   readonly l1PageTable: PageTable = new PageTable();
@@ -76,38 +85,39 @@ export class VirtualMemory {
   }
 
   public dataGetAddressAtOffset(offset: number): number {
-    return (
-      this.segmentAddresses[Segment.DATA].baseAddress +
-      offset * PageTable.ENTRY_SIZE
-    );
+    return this.segmentAddresses[Segment.DATA].baseAddress + offset;
   }
 
   public stackGetAddressAtOffset(offset: number): number {
-    return this.rbp + offset * PageTable.ENTRY_SIZE;
+    return this.rbp + offset;
   }
 
-  public dataGetByOffset(offset: number): number {
-    const address =
-      this.segmentAddresses[Segment.DATA].baseAddress +
-      offset * PageTable.ENTRY_SIZE;
-    return this.get(address);
+  public dataGetByOffset(offset: number, dataType: DataType): number {
+    const address = this.segmentAddresses[Segment.DATA].baseAddress + offset;
+    return this.get(address, dataType);
   }
 
-  public dataSetByOffset(offset: number, data: number): void {
-    const address =
-      this.segmentAddresses[Segment.DATA].baseAddress +
-      offset * PageTable.ENTRY_SIZE;
-    this.set(address, data);
+  public dataSetByOffset(
+    offset: number,
+    data: number,
+    dataType: DataType
+  ): void {
+    const address = this.segmentAddresses[Segment.DATA].baseAddress + offset;
+    this.set(address, data, dataType);
   }
 
-  public stackGetByOffset(offset: number): number {
-    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
-    return this.get(address);
+  public stackGetByOffset(offset: number, dataType: DataType): number {
+    const address = this.rbp + offset;
+    return this.get(address, dataType);
   }
 
-  public stackSetByOffset(offset: number, data: number): void {
-    const address = this.rbp + offset * PageTable.ENTRY_SIZE;
-    this.set(address, data);
+  public stackSetByOffset(
+    offset: number,
+    data: number,
+    dataType: DataType
+  ): void {
+    const address = this.rbp + offset;
+    this.set(address, data, dataType);
   }
 
   public stackAllocate(data: number): void {
@@ -116,7 +126,8 @@ export class VirtualMemory {
   }
 
   public stackFunctionCallSetup(
-    args: number[],
+    args: ValueWithDataType[],
+    numOfEntriesForArgs: number,
     numOfEntriesForVars: number,
     returnAddress: number
   ): void {
@@ -136,26 +147,40 @@ export class VirtualMemory {
     -------------
      */
     const savedRsp = this.rsp;
-    args.forEach((arg) => {
-      this.stackAllocate(arg);
-    });
+    const placeholderData = 0;
+    for (let i = 0; i < numOfEntriesForArgs; i++) {
+      this.stackAllocate(placeholderData);
+    }
     this.stackAllocate(this.rbp);
     this.stackAllocate(savedRsp);
     this.stackAllocate(returnAddress);
     this.rbp = this.rsp;
-    const placeholderData = 0;
     for (let i = 0; i < numOfEntriesForVars; i++) {
       this.stackAllocate(placeholderData);
     }
+    let argAddress = this.rbp - 3 * PageTable.ENTRY_SIZE;
+    args.forEach((arg) => {
+      argAddress = argAddress - arg.dataType.sizeInBytes;
+      this.set(argAddress, arg.value, arg.dataType);
+    });
   }
 
   public getReturnAddress(): number {
-    return this.get(this.rbp - PageTable.ENTRY_SIZE);
+    return this.get(
+      this.rbp - ADDRESS_SIZE_IN_BYTES,
+      constructAddressDataType(FLOAT64)
+    );
   }
 
   public stackFunctionCallTeardown(): void {
-    const savedRbp = this.get(this.rbp - 3 * PageTable.ENTRY_SIZE);
-    const savedRsp = this.get(this.rbp - 2 * PageTable.ENTRY_SIZE);
+    const savedRbp = this.get(
+      this.rbp - 3 * ADDRESS_SIZE_IN_BYTES,
+      constructAddressDataType(FLOAT64)
+    );
+    const savedRsp = this.get(
+      this.rbp - 2 * ADDRESS_SIZE_IN_BYTES,
+      constructAddressDataType(FLOAT64)
+    );
     let fp = this.rsp;
     while (fp > savedRsp) {
       fp -= PageTable.ENTRY_SIZE;
@@ -165,63 +190,165 @@ export class VirtualMemory {
     this.rbp = savedRbp;
   }
 
-  public getByOffsetFromAddress(baseAddress: number, offset: number): number {
-    const address = baseAddress + offset * PageTable.ENTRY_SIZE;
-    return this.get(address);
+  public getByOffsetFromAddress(
+    baseAddress: number,
+    offset: number,
+    dataType: DataType
+  ): number {
+    const address = baseAddress + offset;
+    return this.get(address, dataType);
   }
 
   public getAddressByOffset(baseAddress: number, offset: number): number {
-    return baseAddress + offset * PageTable.ENTRY_SIZE;
+    return baseAddress + offset;
   }
 
-  /**
-   * Gets data from entry at address.
-   */
-  public get(address: number): number {
-    const ids = AddressIndex.fromAddress(address);
-    const l5PageTable = this.getL5PageTable(ids);
-    return l5PageTable.get(ids.getL5EntryOffset());
-  }
-
-  /**
-   * Allocates data to the top of the segment.
-   */
-  public allocate(data: number, segment: Segment): number {
-    const segmentAddress = this.segmentAddresses[segment];
-    if (segmentAddress === undefined) {
-      throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
-    }
-    if (segmentAddress.hasReachedTop()) {
-      throw new MemoryError(
-        MemoryErrorType.SEGMENTATION_FAULT,
-        segmentAddress.getFreeAddress()
-      );
-    }
-    const address = segmentAddress.getFreeAddress();
+  public get(address: number, dataType: DataType): Value {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
-    l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
-    segmentAddress.updateFreeAddress(address + PageTable.ENTRY_SIZE);
-    return address;
+    const offset = addressIndex.l5Idx;
+    switch (dataType.type) {
+      case 'Integer':
+        if (dataType.isSigned) {
+          switch (dataType.sizeInBytes) {
+            case 1:
+              return l5PageTable.getInt8(offset);
+            case 2:
+              return l5PageTable.getInt16(offset);
+            case 4:
+              return l5PageTable.getInt32(offset);
+            case 8:
+              return l5PageTable.getInt64(offset);
+            default:
+              throw new TypeError(
+                `Tried to get an invalid Int size in the memory: ${dataType.sizeInBytes}`
+              );
+          }
+        } else {
+          switch (dataType.sizeInBytes) {
+            case 1:
+              return l5PageTable.getUint8(offset);
+            case 2:
+              return l5PageTable.getUint16(offset);
+            case 4:
+              return l5PageTable.getUint32(offset);
+            case 8:
+              return l5PageTable.getUint64(offset);
+            default:
+              throw new TypeError(
+                `Tried to get an invalid Uint size in the memory: ${dataType.sizeInBytes}`
+              );
+          }
+        }
+      case 'FloatingPoint':
+        switch (dataType.sizeInBytes) {
+          case 4:
+            return l5PageTable.getFloat32(offset);
+          case 8:
+            return l5PageTable.getFloat64(offset);
+          default:
+            throw new TypeError(
+              `Tried to get an invalid FloatingPoint size in the memory: ${dataType.sizeInBytes}`
+            );
+        }
+      case 'Address':
+        switch (dataType.sizeInBytes) {
+          case 8:
+            return l5PageTable.getFloat64(offset);
+          default:
+            throw new TypeError(
+              `Tried to get an invalid Address size in the memory`
+            );
+        }
+      default:
+        throw new TypeError(
+          `Tried to get an invalid type in the memory: ${dataType.type}`
+        );
+    }
   }
 
-  /**
-   * Sets data at a free entry.
-   */
   private setFree(address: number, data: number): void {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
     l5PageTable.setFreeEntryAt(addressIndex.getL5EntryOffset(), data);
   }
 
-  /**
-   * Updates entry at address to store data.
-   * The address must have been allocated previously. It cannot be a free address.
-   */
-  public set(address: number, data: number): void {
+  public set(address: number, value: Value, dataType: DataType): void {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
-    l5PageTable.setAllocatedEntry(addressIndex.getL5EntryOffset(), data);
+    const offset = addressIndex.l5Idx;
+    switch (dataType.type) {
+      case 'Integer':
+        if (dataType.isSigned) {
+          switch (dataType.sizeInBytes) {
+            case 1:
+              l5PageTable.setInt8(offset, value);
+              break;
+            case 2:
+              l5PageTable.setInt16(offset, value);
+              break;
+            case 4:
+              l5PageTable.setInt32(offset, value);
+              break;
+            case 8:
+              l5PageTable.setInt64(offset, value);
+              break;
+            default:
+              throw new TypeError(
+                `Tried to set an invalid Int size in the memory: ${dataType.sizeInBytes}`
+              );
+          }
+        } else {
+          switch (dataType.sizeInBytes) {
+            case 1:
+              l5PageTable.setUint8(offset, value);
+              break;
+            case 2:
+              l5PageTable.setUint16(offset, value);
+              break;
+            case 4:
+              l5PageTable.setUint32(offset, value);
+              break;
+            case 8:
+              l5PageTable.setUint64(offset, value);
+              break;
+            default:
+              throw new TypeError(
+                `Tried to set an invalid Uint size in the memory: ${dataType.sizeInBytes}`
+              );
+          }
+        }
+        break;
+      case 'FloatingPoint':
+        switch (dataType.sizeInBytes) {
+          case 4:
+            l5PageTable.setFloat32(offset, value);
+            break;
+          case 8:
+            l5PageTable.setFloat64(offset, value);
+            break;
+          default:
+            throw new TypeError(
+              `Tried to set an invalid FloatingPoint size in the memory: ${dataType.sizeInBytes}`
+            );
+        }
+        break;
+      case 'Address':
+        switch (dataType.sizeInBytes) {
+          case 8:
+            l5PageTable.setFloat64(offset, value);
+            break;
+          default:
+            throw new TypeError(
+              `Tried to set an invalid Address size in the memory`
+            );
+        }
+        break;
+      default:
+        throw new TypeError(
+          `Tried to set an invalid type in the memory: ${dataType.type}`
+        );
+    }
   }
 
   /**
@@ -230,19 +357,19 @@ export class VirtualMemory {
   public free(address: number): void {
     const addressIndex = AddressIndex.fromAddress(address);
     const l5PageTable = this.getL5PageTable(addressIndex);
-    l5PageTable.free(addressIndex.getL5EntryOffset());
+    l5PageTable.freeEntry(addressIndex.getL5EntryOffset());
   }
 
   private getL5PageTable(addressIndex: AddressIndex): PageTable {
-    const l2PageTableIdx = this.l1PageTable.get(addressIndex.l1Idx);
-    const l3PageTableIdx = this.l2PageTables[l2PageTableIdx].get(
-      addressIndex.l2Idx
+    const l2PageTableIdx = this.l1PageTable.getFloat64(addressIndex.l1Idx);
+    const l3PageTableIdx = this.l2PageTables[l2PageTableIdx].getFloat64(
+      addressIndex.l2Idx * PageTable.ENTRY_SIZE
     );
-    const l4PageTableIdx = this.l3PageTables[l3PageTableIdx].get(
-      addressIndex.l3Idx
+    const l4PageTableIdx = this.l3PageTables[l3PageTableIdx].getFloat64(
+      addressIndex.l3Idx * PageTable.ENTRY_SIZE
     );
-    const l5PageTableIdx = this.l4PageTables[l4PageTableIdx].get(
-      addressIndex.l4Idx
+    const l5PageTableIdx = this.l4PageTables[l4PageTableIdx].getFloat64(
+      addressIndex.l4Idx * PageTable.ENTRY_SIZE
     );
     return this.l5PageTables[l5PageTableIdx];
   }

@@ -25,114 +25,164 @@ export class PageTable {
   }
 
   /**
-   * Gets the data from the entry at the offset.
-   * Note: This should be the offset to an entry (9 bits),
-   * not an offset to the within the entry (12 bits)
-   */
-  public get(offset: number): number {
-    if (!this.isValidOffset(offset)) {
-      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
-    }
-
-    return this.memory.getFloat64(offset * PageTable.ENTRY_SIZE);
-  }
-
-  /**
-   * Sets the first free entry in the free list to contain data.
-   */
-  public setFreeEntry(data: number): number {
-    const offset = this.freeList;
-
-    if (!this.isValidOffset(offset)) {
-      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
-    }
-
-    this.freeList = this.get(offset);
-    this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
-    return offset;
-  }
-
-  /**
    * Sets a free entry to contain data.
    */
-  public setFreeEntryAt(offset: number, data: number): number {
-    if (!this.isValidOffset(offset)) {
-      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
+  public setFreeEntryAt(entryOffset: number, data: number): number {
+    if (!this.isValidEntryOffset(entryOffset)) {
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, entryOffset);
     }
 
-    assert(this.isFree(offset), 'Offset must be free.');
+    assert(this.isFreeEntry(entryOffset), 'Offset must be free.');
 
-    this.removeFromFreeList(offset);
-    this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
-    return offset;
+    this.removeEntryFromFreeList(entryOffset);
+    this.memory.setFloat64(entryOffset * PageTable.ENTRY_SIZE, data);
+    return entryOffset;
   }
 
-  /**
-   * Updates the data contained in a used entry.
-   */
-  public setAllocatedEntry(offset: number, data: number): void {
-    if (!this.isValidOffset(offset)) {
-      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
-    }
-
-    assert(!this.isFree(offset), 'Only allocated entries can be set.');
-
-    this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, data);
+  public getInt8(offset: number): number {
+    return this.memory.getInt8(offset);
   }
 
-  /**
-   * Frees entry at offset.
-   */
-  public free(offset: number): void {
-    if (!this.isValidOffset(offset)) {
-      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, offset);
-    }
-
-    assert(!this.isFree(offset), 'Only allocated entries can be freed.');
-
-    this.memory.setFloat64(offset * PageTable.ENTRY_SIZE, this.freeList);
-    this.freeList = offset;
+  public getUint8(offset: number): number {
+    return this.memory.getUint8(offset);
   }
 
-  private removeFromFreeList(offset: number): void {
-    let prevFreeOffset = PageTable.EMPTY_FREE_LIST;
-    let freeOffset = this.freeList;
-    while (freeOffset !== offset && freeOffset !== PageTable.EMPTY_FREE_LIST) {
-      prevFreeOffset = freeOffset;
-      freeOffset = this.get(freeOffset);
+  public getInt16(offset: number): number {
+    return this.memory.getInt16(offset);
+  }
+
+  public getUint16(offset: number): number {
+    return this.memory.getUint16(offset);
+  }
+
+  public getInt32(offset: number): number {
+    return this.memory.getInt32(offset);
+  }
+
+  public getUint32(offset: number): number {
+    return this.memory.getUint32(offset);
+  }
+
+  public getInt64(offset: number): bigint {
+    return this.memory.getBigInt64(offset);
+  }
+
+  public getUint64(offset: number): bigint {
+    return this.memory.getBigUint64(offset);
+  }
+
+  public getFloat32(offset: number): number {
+    return this.memory.getFloat32(offset);
+  }
+
+  public getFloat64(offset: number): number {
+    return this.memory.getFloat64(offset);
+  }
+
+  public setInt8(offset: number, data: number): void {
+    this.memory.setInt8(offset, data);
+  }
+
+  public setUint8(offset: number, data: number): void {
+    this.memory.setUint8(offset, data);
+  }
+
+  public setInt16(offset: number, data: number): void {
+    this.memory.setInt16(offset, data);
+  }
+
+  public setUint16(offset: number, data: number): void {
+    this.memory.setUint16(offset, data);
+  }
+
+  public setInt32(offset: number, data: number): void {
+    this.memory.setInt32(offset, data);
+  }
+
+  public setUint32(offset: number, data: number): void {
+    this.memory.setUint32(offset, data);
+  }
+
+  public setInt64(offset: number, data: bigint): void {
+    this.memory.setBigInt64(offset, data);
+  }
+
+  public setUint64(offset: number, data: bigint): void {
+    this.memory.setBigUint64(offset, data);
+  }
+
+  public setFloat32(offset: number, data: number): void {
+    this.memory.setFloat32(offset, data);
+  }
+
+  public setFloat64(offset: number, data: number): void {
+    this.memory.setFloat64(offset, data);
+  }
+
+  public freeEntry(entryOffset: number): void {
+    if (!this.isValidEntryOffset(entryOffset)) {
+      throw new MemoryError(MemoryErrorType.INVALID_OFFSET, entryOffset);
     }
 
-    if (freeOffset === PageTable.EMPTY_FREE_LIST) {
+    assert(
+      !this.isFreeEntry(entryOffset),
+      'Only allocated entries can be freed.'
+    );
+
+    this.memory.setFloat64(entryOffset * PageTable.ENTRY_SIZE, this.freeList);
+    this.freeList = entryOffset;
+  }
+
+  private removeEntryFromFreeList(entryOffset: number): void {
+    let prevFreeEntryOffset = PageTable.EMPTY_FREE_LIST;
+    let freeEntryOffset = this.freeList;
+    while (
+      freeEntryOffset !== entryOffset &&
+      freeEntryOffset !== PageTable.EMPTY_FREE_LIST
+    ) {
+      prevFreeEntryOffset = freeEntryOffset;
+      freeEntryOffset = this.memory.getFloat64(
+        freeEntryOffset * PageTable.ENTRY_SIZE
+      );
+    }
+
+    if (freeEntryOffset === PageTable.EMPTY_FREE_LIST) {
       return;
     }
 
-    if (prevFreeOffset === PageTable.EMPTY_FREE_LIST) {
-      this.freeList = this.get(freeOffset);
+    if (prevFreeEntryOffset === PageTable.EMPTY_FREE_LIST) {
+      this.freeList = this.memory.getFloat64(
+        freeEntryOffset * PageTable.ENTRY_SIZE
+      );
     }
 
-    if (prevFreeOffset !== PageTable.EMPTY_FREE_LIST) {
+    if (prevFreeEntryOffset !== PageTable.EMPTY_FREE_LIST) {
       this.memory.setFloat64(
-        prevFreeOffset * PageTable.ENTRY_SIZE,
-        this.get(freeOffset)
+        prevFreeEntryOffset * PageTable.ENTRY_SIZE,
+        this.memory.getFloat64(freeEntryOffset * PageTable.ENTRY_SIZE)
       );
     }
   }
 
-  private isValidOffset(offset: number): boolean {
-    return this.isWithinBounds(offset) && Number.isInteger(offset);
+  private isValidEntryOffset(entryOffset: number): boolean {
+    return (
+      this.entryIsWithinBounds(entryOffset) && Number.isInteger(entryOffset)
+    );
   }
 
-  private isWithinBounds(offset: number): boolean {
-    return offset >= 0 && offset <= PageTable.NUM_OF_ENTRIES - 1;
+  private entryIsWithinBounds(entryOffset: number): boolean {
+    return entryOffset >= 0 && entryOffset <= PageTable.NUM_OF_ENTRIES - 1;
   }
 
-  private isFree(offset: number): boolean {
-    let freeOffset = this.freeList;
-    while (freeOffset !== PageTable.EMPTY_FREE_LIST) {
-      if (offset === freeOffset) {
+  private isFreeEntry(entryOffset: number): boolean {
+    let freeEntryOffset = this.freeList;
+    while (freeEntryOffset !== PageTable.EMPTY_FREE_LIST) {
+      if (entryOffset === freeEntryOffset) {
         return true;
       }
-      freeOffset = this.get(freeOffset);
+      freeEntryOffset = this.memory.getFloat64(
+        freeEntryOffset * PageTable.ENTRY_SIZE
+      );
     }
     return false;
   }

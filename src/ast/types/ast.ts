@@ -381,6 +381,7 @@ export interface ParameterDeclaratorDeclaration {
 export interface ParameterAbstractDeclaratorDeclaration {
   type: 'ParameterAbstractDeclaratorDeclaration';
   // TODO: Support declaration specifiers
+  dataType: DataType;
   declarator?: AbstractDeclaratorPattern;
 }
 

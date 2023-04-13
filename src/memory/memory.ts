@@ -3,6 +3,9 @@ import { TextMemory } from './textMemory';
 import { type Instr } from '../interpreter/types/instructions';
 import { Segment } from './segment';
 import { MemoryError, MemoryErrorType } from './memoryError';
+import { type DataType } from '../ast/types/dataTypes';
+import { type ValueWithDataType } from '../interpreter/types/virtualMachine';
+import { PageTable } from './pageTable';
 
 export class Memory {
   private readonly virtualMemory;
@@ -19,44 +22,60 @@ export class Memory {
     this.textMemory = new TextMemory(instructions);
   }
 
-  public get(address: number): number {
-    return this.virtualMemory.get(address);
+  public get(address: number, dataType: DataType): number {
+    return this.virtualMemory.get(address, dataType);
   }
 
-  public set(address: number, data: number): void {
-    this.virtualMemory.set(address, data);
+  public set(address: number, data: number, dataType: DataType): void {
+    this.virtualMemory.set(address, data, dataType);
   }
 
-  public dataAllocate(numOfEntries: number): void {
+  public dataAllocate(sizeOfDeclarationsInBytes: number): void {
+    const numOfEntries = Math.ceil(
+      sizeOfDeclarationsInBytes / PageTable.ENTRY_SIZE
+    );
     this.virtualMemory.dataAllocate(numOfEntries);
   }
 
-  public getByOffset(segment: Segment, offset: number): number {
+  public getByOffset(
+    segment: Segment,
+    offset: number,
+    dataType: DataType
+  ): number {
     switch (segment) {
       case Segment.DATA:
-        return this.virtualMemory.dataGetByOffset(offset);
+        return this.virtualMemory.dataGetByOffset(offset, dataType);
       case Segment.STACK:
-        return this.virtualMemory.stackGetByOffset(offset);
+        return this.virtualMemory.stackGetByOffset(offset, dataType);
       default:
         throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
     }
   }
 
-  public getByOffsetFromAddress(address: number, offset: number): number {
-    return this.virtualMemory.getByOffsetFromAddress(address, offset);
+  public getByOffsetFromAddress(
+    address: number,
+    offset: number,
+    dataType: DataType
+  ): number {
+    return this.virtualMemory.getByOffsetFromAddress(address, offset, dataType);
   }
 
   public getAddressByOffset(address: number, offset: number): number {
     return this.virtualMemory.getAddressByOffset(address, offset);
   }
 
-  public setByOffset(segment: Segment, offset: number, data: number): void {
+  public setByOffset(
+    segment: Segment,
+    offset: number,
+    data: number,
+    dataType: DataType
+  ): void {
     switch (segment) {
       case Segment.DATA:
-        this.virtualMemory.dataSetByOffset(offset, data);
+        this.virtualMemory.dataSetByOffset(offset, data, dataType);
         break;
       case Segment.STACK:
-        this.virtualMemory.stackSetByOffset(offset, data);
+        this.virtualMemory.stackSetByOffset(offset, data, dataType);
         break;
       default:
         throw new MemoryError(MemoryErrorType.INVALID_SEGMENT, segment);
@@ -75,12 +94,23 @@ export class Memory {
   }
 
   public stackFunctionCallAllocate(
-    args: number[],
-    numOfEntriesForVars: number,
+    args: ValueWithDataType[],
+    totalSizeOfVariablesInBytes: number,
     returnAddress: number
   ): void {
+    const totalSizeOfArgsInBytes = args.reduce(
+      (totalSize, currArg) => totalSize + currArg.dataType.sizeInBytes,
+      0
+    );
+    const numOfEntriesForArgs = Math.ceil(
+      totalSizeOfArgsInBytes / PageTable.ENTRY_SIZE
+    );
+    const numOfEntriesForVars = Math.ceil(
+      totalSizeOfVariablesInBytes / PageTable.ENTRY_SIZE
+    );
     this.virtualMemory.stackFunctionCallSetup(
       args,
+      numOfEntriesForArgs,
       numOfEntriesForVars,
       returnAddress
     );

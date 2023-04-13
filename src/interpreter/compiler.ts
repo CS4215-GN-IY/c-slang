@@ -101,7 +101,7 @@ import {
   addProgramSymbolTableEntries,
   getArraySymbolTableEntry,
   getFunctionSymbolTableEntry,
-  getNumOfEntriesInFrame,
+  getSizeOfFrameInBytes,
   getSymbolTableEntry,
   getSymbolTableEntryInFrame,
   isArraySymbolTableEntry,
@@ -194,14 +194,25 @@ const compilers: CompilerMapping = {
     } else {
       compile(node.right, instructions, symbolTable, labelFrame);
     }
-    let unaryAddressExpression;
     if (isUnaryExpression(node.left) && node.left.operator === '*') {
       // If assigning to a pointer, simply remove one layer of indirection.
-      unaryAddressExpression = node.left.operand;
+      // TODO: Figure this out properly.
+      if (!isIdentifier(node.left.operand)) {
+        throw new BrokenInvariantError();
+      }
+      const symbolTableEntry = getSymbolTableEntry(
+        node.left.operand.name,
+        symbolTable
+      );
+      if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
+        throw new BrokenInvariantError();
+      }
+      const loadSymbolInstr = constructLoadSymbolInstr(symbolTableEntry, true);
+      instructions.push(loadSymbolInstr);
     } else {
-      unaryAddressExpression = constructUnaryAddressExpression(node.left);
+      const unaryAddressExpression = constructUnaryAddressExpression(node.left);
+      compile(unaryAddressExpression, instructions, symbolTable, labelFrame);
     }
-    compile(unaryAddressExpression, instructions, symbolTable, labelFrame);
     const assignToAddressInstr = constructAssignToAddressInstr();
     instructions.push(assignToAddressInstr);
   },
@@ -251,18 +262,17 @@ const compilers: CompilerMapping = {
       node.callee.name,
       symbolTable
     );
-    if (functionEntry.numOfParams !== node.arguments.length) {
-      throw new InvalidCallError(
-        `Function takes in ${functionEntry.numOfParams} arguments but ${node.arguments.length} arguments were passed in.`
-      );
-    }
-
     compile(node.callee, instructions, symbolTable, labelFrame);
-    node.arguments.forEach((arg) => {
-      compile(arg, instructions, symbolTable, labelFrame);
-    });
+    for (let i = node.arguments.length - 1; i >= 0; i--) {
+      compile(node.arguments[i], instructions, symbolTable, labelFrame);
+    }
     // If the function being called is a built-in function, we simply push the CallBuiltInInstr.
     if (isBuiltinFunctionSymbolTableEntry(functionEntry)) {
+      if (functionEntry.numOfParams !== node.arguments.length) {
+        throw new InvalidCallError(
+          `Function takes in ${functionEntry.numOfParams} arguments but ${node.arguments.length} arguments were passed in.`
+        );
+      }
       const callBuiltInInstr = constructCallBuiltInInstr(
         functionEntry.name,
         node.arguments.length
@@ -270,11 +280,22 @@ const compilers: CompilerMapping = {
       instructions.push(callBuiltInInstr);
       return;
     }
+
+    // Note: This would change if/when variadic functions are supported.
+    // - There can be less param data types than arguments.
+    // - More param symbol table entries must be inserted according to the number of args.
+    if (functionEntry.paramDataTypes.length !== node.arguments.length) {
+      throw new InvalidCallError(
+        `Function takes in ${functionEntry.paramDataTypes.length} arguments but ${node.arguments.length} arguments were passed in.`
+      );
+    }
+
     const loadReturnAddressInstr = constructLoadReturnAddressInstr();
     instructions.push(loadReturnAddressInstr);
     const callInstr = constructCallInstr(
       node.arguments.length,
-      functionEntry.numOfEntriesForVariables
+      functionEntry.paramDataTypes,
+      functionEntry.totalSizeOfVariablesInBytes
     );
     instructions.push(callInstr);
   },
@@ -457,9 +478,20 @@ const compilers: CompilerMapping = {
 
     loadFunctionInstr.functionInstrAddress = instructions.length;
 
+    const symbolTableEntry = getSymbolTableEntry(
+      getNameFromDeclaratorPattern(node.id),
+      symbolTable
+    );
+    if (!isUserDeclaredFunctionSymbolTableEntry(symbolTableEntry)) {
+      throw new BrokenInvariantError(
+        'Symbol table entry should always be for a user-declared function here.'
+      );
+    }
+
     const functionSymbolTable = addFunctionSymbolTableEntries(
       node,
-      symbolTable
+      symbolTable,
+      symbolTableEntry
     );
     const newLabelFrame = constructFunctionLabelFrame(node);
     if (!isEmptyStatement(node.body)) {
@@ -472,15 +504,6 @@ const compilers: CompilerMapping = {
 
     jumpInstr.instrAddress = instructions.length;
 
-    const symbolTableEntry = getSymbolTableEntry(
-      getNameFromDeclaratorPattern(node.id),
-      symbolTable
-    );
-    if (!isUserDeclaredFunctionSymbolTableEntry(symbolTableEntry)) {
-      throw new BrokenInvariantError(
-        'Symbol table entry should always be for a user-declared function here.'
-      );
-    }
     const assignInstr = constructAssignInstr(symbolTableEntry, 1);
     instructions.push(assignInstr);
   },
@@ -509,7 +532,7 @@ const compilers: CompilerMapping = {
     if (isBuiltinFunctionSymbolTableEntry(symbolTableEntry)) {
       return;
     }
-    const loadSymbolInstr = constructLoadSymbolInstr(symbolTableEntry);
+    const loadSymbolInstr = constructLoadSymbolInstr(symbolTableEntry, false);
     instructions.push(loadSymbolInstr);
   },
   IdentifierStatement: (
@@ -608,7 +631,7 @@ const compilers: CompilerMapping = {
   ) => {
     const programSymbolTable = addProgramSymbolTableEntries(node, symbolTable);
     const enterProgramInstr = constructEnterProgramInstr(
-      getNumOfEntriesInFrame(programSymbolTable.head)
+      getSizeOfFrameInBytes(symbolTable.head)
     );
     instructions.push(enterProgramInstr);
     node.body.forEach((item) => {

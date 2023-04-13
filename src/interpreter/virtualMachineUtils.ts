@@ -6,13 +6,14 @@ import {
   UnsupportedOperatorErrorType
 } from './errors';
 import { ARBITRARY_TRUE_VALUE, FALSE_VALUE } from '../utils/constants';
-import { type Value } from './types/virtualMachine';
+import { type Value, type ValueWithDataType } from './types/virtualMachine';
 import {
   type BinaryOperator,
   UNARY_OPERATORS,
   type UnaryOperator
 } from './types/instructions';
 import { type Memory } from '../memory/memory';
+import { type DataType } from '../ast/types/dataTypes';
 
 const typeOf = (v: Value): TypeofResult => typeof v;
 const isNumber = (v: Value): v is number => typeOf(v) === 'number';
@@ -41,6 +42,17 @@ export const convertToNumber = (
     throw new TypeError('number', typeOf(number), typeErrorContext);
   }
   return number;
+};
+
+export const convertToValueWithDataType = (value: Value): ValueWithDataType => {
+  if (!isValueWithDataType(value)) {
+    throw new TypeError(
+      'Value with dataType',
+      typeOf(value),
+      TypeErrorContext.NA
+    );
+  }
+  return value;
 };
 
 export const typeCheckBinaryOperation = (
@@ -151,9 +163,6 @@ export const evaluateUnaryOperation = (
   operand: Value,
   memory: Memory
 ): Value => {
-  if (!isNumber(operand)) {
-    throw new TypeError('number', typeOf(operand), TypeErrorContext.NA);
-  }
   switch (operator) {
     case '+':
       return operand;
@@ -163,12 +172,30 @@ export const evaluateUnaryOperation = (
       return isTrue(operand) ? FALSE_VALUE : ARBITRARY_TRUE_VALUE;
     case '~':
       return ~operand;
-    case '*':
-      return memory.get(operand);
+    case '*': {
+      const valueWithDataType = convertToValueWithDataType(operand);
+      return memory.get(valueWithDataType.value, valueWithDataType.dataType);
+    }
     default:
       throw new UnsupportedOperatorError(
         operator,
         UnsupportedOperatorErrorType.UNARY
       );
   }
+};
+
+export const isValueWithDataType = (
+  value: Value
+): value is ValueWithDataType => {
+  return typeof value === 'object' && 'dataType' in value;
+};
+
+export const constructValueWithDataType = (
+  value: Value,
+  dataType: DataType
+): ValueWithDataType => {
+  return {
+    value,
+    dataType
+  };
 };

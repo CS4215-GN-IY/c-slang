@@ -1,6 +1,7 @@
 import { type Instr } from './instructions';
 import { type Memory } from '../../memory/memory';
 import { type Stack } from '../../utils/stack';
+import { type DataType } from '../../ast/types/dataTypes';
 
 export type VirtualMachineMapping = {
   [InstrType in Instr['type']]: (
@@ -15,3 +16,8 @@ export interface VirtualMachineState {
 }
 
 export type Value = any;
+
+export interface ValueWithDataType {
+  value: Value;
+  dataType: DataType;
+}

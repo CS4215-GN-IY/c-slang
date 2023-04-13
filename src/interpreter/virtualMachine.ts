@@ -1,13 +1,17 @@
 import {
+  type Value,
+  type ValueWithDataType,
   type VirtualMachineMapping,
-  type VirtualMachineState,
-  type Value
+  type VirtualMachineState
 } from './types/virtualMachine';
 import {
+  type ArrayAccessInstr,
   type AssignInstr,
+  type AssignToAddressInstr,
   type BinaryOperationInstr,
   type BreakDoneInstr,
   type BreakInstr,
+  type CallBuiltInInstr,
   type CallInstr,
   type ContinueDoneInstr,
   type ContinueInstr,
@@ -15,35 +19,41 @@ import {
   type EnterProgramInstr,
   type FallthroughDoneInstr,
   type FallthroughInstr,
-  type JumpInstr,
   type Instr,
+  type JumpInstr,
   type JumpOnFalseInstr,
   type JumpOnTrueInstr,
+  type LoadAddressInstr,
   type LoadConstantInstr,
   type LoadFunctionInstr,
+  type LoadReturnAddressInstr,
   type LoadSymbolInstr,
   type MatchCaseInstr,
   type PopInstr,
-  type TeardownInstr,
-  type UnaryOperationInstr,
-  type LoadAddressInstr,
   type TailCallInstr,
-  type LoadReturnAddressInstr,
-  type ArrayAccessInstr,
-  type AssignToAddressInstr,
-  type CallBuiltInInstr
+  type TeardownInstr,
+  type UnaryOperationInstr
 } from './types/instructions';
 import {
+  constructValueWithDataType,
   convertToAddress,
   convertToPredicate,
+  convertToValueWithDataType,
   evaluateBinaryExpression,
   evaluateUnaryOperation,
   isTrue,
+  isValueWithDataType,
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
 import { Stack } from '../utils/stack';
 import { Memory } from '../memory/memory';
 import { BUILT_INS } from './builtins';
+import {
+  constructAddressDataType,
+  FLOAT64,
+  isAddressDataType
+} from '../ast/types/dataTypes';
+import { TypeError, TypeErrorContext } from './errors';
 
 export const interpret = (instructions: Instr[]): Value => {
   const memory = new Memory(instructions, 1000, 1000, 1000);
@@ -64,16 +74,33 @@ export const interpret = (instructions: Instr[]): Value => {
 const virtualMachineEvaluators: VirtualMachineMapping = {
   ArrayAccess: (instr: ArrayAccessInstr, state: VirtualMachineState) => {
     const offset = state.stash.pop();
-    const baseAddress = state.stash.pop();
-    if (instr.isAccessingAddress) {
-      state.stash.push(
-        state.memory.getAddressByOffset(baseAddress, offset * instr.multiplier)
+    const baseStashAddress = convertToValueWithDataType(state.stash.pop());
+    if (!isAddressDataType(baseStashAddress.dataType)) {
+      throw new TypeError(
+        'Address DataType',
+        baseStashAddress.dataType.type,
+        TypeErrorContext.NA
       );
+    }
+    if (instr.isAccessingAddress) {
+      const stashAddress = constructValueWithDataType(
+        state.memory.getAddressByOffset(
+          baseStashAddress.value,
+          offset *
+            instr.multiplier *
+            baseStashAddress.dataType.valueDataType.sizeInBytes
+        ),
+        constructAddressDataType(baseStashAddress.dataType.valueDataType)
+      );
+      state.stash.push(stashAddress);
     } else {
       state.stash.push(
         state.memory.getByOffsetFromAddress(
-          baseAddress,
-          offset * instr.multiplier
+          baseStashAddress.value,
+          offset *
+            instr.multiplier *
+            baseStashAddress.dataType.valueDataType.sizeInBytes,
+          baseStashAddress.dataType.valueDataType
         )
       );
     }
@@ -83,10 +110,15 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     // TODO: Add conversion method to convert various stash values to their respective number.
     // Do this when types are supported.
     for (let i = instr.numOfItems - 1; i >= 0; i--) {
+      let stashValue = state.stash.pop();
+      if (isValueWithDataType(stashValue)) {
+        stashValue = stashValue.value;
+      }
       state.memory.setByOffset(
         instr.scope,
-        instr.offset + i,
-        state.stash.pop()
+        instr.offset + i * instr.dataTypeOfEachItem.sizeInBytes,
+        stashValue,
+        instr.dataTypeOfEachItem
       );
     }
     state.memory.moveToNextInstr();
@@ -95,9 +127,20 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     instr: AssignToAddressInstr,
     state: VirtualMachineState
   ) => {
-    const address = state.stash.pop();
+    const stashAddress = convertToValueWithDataType(state.stash.pop());
+    if (!isAddressDataType(stashAddress.dataType)) {
+      throw new TypeError(
+        'Address DataType',
+        stashAddress.dataType.type,
+        TypeErrorContext.NA
+      );
+    }
     const data = state.stash.pop();
-    state.memory.set(address, data);
+    state.memory.set(
+      stashAddress.value,
+      data,
+      stashAddress.dataType.valueDataType
+    );
     state.memory.moveToNextInstr();
   },
   BinaryOperation: (
@@ -117,16 +160,22 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.memory.moveToNextInstr();
   },
   Call: (instr: CallInstr, state: VirtualMachineState) => {
-    const returnAddress = state.stash.pop();
+    const stashReturnAddress = convertToValueWithDataType(state.stash.pop());
+    const returnAddress = convertToAddress(stashReturnAddress.value);
     // First item popped from the stash should be the arg for the first param and so on.
-    const args: Value[] = [];
+    const args: ValueWithDataType[] = [];
     for (let i = 0; i < instr.numOfArgs; i++) {
-      args.push(state.stash.pop());
+      let value: Value = state.stash.pop();
+      if (!isValueWithDataType(value)) {
+        value = constructValueWithDataType(value, instr.paramDataTypes[i]);
+      }
+      args.push(value);
     }
-    const functionInstrAddress = convertToAddress(state.stash.pop());
+    const stashFunctionAddress = convertToValueWithDataType(state.stash.pop());
+    const functionInstrAddress = convertToAddress(stashFunctionAddress.value);
     state.memory.stackFunctionCallAllocate(
       args,
-      instr.numOfEntriesForVars,
+      instr.totalSizeOfVariablesInBytes,
       returnAddress
     );
     state.memory.moveToInstr(functionInstrAddress);
@@ -151,7 +200,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   },
   Done: (instr: DoneInstr, state: VirtualMachineState) => {},
   EnterProgram: (instr: EnterProgramInstr, state: VirtualMachineState) => {
-    state.memory.dataAllocate(instr.numOfDeclarations);
+    state.memory.dataAllocate(instr.sizeOfDeclarationsInBytes);
     state.memory.moveToNextInstr();
   },
   Fallthrough: (instr: FallthroughInstr, state: VirtualMachineState) => {
@@ -184,7 +233,8 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   },
   LoadAddress: (instr: LoadAddressInstr, state: VirtualMachineState) => {
     const address = state.memory.getAddressAtOffset(instr.scope, instr.offset);
-    state.stash.push(address);
+    const stashAddress = constructValueWithDataType(address, instr.dataType);
+    state.stash.push(stashAddress);
     state.memory.moveToNextInstr();
   },
   LoadConstant: (instr: LoadConstantInstr, state: VirtualMachineState) => {
@@ -199,11 +249,22 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     instr: LoadReturnAddressInstr,
     state: VirtualMachineState
   ) => {
-    state.stash.push(state.memory.getInstrAddressByOffset(2));
+    const stashReturnAddress = constructValueWithDataType(
+      state.memory.getInstrAddressByOffset(2),
+      constructAddressDataType(FLOAT64)
+    );
+    state.stash.push(stashReturnAddress);
     state.memory.moveToNextInstr();
   },
   LoadSymbol: (instr: LoadSymbolInstr, state: VirtualMachineState) => {
-    const value = state.memory.getByOffset(instr.scope, instr.offset);
+    let value: Value = state.memory.getByOffset(
+      instr.scope,
+      instr.offset,
+      instr.dataType
+    );
+    if (isAddressDataType(instr.dataType)) {
+      value = constructValueWithDataType(value, instr.dataType.valueDataType);
+    }
     state.stash.push(value);
     state.memory.moveToNextInstr();
   },
@@ -232,7 +293,11 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
   },
   TailCall: (instr: TailCallInstr, state: VirtualMachineState) => {
     const returnAddress = state.memory.getReturnAddress();
-    state.stash.push(returnAddress);
+    const stashReturnAddress = constructValueWithDataType(
+      returnAddress,
+      constructAddressDataType(FLOAT64)
+    );
+    state.stash.push(stashReturnAddress);
     state.memory.stackFunctionCallTeardown();
     state.memory.moveToNextInstr();
   },

@@ -28,28 +28,22 @@ export const getNameFromDeclaratorPattern = (
   throw new UnsupportedDeclarationError();
 };
 
-// TODO: This method may be modified once types are introduced.
-export const getFixedNumOfEntriesOfDeclaratorPattern = (
+export const getFixedNumOfItemsOfDeclaratorPattern = (
   pattern: DeclaratorPattern
 ): number => {
   if (isIdentifier(pattern)) {
-    // Allocate 1 entry space to each identifier for now.
     return 1;
   }
 
   if (isArrayPattern(pattern)) {
-    // Allocate 1 entry space to each item in the array for now.
-    // Multiply the sizes of each array dimension to get the total array size.
     return getArrayMaxNumOfItems(pattern);
   }
 
   if (isFunctionPattern(pattern)) {
-    // Function should point to an address. An address takes 1 entry space.
     return 1;
   }
 
   if (isPointerPattern(pattern)) {
-    // Pointer should point to an address. An address takes 1 entry space.
     return 1;
   }
 
