@@ -24,12 +24,13 @@ export interface VirtualMemoryConfig {
 
 export class VirtualMemory {
   private readonly segments: Segments;
+  private readonly stack: DataViewMemoryRegion;
   private readonly heap: HeapMemoryRegion;
 
   constructor(config: VirtualMemoryConfig) {
     const text = new TextMemoryRegion(config.instructions);
     const data = new DataViewMemoryRegion(config.dataSizeInBytes);
-    const stack = new DataViewMemoryRegion(config.stackSizeInBytes);
+    this.stack = new DataViewMemoryRegion(config.stackSizeInBytes);
     this.heap = new HeapMemoryRegion(config.heapSizeInBytes);
 
     this.segments = {
@@ -44,7 +45,7 @@ export class VirtualMemory {
         config.dataSizeInBytes
       ),
       stack: new MappedMemoryRegion(
-        stack,
+        this.stack,
         config.stackBaseAddress,
         config.stackSizeInBytes
       ),
@@ -376,5 +377,13 @@ export class VirtualMemory {
     }
     const byteOffset = address - this.segments.heap.baseAddress;
     this.heap.free(byteOffset);
+  }
+
+  public displayStackBytes(): string {
+    return this.stack.displayBytes(this.segments.stack.baseAddress);
+  }
+
+  public displayHeapBytes(): string {
+    return this.heap.displayBytes(this.segments.heap.baseAddress);
   }
 }

@@ -19,7 +19,7 @@ describe('goto statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('executes identifier statement that it passes even without goto', () => {
@@ -45,7 +45,7 @@ describe('goto statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('can have same name as variable', () => {
@@ -71,6 +71,6 @@ describe('goto statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

@@ -16,12 +16,11 @@ export class Stack<T> {
     this.elements.push(element);
   }
 
-  public pop(): T {
-    const poppedElement = this.elements.pop();
-    if (poppedElement === undefined) {
+  public pop(): T | undefined {
+    if (this.size() === 0) {
       throw new Error('Cannot pop from an empty stack!');
     }
-    return poppedElement;
+    return this.elements.pop();
   }
 
   public peek(): T {

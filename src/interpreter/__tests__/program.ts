@@ -9,6 +9,6 @@ describe('program', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

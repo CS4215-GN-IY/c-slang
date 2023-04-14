@@ -17,7 +17,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -30,7 +30,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 
@@ -48,7 +48,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -61,7 +61,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 
@@ -79,7 +79,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -92,7 +92,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 
@@ -110,7 +110,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -123,7 +123,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 
@@ -141,7 +141,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -154,7 +154,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 
@@ -172,7 +172,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(largestPossibleValue);
+      expect(result.value).toEqual(largestPossibleValue);
     });
 
     test('overflows', () => {
@@ -185,7 +185,7 @@ describe('declaration type', () => {
       const ast = parse(code);
       const instructions = compileProgram(ast);
       const result = interpret(instructions);
-      expect(result).toEqual(smallestPossibleValue);
+      expect(result.value).toEqual(smallestPossibleValue);
     });
   });
 });

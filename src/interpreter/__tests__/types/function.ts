@@ -13,7 +13,7 @@ describe('function return type', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(-26);
+    expect(result.value).toEqual(-26);
   });
 
   test('casts to function return type if return value is a constant', () => {
@@ -25,6 +25,6 @@ describe('function return type', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(-26);
+    expect(result.value).toEqual(-26);
   });
 });

@@ -9,7 +9,7 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles array variable declaration', () => {
@@ -18,7 +18,7 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles array variable declaration with initializer list', () => {
@@ -27,7 +27,7 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles array variable declaration with initializer list get first item.', () => {
@@ -36,7 +36,7 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 1;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles array variable declaration with initializer list get second item.', () => {
@@ -45,7 +45,7 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles array variable declaration with initializer list get third item.', () => {
@@ -54,6 +54,6 @@ describe('variable declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

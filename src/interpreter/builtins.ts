@@ -11,9 +11,19 @@ import {
 } from './virtualMachineUtils';
 
 export const getBuiltInFunctions = (
-  memory: VirtualMemory
+  memory: VirtualMemory,
+  debugOutput: string[]
 ): Record<string, (...args: any[]) => any> => {
   return {
+    __dump_memory__: () => {
+      const stackDump = memory.displayStackBytes();
+      const heapDump = memory.displayHeapBytes();
+      debugOutput.push(
+        `Breakpoint ${
+          debugOutput.length + 1
+        }:\n========== Stack Layout ==========\n${stackDump}\n========== Heap Layout ==========\n${heapDump}`
+      );
+    },
     free: (address: number) => {
       if (isValueWithDataType(address)) {
         memory.heapFree(address.value);
@@ -32,6 +42,12 @@ export const getBuiltInFunctions = (
 
 export const getBuiltInSymbols = (): SymbolTableFrame => {
   return {
+    __dump_memory__: {
+      nameType: 'BuiltInFunction',
+      name: '__dump_memory__',
+      numOfParams: 0,
+      dataType: BUILTIN
+    },
     free: {
       nameType: 'BuiltInFunction',
       name: 'free',

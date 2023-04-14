@@ -15,7 +15,7 @@ describe('update expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 1;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles prefix ++ update', () => {
@@ -30,7 +30,7 @@ describe('update expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles postfix -- update', () => {
@@ -45,7 +45,7 @@ describe('update expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles prefix -- update', () => {
@@ -60,6 +60,6 @@ describe('update expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 0;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

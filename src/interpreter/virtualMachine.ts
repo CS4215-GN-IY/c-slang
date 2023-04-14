@@ -1,6 +1,7 @@
 import {
   type Value,
   type ValueWithDataType,
+  type ValueWithDebugOutput,
   type VirtualMachineMapping,
   type VirtualMachineState
 } from './types/virtualMachine';
@@ -71,7 +72,7 @@ const HEAP_BASE_ADDRESS = 300000;
 
 let BUILT_INS: Record<string, (...args: any[]) => any>;
 
-export const interpret = (instructions: Instr[]): Value => {
+export const interpret = (instructions: Instr[]): ValueWithDebugOutput => {
   const memoryConfig: VirtualMemoryConfig = {
     instructions,
     dataSizeInBytes: 50000,
@@ -90,7 +91,8 @@ export const interpret = (instructions: Instr[]): Value => {
     registers,
     stash
   };
-  BUILT_INS = getBuiltInFunctions(memory);
+  const debugOutput: string[] = [];
+  BUILT_INS = getBuiltInFunctions(memory, debugOutput);
   while (true) {
     const encodedInstr = state.memory.getUint64(state.registers.rip);
     const instr = decodeInstruction(encodedInstr);
@@ -101,7 +103,10 @@ export const interpret = (instructions: Instr[]): Value => {
     // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
     virtualMachineEvaluators[instr.type](instr as any, state);
   }
-  return state.stash.size() === 0 ? undefined : state.stash.peek();
+  return {
+    value: state.stash.size() === 0 ? undefined : state.stash.peek(),
+    debugOutput
+  };
 };
 
 const virtualMachineEvaluators: VirtualMachineMapping = {
@@ -266,7 +271,6 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     // Advance rbp.
     state.registers.rbp = state.registers.rsp;
-    // TODO: Handle variable sizes.
     // Advance rsp by the total size of variables.
     state.registers.rsp += instr.totalSizeOfVariablesInBytes;
 
@@ -281,9 +285,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       args.push(state.stash.pop());
     }
     const result = BUILT_INS[instr.builtInName](...args);
-    if (result !== undefined) {
-      state.stash.push(result);
-    }
+    state.stash.push(result);
     state.registers.moveToNextInstruction();
   },
   Continue: (instr: ContinueInstr, state: VirtualMachineState) => {

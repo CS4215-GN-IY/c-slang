@@ -15,7 +15,7 @@ describe('array access expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('accesses and assigns to two dimensional array', () => {
@@ -30,7 +30,7 @@ describe('array access expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('accesses and assigns to two dimensional array in several places', () => {
@@ -47,6 +47,6 @@ describe('array access expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 9;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });
