@@ -146,6 +146,7 @@ import {
   isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
+  isPointerPattern,
   isTypedefNameReturnValue,
   isTypeSpecifierReturnValue
 } from './types/typeGuards';
@@ -160,6 +161,7 @@ import {
 } from './constructors';
 import { TYPE_SPECIFIER_SEQUENCE_TO_TYPE } from './typeSpecifierSequenceToType';
 import { InvalidTypeError } from '../typeChecker/errors';
+import { constructAddressDataType } from './types/dataTypes';
 
 export class ASTBuilder implements CVisitor<any> {
   visit(tree: ParseTree): BaseNode {
@@ -1099,7 +1101,13 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
 
-    const processedDeclarator = this.visitDeclarator(declarator);
+    let processedDeclarator = this.visitDeclarator(declarator);
+    let returnsPointer = false;
+    // If the function returns a pointer, dig one level down.
+    if (isPointerPattern(processedDeclarator)) {
+      processedDeclarator = processedDeclarator.pattern;
+      returnsPointer = true;
+    }
     if (!isFunctionPattern(processedDeclarator)) {
       throw new BrokenInvariantError(
         'Encountered an invalid Declarator for a FunctionDefinition'
@@ -1126,6 +1134,11 @@ export class ASTBuilder implements CVisitor<any> {
       if (returnDataType === undefined) {
         throw new InvalidTypeError(typeSpecifierSequence);
       }
+    }
+
+    // Handle pointers as return value.
+    if (returnsPointer) {
+      returnDataType = constructAddressDataType(returnDataType);
     }
 
     return {

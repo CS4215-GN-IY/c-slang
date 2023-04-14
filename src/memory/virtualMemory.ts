@@ -1,8 +1,15 @@
 import { MappedMemoryRegion } from './mappedMemoryRegion';
-import { OverlappingMemoryRegionsError, SegmentationFault } from './errors';
+import {
+  InvalidPointerError,
+  OverlappingMemoryRegionsError,
+  SegmentationFault
+} from './errors';
 import { type Segments } from './types';
 import { type Instr } from '../interpreter/types/instructions';
 import { type DataType } from '../ast/types/dataTypes';
+import { TextMemoryRegion } from './textMemoryRegion';
+import { DataViewMemoryRegion } from './dataViewMemoryRegion';
+import { HeapMemoryRegion } from './heapMemoryRegion';
 
 export interface VirtualMemoryConfig {
   instructions: Instr[];
@@ -17,29 +24,35 @@ export interface VirtualMemoryConfig {
 
 export class VirtualMemory {
   private readonly segments: Segments;
+  private readonly heap: HeapMemoryRegion;
 
   constructor(config: VirtualMemoryConfig) {
+    const text = new TextMemoryRegion(config.instructions);
+    const data = new DataViewMemoryRegion(config.dataSizeInBytes);
+    const stack = new DataViewMemoryRegion(config.stackSizeInBytes);
+    this.heap = new HeapMemoryRegion(config.heapSizeInBytes);
+
     this.segments = {
-      text: new MappedMemoryRegion({
-        type: 'Text',
-        baseAddress: config.textBaseAddress,
-        instructions: config.instructions
-      }),
-      data: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.dataBaseAddress,
-        sizeInBytes: config.dataSizeInBytes
-      }),
-      stack: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.stackBaseAddress,
-        sizeInBytes: config.stackSizeInBytes
-      }),
-      heap: new MappedMemoryRegion({
-        type: 'DataView',
-        baseAddress: config.heapBaseAddress,
-        sizeInBytes: config.heapSizeInBytes
-      })
+      text: new MappedMemoryRegion(
+        text,
+        config.textBaseAddress,
+        text.sizeInBytes
+      ),
+      data: new MappedMemoryRegion(
+        data,
+        config.dataBaseAddress,
+        config.dataSizeInBytes
+      ),
+      stack: new MappedMemoryRegion(
+        stack,
+        config.stackBaseAddress,
+        config.stackSizeInBytes
+      ),
+      heap: new MappedMemoryRegion(
+        this.heap,
+        config.heapBaseAddress,
+        config.heapSizeInBytes
+      )
     };
 
     this.checkMemoryRegionsDoNotOverlap();
@@ -346,5 +359,22 @@ export class VirtualMemory {
   public getFloat64(address: number): number {
     const memoryRegion = this.getMappedMemoryRegion(address, 8);
     return memoryRegion.getFloat64(address);
+  }
+
+  public heapAllocate(sizeInBytes: number): number {
+    const baseAddress = this.heap.allocate(sizeInBytes);
+    // If the allocated address is -1, allocation failed.
+    if (baseAddress === -1) {
+      return -1;
+    }
+    return baseAddress + this.segments.heap.baseAddress;
+  }
+
+  public heapFree(address: number): void {
+    if (!this.segments.heap.containsAddress(address)) {
+      throw new InvalidPointerError();
+    }
+    const byteOffset = address - this.segments.heap.baseAddress;
+    this.heap.free(byteOffset);
   }
 }

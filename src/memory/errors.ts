@@ -36,3 +36,9 @@ export class SegmentationFault extends MemoryError {
 }
 
 export class InvalidSegmentError extends MemoryError {}
+
+export class InvalidPointerError extends MemoryError {
+  constructor() {
+    super('Invalid pointer: Unable to free non-heap region of memory.');
+  }
+}
