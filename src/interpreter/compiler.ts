@@ -63,6 +63,7 @@ import {
   constructTailCallInstr,
   constructTeardownInstr,
   constructUnaryOperationInstr,
+  isLoadConstantInstr,
   isLoadReturnAddressInstr,
   isLoadSymbolInstr,
   PLACEHOLDER_ADDRESS
@@ -111,7 +112,10 @@ import {
   isVariableSymbolTableEntry
 } from './symbolTable';
 import { type Instr, type JumpOnFalseInstr } from './types/instructions';
-import { getNameFromDeclaratorPattern } from './compilerUtils';
+import {
+  castConstantToDataType,
+  getNameFromDeclaratorPattern
+} from './compilerUtils';
 import {
   addBlockLabelFrameEntries,
   constructFunctionLabelFrame,
@@ -652,15 +656,20 @@ const compilers: CompilerMapping = {
   ) => {
     if (isNotUndefined(node.argument)) {
       compile(node.argument, instructions, symbolTable, labelFrame);
+      if (symbolTable.parent === null) {
+        throw new BrokenInvariantError(
+          'Return statements must be inside a function.'
+        );
+      }
       // If returning a symbol, set its type to the function's return type.
       const lastInstr = instructions[instructions.length - 1];
       if (isLoadSymbolInstr(lastInstr)) {
-        if (symbolTable.parent === null) {
-          throw new BrokenInvariantError(
-            'Return statements must be inside a function.'
-          );
-        }
         lastInstr.dataType = symbolTable.parent.returnDataType;
+      } else if (isLoadConstantInstr(lastInstr)) {
+        lastInstr.value = castConstantToDataType(
+          lastInstr.value,
+          symbolTable.parent.returnDataType
+        );
       }
     }
     // Perform a tail call if the last instruction is a CallInstr.

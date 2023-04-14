@@ -216,3 +216,9 @@ export const isLoadReturnAddressInstr = (
 export const isLoadSymbolInstr = (instr: Instr): instr is LoadSymbolInstr => {
   return instr.type === 'LoadSymbol';
 };
+
+export const isLoadConstantInstr = (
+  instr: Instr
+): instr is LoadConstantInstr => {
+  return instr.type === 'LoadConstant';
+};
