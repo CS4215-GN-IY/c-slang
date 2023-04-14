@@ -20,7 +20,7 @@ describe('heap', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4215;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles free', () => {
@@ -40,7 +40,7 @@ describe('heap', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = undefined;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('throws error when trying to free non-heap memory', () => {

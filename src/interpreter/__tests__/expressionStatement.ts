@@ -13,6 +13,6 @@ describe('expression statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = undefined;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

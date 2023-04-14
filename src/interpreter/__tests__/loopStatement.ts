@@ -17,7 +17,7 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles return in for loop', () => {
@@ -34,7 +34,7 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles for loop without init declaration', () => {
@@ -52,7 +52,7 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles for loop without init', () => {
@@ -70,7 +70,7 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles for loop without condition', () => {
@@ -88,7 +88,7 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles for loop without update', () => {
@@ -106,6 +106,6 @@ describe('loop statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

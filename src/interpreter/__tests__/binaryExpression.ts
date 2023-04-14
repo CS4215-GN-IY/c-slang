@@ -10,7 +10,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary - expression', () => {
@@ -19,7 +19,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary * expression', () => {
@@ -28,7 +28,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 56;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary / expression', () => {
@@ -37,7 +37,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary % expression', () => {
@@ -46,7 +46,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 0;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary <= expression expecting false', () => {
@@ -54,7 +54,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary <= expression when equal expecting true', () => {
@@ -62,7 +62,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary <= expression when less expecting true', () => {
@@ -70,7 +70,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary < expression expecting false', () => {
@@ -78,7 +78,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary < expression when equal expecting false', () => {
@@ -86,7 +86,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary < expression when less expecting true', () => {
@@ -94,7 +94,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary > expression expecting false', () => {
@@ -102,7 +102,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary > expression when equal expecting false', () => {
@@ -110,7 +110,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary <= expression when more expecting true', () => {
@@ -118,7 +118,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary >= expression expecting false', () => {
@@ -126,7 +126,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary >= expression when equal expecting true', () => {
@@ -134,7 +134,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary >= expression when more expecting true', () => {
@@ -142,7 +142,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary & expression', () => {
@@ -151,7 +151,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary | expression', () => {
@@ -160,7 +160,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 15;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary ^ expression', () => {
@@ -169,7 +169,7 @@ describe('binary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 10;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary == expression expecting true', () => {
@@ -177,7 +177,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 
   test('handles binary == expression expecting false', () => {
@@ -185,7 +185,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary != expression expecting false', () => {
@@ -193,7 +193,7 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles binary != expression expecting true', () => {
@@ -201,6 +201,6 @@ describe('binary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 });

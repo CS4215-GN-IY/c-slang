@@ -15,7 +15,7 @@ describe('unary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = -2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles unary + operation', () => {
@@ -29,7 +29,7 @@ describe('unary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles unary ~ operation', () => {
@@ -43,7 +43,7 @@ describe('unary expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = -6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles unary ! operation when operand is true', () => {
@@ -56,7 +56,7 @@ describe('unary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).toEqual(FALSE_VALUE);
+    expect(result.value).toEqual(FALSE_VALUE);
   });
 
   test('handles unary ! operation when operand is false', () => {
@@ -69,6 +69,6 @@ describe('unary expression', () => {
     const ast = parse(code);
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
-    expect(result).not.toEqual(FALSE_VALUE);
+    expect(result.value).not.toEqual(FALSE_VALUE);
   });
 });

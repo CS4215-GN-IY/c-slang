@@ -18,7 +18,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 1;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in block in while loop', () => {
@@ -38,7 +38,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in do while loop', () => {
@@ -56,7 +56,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 1;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in block in do while loop', () => {
@@ -76,7 +76,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in for loop', () => {
@@ -94,7 +94,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 1;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in block in for loop', () => {
@@ -114,7 +114,7 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles break statement in switch statement', () => {
@@ -143,6 +143,6 @@ describe('break statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

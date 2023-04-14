@@ -10,7 +10,7 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
+    expect(result.value).not.toEqual(falseVal);
   });
 
   test('handles logical and expression whose left side is false', () => {
@@ -19,7 +19,7 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
+    expect(result.value).toEqual(falseVal);
   });
 
   test('handles logical and expression whose right side is false', () => {
@@ -28,7 +28,7 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
+    expect(result.value).toEqual(falseVal);
   });
 
   test('handles logical or expression whose left side is true', () => {
@@ -37,7 +37,7 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
+    expect(result.value).not.toEqual(falseVal);
   });
 
   test('handles logical or expression whose right side is true', () => {
@@ -46,7 +46,7 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).not.toEqual(falseVal);
+    expect(result.value).not.toEqual(falseVal);
   });
 
   test('handles logical or expression that is false', () => {
@@ -55,6 +55,6 @@ describe('logical expression', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const falseVal = FALSE_VALUE;
-    expect(result).toEqual(falseVal);
+    expect(result.value).toEqual(falseVal);
   });
 });

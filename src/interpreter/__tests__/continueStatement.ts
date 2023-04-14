@@ -19,7 +19,7 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 2;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('in block in while loop', () => {
@@ -40,7 +40,7 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('in do while loop', () => {
@@ -59,7 +59,7 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('in block in do while loop', () => {
@@ -80,7 +80,7 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('in for loop', () => {
@@ -99,7 +99,7 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('in block in for loop', () => {
@@ -120,6 +120,6 @@ describe('continue statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 5;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

@@ -9,7 +9,7 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles return with no argument', () => {
@@ -30,7 +30,7 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles function with no return statement', () => {
@@ -50,7 +50,7 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 3;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles tail call', () => {
@@ -73,7 +73,7 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles recursion', () => {
@@ -93,7 +93,7 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 24;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles several function calls', () => {
@@ -118,6 +118,6 @@ describe('return statement', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 120;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

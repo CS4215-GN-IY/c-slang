@@ -11,9 +11,16 @@ import {
 } from './virtualMachineUtils';
 
 export const getBuiltInFunctions = (
-  memory: VirtualMemory
+  memory: VirtualMemory,
+  debugOutput: string[]
 ): Record<string, (...args: any[]) => any> => {
   return {
+    __dump_memory__: () => {
+      const stackDump = memory.displayStackBytes();
+      debugOutput.push(`========== Stack Layout ==========\n${stackDump}`);
+      const heapDump = memory.displayHeapBytes();
+      debugOutput.push(`========== Heap Layout ==========\n${heapDump}`);
+    },
     free: (address: number) => {
       if (isValueWithDataType(address)) {
         memory.heapFree(address.value);

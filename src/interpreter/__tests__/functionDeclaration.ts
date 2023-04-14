@@ -17,7 +17,7 @@ describe('function declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4215;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles unary functions', () => {
@@ -34,7 +34,7 @@ describe('function declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4215;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles binary functions (& passes arguments in the correct order)', () => {
@@ -51,7 +51,7 @@ describe('function declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 4215;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 
   test('handles pointers as function arguments', () => {
@@ -72,6 +72,6 @@ describe('function declaration', () => {
     const instructions = compileProgram(ast);
     const result = interpret(instructions);
     const expectedResult = 6;
-    expect(result).toEqual(expectedResult);
+    expect(result.value).toEqual(expectedResult);
   });
 });

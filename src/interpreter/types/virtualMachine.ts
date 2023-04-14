@@ -23,3 +23,8 @@ export interface ValueWithDataType {
   value: Value;
   dataType: DataType;
 }
+
+export interface ValueWithDebugOutput {
+  value: Value;
+  debugOutput: string[];
+}
