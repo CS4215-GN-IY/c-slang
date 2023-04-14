@@ -1,5 +1,5 @@
 import { parse } from '../parser/parser';
-import { type Value } from '../interpreter/types/virtualMachine';
+import { type ValueWithDebugOutput } from '../interpreter/types/virtualMachine';
 import { compileProgram } from '../interpreter/compiler';
 import { interpret } from '../interpreter/virtualMachine';
 
@@ -8,9 +8,12 @@ import { interpret } from '../interpreter/virtualMachine';
  *
  * @param code The C code to be run.
  */
-export const run = async (code: string): Promise<Value> => {
+export const run = async (code: string): Promise<ValueWithDebugOutput> => {
   return await new Promise(
-    (resolve: (value: Value) => void, reject: (reason?: any) => void) => {
+    (
+      resolve: (value: ValueWithDebugOutput) => void,
+      reject: (reason?: any) => void
+    ) => {
       try {
         const ast = parse(code);
         const instructions = compileProgram(ast);

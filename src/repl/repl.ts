@@ -1,7 +1,10 @@
 import { start } from 'repl';
 import { type Context } from 'vm';
 import { run } from '../runner/runner';
-import { type Value } from '../interpreter/types/virtualMachine';
+import {
+  type Value,
+  type ValueWithDebugOutput
+} from '../interpreter/types/virtualMachine';
 
 const startRepl = (): void => {
   start({
@@ -12,8 +15,8 @@ const startRepl = (): void => {
       callback: (err: Error | null, result: Value) => void
     ) => {
       void run(replInput)
-        .then((result: Value) => {
-          callback(null, result);
+        .then((result: ValueWithDebugOutput) => {
+          callback(null, result.value);
         })
         .catch((err) => {
           callback(err.message, undefined);
