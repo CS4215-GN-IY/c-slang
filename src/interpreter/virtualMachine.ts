@@ -46,7 +46,6 @@ import {
   typeCheckBinaryOperation
 } from './virtualMachineUtils';
 import { Stack } from '../utils/stack';
-import { BUILT_INS } from './builtins';
 import {
   VirtualMemory,
   type VirtualMemoryConfig
@@ -63,11 +62,14 @@ import {
   FLOAT64,
   isAddressDataType
 } from '../ast/types/dataTypes';
+import { getBuiltInFunctions } from './builtins';
 
 const TEXT_BASE_ADDRESS = 0;
 const DATA_BASE_ADDRESS = 100000;
 const STACK_BASE_ADDRESS = 200000;
 const HEAP_BASE_ADDRESS = 300000;
+
+let BUILT_INS: Record<string, (...args: any[]) => any>;
 
 export const interpret = (instructions: Instr[]): Value => {
   const memoryConfig: VirtualMemoryConfig = {
@@ -88,6 +90,7 @@ export const interpret = (instructions: Instr[]): Value => {
     registers,
     stash
   };
+  BUILT_INS = getBuiltInFunctions(memory);
   while (true) {
     const encodedInstr = state.memory.getUint64(state.registers.rip);
     const instr = decodeInstruction(encodedInstr);
