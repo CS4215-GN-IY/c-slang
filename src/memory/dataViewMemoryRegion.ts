@@ -103,7 +103,7 @@ export class DataViewMemoryRegion extends MemoryRegion {
         if (lastNonZeroLine === i - 2) {
           hexDump += `0x${(startAddress + (i - 1) * 8).toString(
             16
-          )}\t: 00 00 00 00 00 00 00 00`;
+          )}\t: 00 00 00 00 00 00 00 00\n`;
         } else if (lastNonZeroLine < i - 2) {
           hexDump += `0x${(startAddress + (lastNonZeroLine + 1) * 8).toString(
             16
