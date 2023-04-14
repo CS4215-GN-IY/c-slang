@@ -2,11 +2,13 @@ import { MemoryRegion } from './memoryRegion';
 
 export class DataViewMemoryRegion extends MemoryRegion {
   private readonly dataView: DataView;
+  private readonly sizeInBytes: number;
 
   public constructor(sizeInBytes: number) {
     super();
     const buffer = new ArrayBuffer(sizeInBytes);
     this.dataView = new DataView(buffer);
+    this.sizeInBytes = sizeInBytes;
   }
 
   public setInt8(byteOffset: number, value: number): void {
@@ -87,5 +89,36 @@ export class DataViewMemoryRegion extends MemoryRegion {
 
   public getFloat64(byteOffset: number): number {
     return this.dataView.getFloat64(byteOffset);
+  }
+
+  public displayBytes(startAddress: number): string {
+    let hexDump = '';
+    let lastNonZeroLine = 0;
+    for (let i = 0; i < this.sizeInBytes; i += 8) {
+      const value = this.dataView.getBigUint64(i);
+      if (value === BigInt(0) && i + 8 < this.sizeInBytes) {
+        continue;
+      }
+      if (lastNonZeroLine !== i - 1) {
+        if (lastNonZeroLine === i - 2) {
+          hexDump += `0x${(startAddress + i - 1).toString(
+            16
+          )}\t: 00 00 00 00 00 00 00 00`;
+        } else if (lastNonZeroLine < i - 2) {
+          hexDump += `0x${(startAddress + lastNonZeroLine + 1).toString(
+            16
+          )}\t: 00 00 00 00 00 00 00 00\n`;
+          hexDump += `<Repeated ${i / 8 - lastNonZeroLine - 2} times>\n`;
+          hexDump += `0x${(startAddress + i - 1).toString(
+            16
+          )}\t: 00 00 00 00 00 00 00 00\n`;
+        }
+      }
+      lastNonZeroLine = i;
+      const bytes = value.toString(16).padStart(16, '0');
+      const bytesWithSpaces = bytes.replace(/\d{2}(?=.)/g, '$& ');
+      hexDump += `0x${(startAddress + i).toString(16)}\t: ${bytesWithSpaces}\n`;
+    }
+    return hexDump;
   }
 }

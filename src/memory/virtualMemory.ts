@@ -377,4 +377,8 @@ export class VirtualMemory {
     const byteOffset = address - this.segments.heap.baseAddress;
     this.heap.free(byteOffset);
   }
+
+  public displayHeapBytes(): string {
+    return this.heap.displayBytes(this.segments.heap.baseAddress);
+  }
 }
