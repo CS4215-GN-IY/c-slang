@@ -7,6 +7,7 @@ test('dump memory', () => {
         int* f() {
             int *p = malloc(32);
             *p = 4215;
+            __dump_memory__();
             return p;
         }
 
@@ -20,5 +21,5 @@ test('dump memory', () => {
   const ast = parse(code);
   const instructions = compileProgram(ast);
   const result = interpret(instructions);
-  expect(result.debugOutput.length).toEqual(2);
+  expect(result.debugOutput.length).toEqual(3);
 });

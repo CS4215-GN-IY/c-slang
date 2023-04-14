@@ -271,7 +271,6 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
     // Advance rbp.
     state.registers.rbp = state.registers.rsp;
-    // TODO: Handle variable sizes.
     // Advance rsp by the total size of variables.
     state.registers.rsp += instr.totalSizeOfVariablesInBytes;
 
@@ -286,9 +285,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
       args.push(state.stash.pop());
     }
     const result = BUILT_INS[instr.builtInName](...args);
-    if (result !== undefined) {
-      state.stash.push(result);
-    }
+    state.stash.push(result);
     state.registers.moveToNextInstruction();
   },
   Continue: (instr: ContinueInstr, state: VirtualMachineState) => {
