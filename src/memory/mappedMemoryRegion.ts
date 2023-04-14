@@ -23,6 +23,10 @@ export class MappedMemoryRegion {
     return this.baseAddress + this.sizeInBytes;
   }
 
+  public containsAddress(address: number): boolean {
+    return this.containsAddressRange(address, 1);
+  }
+
   public containsAddressRange(address: number, sizeInBytes: number): boolean {
     return (
       address >= this.baseAddress && address + sizeInBytes <= this.topAddress
