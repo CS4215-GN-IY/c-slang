@@ -17,9 +17,12 @@ export const getBuiltInFunctions = (
   return {
     __dump_memory__: () => {
       const stackDump = memory.displayStackBytes();
-      debugOutput.push(`========== Stack Layout ==========\n${stackDump}`);
       const heapDump = memory.displayHeapBytes();
-      debugOutput.push(`========== Heap Layout ==========\n${heapDump}`);
+      debugOutput.push(
+        `Breakpoint ${
+          debugOutput.length + 1
+        }:\n========== Stack Layout ==========\n${stackDump}\n========== Heap Layout ==========\n${heapDump}`
+      );
     },
     free: (address: number) => {
       if (isValueWithDataType(address)) {
@@ -39,6 +42,12 @@ export const getBuiltInFunctions = (
 
 export const getBuiltInSymbols = (): SymbolTableFrame => {
   return {
+    __dump_memory__: {
+      nameType: 'BuiltInFunction',
+      name: '__dump_memory__',
+      numOfParams: 0,
+      dataType: BUILTIN
+    },
     free: {
       nameType: 'BuiltInFunction',
       name: 'free',
