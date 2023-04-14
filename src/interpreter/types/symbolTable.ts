@@ -1,3 +1,5 @@
+import { type DataType } from '../../ast/types/dataTypes';
+
 export interface SymbolTable {
   head: SymbolTableFrame;
   tail: SymbolTable | null;
@@ -19,6 +21,7 @@ export interface BaseSymbolTableEntry {
   // make use of TypeScript's discriminated unions.
   nameType: string;
   name: string;
+  dataType: DataType;
 }
 
 export interface BaseSymbolTableEntryWithAddress extends BaseSymbolTableEntry {
@@ -35,8 +38,9 @@ export interface ArraySymbolTableEntry extends BaseSymbolTableEntryWithAddress {
 export interface UserDeclaredFunctionSymbolTableEntry
   extends BaseSymbolTableEntryWithAddress {
   nameType: 'UserDeclaredFunction';
-  numOfParams: number;
-  numOfEntriesForVariables: number;
+  paramDataTypes: DataType[];
+  returnDataType: DataType;
+  totalSizeOfVariablesInBytes: number;
 }
 
 export interface BuiltInFunctionSymbolTableEntry extends BaseSymbolTableEntry {

@@ -1,5 +1,6 @@
 import { type Segment } from '../../memory/segment';
 import { type Value } from './virtualMachine';
+import { type DataType } from '../../ast/types/dataTypes';
 
 interface BaseInstr {
   type: string;
@@ -45,6 +46,7 @@ export interface AssignInstr extends BaseInstr {
   scope: Segment;
   offset: number;
   numOfItems: number;
+  dataTypeOfEachItem: DataType;
 }
 
 export interface AssignToAddressInstr extends BaseInstr {
@@ -67,7 +69,8 @@ export interface BreakDoneInstr extends BaseInstr {
 export interface CallInstr extends BaseInstr {
   type: 'Call';
   numOfArgs: number;
-  numOfEntriesForVars: number;
+  paramDataTypes: DataType[];
+  totalSizeOfVariablesInBytes: number;
 }
 
 export interface CallBuiltInInstr extends BaseInstr {
@@ -90,7 +93,7 @@ export interface DoneInstr extends BaseInstr {
 
 export interface EnterProgramInstr extends BaseInstr {
   type: 'EnterProgram';
-  numOfDeclarations: number;
+  sizeOfDeclarationsInBytes: number;
 }
 
 export interface FallthroughInstr extends BaseInstr {
@@ -120,6 +123,7 @@ export interface LoadAddressInstr extends BaseInstr {
   type: 'LoadAddress';
   scope: Segment;
   offset: number;
+  dataType: DataType;
 }
 
 export interface LoadConstantInstr extends BaseInstr {
@@ -140,6 +144,7 @@ export interface LoadSymbolInstr extends BaseInstr {
   type: 'LoadSymbol';
   scope: Segment;
   offset: number;
+  dataType: DataType;
 }
 
 export interface MatchCaseInstr extends BaseInstr {

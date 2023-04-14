@@ -2,6 +2,7 @@ import { MappedMemoryRegion } from './mappedMemoryRegion';
 import { OverlappingMemoryRegionsError, SegmentationFault } from './errors';
 import { type Segments } from './types';
 import { type Instr } from '../interpreter/types/instructions';
+import { type DataType } from '../ast/types/dataTypes';
 
 export interface VirtualMemoryConfig {
   instructions: Instr[];
@@ -73,6 +74,178 @@ export class VirtualMemory {
       }
     }
     throw new SegmentationFault(address, sizeInBytes);
+  }
+
+  private setSignedInteger(
+    sizeInBytes: number,
+    address: number,
+    value: number
+  ): void {
+    switch (sizeInBytes) {
+      case 1:
+        this.setInt8(address, value);
+        break;
+      case 2:
+        this.setInt16(address, value);
+        break;
+      case 4:
+        this.setInt32(address, value);
+        break;
+      case 8:
+        this.setInt64(address, BigInt(value));
+        break;
+      default:
+        throw new TypeError(
+          `Encountered invalid signed integer size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  private setUnsignedInteger(
+    sizeInBytes: number,
+    address: number,
+    value: number
+  ): void {
+    switch (sizeInBytes) {
+      case 1:
+        this.setUint8(address, value);
+        break;
+      case 2:
+        this.setUint16(address, value);
+        break;
+      case 4:
+        this.setUint32(address, value);
+        break;
+      case 8:
+        this.setUint64(address, BigInt(value));
+        break;
+      default:
+        throw new TypeError(
+          `Encountered invalid unsigned integer size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  public setFloat(sizeInBytes: number, address: number, value: number): void {
+    switch (sizeInBytes) {
+      case 4:
+        this.setFloat32(address, value);
+        break;
+      case 8:
+        this.setFloat64(address, value);
+        break;
+      default:
+        throw new TypeError(
+          `Encountered invalid floating point size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  public setAddress(sizeInBytes: number, address: number, value: number): void {
+    switch (sizeInBytes) {
+      case 8:
+        this.setFloat64(address, value);
+        break;
+      default:
+        throw new TypeError(`Encountered invalid address size: ${sizeInBytes}`);
+    }
+  }
+
+  public set(dataType: DataType, address: number, value: number): void {
+    switch (dataType.type) {
+      case 'Integer':
+        if (dataType.isSigned) {
+          this.setSignedInteger(dataType.sizeInBytes, address, value);
+        } else {
+          this.setUnsignedInteger(dataType.sizeInBytes, address, value);
+        }
+        break;
+      case 'FloatingPoint':
+        this.setFloat(dataType.sizeInBytes, address, value);
+        break;
+      case 'Address':
+        this.setAddress(dataType.sizeInBytes, address, value);
+        break;
+      default:
+        throw new TypeError(`Encountered unknown type: ${dataType.type}`);
+    }
+  }
+
+  private getSignedInteger(sizeInBytes: number, address: number): number {
+    switch (sizeInBytes) {
+      case 1:
+        return this.getInt8(address);
+      case 2:
+        return this.getInt16(address);
+      case 4:
+        return this.getInt32(address);
+      case 8:
+        // FIXME: Not all 64-bit values can be represented because JavaScript's 'number' type
+        //        makes use of the IEEE 754 representation. Only 53-bit values can be represented.
+        return Number(this.getInt64(address));
+      default:
+        throw new TypeError(
+          `Encountered invalid signed integer size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  private getUnsignedInteger(sizeInBytes: number, address: number): number {
+    switch (sizeInBytes) {
+      case 1:
+        return this.getUint8(address);
+      case 2:
+        return this.getUint16(address);
+      case 4:
+        return this.getUint32(address);
+      case 8:
+        // FIXME: Not all 64-bit values can be represented because JavaScript's 'number' type
+        //        makes use of the IEEE 754 representation. Only 53-bit values can be represented.
+        return Number(this.getUint64(address));
+      default:
+        throw new TypeError(
+          `Encountered invalid unsigned integer size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  public getFloat(sizeInBytes: number, address: number): number {
+    switch (sizeInBytes) {
+      case 4:
+        return this.getFloat32(address);
+      case 8:
+        return this.getFloat64(address);
+      default:
+        throw new TypeError(
+          `Encountered invalid floating point size: ${sizeInBytes}`
+        );
+    }
+  }
+
+  public getAddress(sizeInBytes: number, address: number): number {
+    switch (sizeInBytes) {
+      case 8:
+        return this.getFloat64(address);
+      default:
+        throw new TypeError(`Encountered invalid address size: ${sizeInBytes}`);
+    }
+  }
+
+  public get(dataType: DataType, address: number): number {
+    switch (dataType.type) {
+      case 'Integer':
+        if (dataType.isSigned) {
+          return this.getSignedInteger(dataType.sizeInBytes, address);
+        } else {
+          return this.getUnsignedInteger(dataType.sizeInBytes, address);
+        }
+      case 'FloatingPoint':
+        return this.getFloat(dataType.sizeInBytes, address);
+      case 'Address':
+        return this.getAddress(dataType.sizeInBytes, address);
+      default:
+        throw new TypeError(`Encountered unknown type: ${dataType.type}`);
+    }
   }
 
   public setInt8(address: number, value: number): void {

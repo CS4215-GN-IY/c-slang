@@ -1,11 +1,18 @@
-export type DataType = IntegerDataType | FloatingPointDataType | VoidDataType;
+export type DataType =
+  | AddressDataType
+  | BuiltInDataType
+  | IntegerDataType
+  | FloatingPointDataType
+  | VoidDataType;
 
 export interface VoidDataType {
   type: 'Void';
+  sizeInBytes: number;
 }
 
 export const VOID: VoidDataType = {
-  type: 'Void'
+  type: 'Void',
+  sizeInBytes: 0
 };
 
 export interface IntegerDataType {
@@ -75,4 +82,36 @@ export const FLOAT32: FloatingPointDataType = {
 export const FLOAT64: FloatingPointDataType = {
   type: 'FloatingPoint',
   sizeInBytes: 8
+};
+
+export interface AddressDataType {
+  type: 'Address';
+  sizeInBytes: 8;
+  valueDataType: DataType;
+}
+
+export const ADDRESS_SIZE_IN_BYTES = 8;
+
+export const constructAddressDataType = (
+  valueDataType: DataType
+): AddressDataType => ({
+  type: 'Address',
+  sizeInBytes: ADDRESS_SIZE_IN_BYTES,
+  valueDataType
+});
+
+export const isAddressDataType = (
+  dataType: DataType
+): dataType is AddressDataType => {
+  return dataType.type === 'Address';
+};
+
+export interface BuiltInDataType {
+  type: 'Builtin';
+  sizeInBytes: 0;
+}
+
+export const BUILTIN: BuiltInDataType = {
+  type: 'Builtin',
+  sizeInBytes: 0
 };

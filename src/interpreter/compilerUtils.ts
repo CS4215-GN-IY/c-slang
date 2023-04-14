@@ -9,6 +9,20 @@ import {
 } from '../ast/types/typeGuards';
 import { UnsupportedArrayError, UnsupportedDeclarationError } from './errors';
 import { isNumber } from '../utils/typeGuards';
+import { type Value } from './types/virtualMachine';
+import {
+  type DataType,
+  FLOAT32,
+  FLOAT64,
+  INT16,
+  INT32,
+  INT64,
+  INT8,
+  UINT16,
+  UINT32,
+  UINT64,
+  UINT8
+} from '../ast/types/dataTypes';
 
 export const getNameFromDeclaratorPattern = (
   pattern: DeclaratorPattern
@@ -28,28 +42,22 @@ export const getNameFromDeclaratorPattern = (
   throw new UnsupportedDeclarationError();
 };
 
-// TODO: This method may be modified once types are introduced.
-export const getFixedNumOfEntriesOfDeclaratorPattern = (
+export const getFixedNumOfItemsOfDeclaratorPattern = (
   pattern: DeclaratorPattern
 ): number => {
   if (isIdentifier(pattern)) {
-    // Allocate 1 entry space to each identifier for now.
     return 1;
   }
 
   if (isArrayPattern(pattern)) {
-    // Allocate 1 entry space to each item in the array for now.
-    // Multiply the sizes of each array dimension to get the total array size.
     return getArrayMaxNumOfItems(pattern);
   }
 
   if (isFunctionPattern(pattern)) {
-    // Function should point to an address. An address takes 1 entry space.
     return 1;
   }
 
   if (isPointerPattern(pattern)) {
-    // Pointer should point to an address. An address takes 1 entry space.
     return 1;
   }
 
@@ -83,4 +91,32 @@ export const getArrayPatternMultipliers = (pattern: ArrayPattern): number[] => {
     multipliers.push(multipliers[multipliers.length - 1] * dimensionSizes[i]);
   }
   return multipliers.reverse();
+};
+
+export const castConstantToDataType = (
+  value: Value,
+  dataType: DataType
+): Value => {
+  if (dataType === INT8) {
+    return new Int8Array([value])[0];
+  } else if (dataType === UINT8) {
+    return new Uint8Array([value])[0];
+  } else if (dataType === INT16) {
+    return new Int16Array([value])[0];
+  } else if (dataType === UINT16) {
+    return new Uint16Array([value])[0];
+  } else if (dataType === INT32) {
+    return new Int32Array([value])[0];
+  } else if (dataType === UINT32) {
+    return new Uint32Array([value])[0];
+  } else if (dataType === INT64) {
+    return Number(new BigInt64Array([value])[0]);
+  } else if (dataType === UINT64) {
+    return Number(new BigUint64Array([value])[0]);
+  } else if (dataType === FLOAT32) {
+    return new Float32Array([value])[0];
+  } else if (dataType === FLOAT64) {
+    return new Float64Array([value])[0];
+  }
+  return value;
 };
