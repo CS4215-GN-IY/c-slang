@@ -146,6 +146,7 @@ import {
   isArrayAccessExpression,
   isArrayPattern,
   isFunctionPattern,
+  isPointerPattern,
   isTypedefNameReturnValue,
   isTypeSpecifierReturnValue
 } from './types/typeGuards';
@@ -1099,7 +1100,11 @@ export class ASTBuilder implements CVisitor<any> {
       );
     }
 
-    const processedDeclarator = this.visitDeclarator(declarator);
+    let processedDeclarator = this.visitDeclarator(declarator);
+    // If the function returns a pointer, dig one level down.
+    if (isPointerPattern(processedDeclarator)) {
+      processedDeclarator = processedDeclarator.pattern;
+    }
     if (!isFunctionPattern(processedDeclarator)) {
       throw new BrokenInvariantError(
         'Encountered an invalid Declarator for a FunctionDefinition'
