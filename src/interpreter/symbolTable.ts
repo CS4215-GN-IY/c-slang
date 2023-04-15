@@ -323,7 +323,7 @@ const addDeclarationSymbolTableEntries = (
       };
       offset +=
         getFixedNumOfItemsOfDeclaratorPattern(declarator.pattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        declaration.dataType.sizeInBytes;
     } else if (isPointerPattern(declarator.pattern)) {
       const dataType = constructAddressDataType(declaration.dataType);
       entry = {
@@ -335,7 +335,7 @@ const addDeclarationSymbolTableEntries = (
       };
       offset +=
         getFixedNumOfItemsOfDeclaratorPattern(declarator.pattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        dataType.sizeInBytes;
     } else {
       entry = {
         name: getNameFromDeclaratorPattern(declarator.pattern),
@@ -346,7 +346,7 @@ const addDeclarationSymbolTableEntries = (
       };
       offset +=
         getFixedNumOfItemsOfDeclaratorPattern(declarator.pattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        declaration.dataType.sizeInBytes;
     }
     addToFrame(symbolTableFrame, entry);
   });
@@ -368,7 +368,7 @@ const addParameterDeclarationSymbolTableEntries = (
       const dataType = constructAddressDataType(parameterDeclaration.dataType);
       offset -=
         getFixedNumOfItemsOfDeclaratorPattern(declaratorPattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        dataType.sizeInBytes;
       functionEntry.paramDataTypes.push(dataType);
       entry = {
         name: getNameFromDeclaratorPattern(declaratorPattern),
@@ -383,7 +383,7 @@ const addParameterDeclarationSymbolTableEntries = (
       const dataType = constructAddressDataType(parameterDeclaration.dataType);
       offset -=
         getFixedNumOfItemsOfDeclaratorPattern(declaratorPattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        dataType.sizeInBytes;
       functionEntry.paramDataTypes.push(dataType);
       entry = {
         name: getNameFromDeclaratorPattern(declaratorPattern),
@@ -395,7 +395,7 @@ const addParameterDeclarationSymbolTableEntries = (
     } else {
       offset -=
         getFixedNumOfItemsOfDeclaratorPattern(declaratorPattern) *
-        ADDRESS_SIZE_IN_BYTES;
+        parameterDeclaration.dataType.sizeInBytes;
       functionEntry.paramDataTypes.push(parameterDeclaration.dataType);
       entry = {
         name: getNameFromDeclaratorPattern(declaratorPattern),

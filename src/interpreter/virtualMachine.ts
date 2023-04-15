@@ -245,7 +245,7 @@ const virtualMachineEvaluators: VirtualMachineMapping = {
     // Push arguments to function onto the stack.
     args.reverse().forEach((arg) => {
       state.memory.set(arg.dataType, state.registers.rsp, arg.value);
-      state.registers.rsp += ADDRESS_SIZE_IN_BYTES;
+      state.registers.rsp += arg.dataType.sizeInBytes;
     });
     // Push saved rbp onto the stack.
     state.memory.set(
