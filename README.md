@@ -2,6 +2,8 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/CS4215-GN-IY/c-slang/badge.svg?branch=master)](https://coveralls.io/github/CS4215-GN-IY/c-slang?branch=master)
 
+An interpreter for C that is implemented in TypeScript.
+
 # Getting Started
 
 1. Install nodenv by following the instructions [here](https://github.com/nodenv/nodenv#installation).
@@ -20,20 +22,29 @@
 
 # Usage
 
-1. To build,
+The interpreter can be used as either a standalone read-eval-print loop (REPL) or as a package.
+
+## REPL
+
+1. Build the project.
    ```sh
    yarn build
    ```
-1. Add \"c-slang\" to your PATH
-   ```sh
-   cd dist
-   yarn link
-   ```
-1. To start the repl, run
-   ```sh
-   c-slang
-   ```
-   Or if you did not do step 2, run
+1. To start the REPL, run:
    ```sh
    node dist/repl/repl.js
    ```
+
+## Package
+
+1. Add c-slang as a dependency via this repository:
+   ```sh
+   yarn add https://github.com/CS4215-GN-IY/c-slang
+   ```
+
+# Testing
+
+The test suite can be run via the command:
+```sh
+yarn test
+```
