@@ -120,7 +120,7 @@ export const addFunctionSymbolTableEntries = (
     });
   }
 
-  functionEntry.totalSizeOfVariablesInBytes += offset;
+  functionEntry.totalSizeOfVariablesInBytes = offset;
 
   return {
     head: frame,
